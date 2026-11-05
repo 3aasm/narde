@@ -4,8 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DICE</title>
-    <!-- ربط الأيقونة المصغرة للتطبيق -->
-    <link rel="icon" type="image/png" href="narde.png">
+    <!-- إعدادات تطبيق الويب التقدمي (PWA) والأيقونة المصغرة لسطح المكتب للآيفون والأندرويد -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MYDICE">
+    <meta name="application-name" content="MYDICE">
+    <meta name="theme-color" content="#121415">
+    <link id="appFavicon" rel="icon" type="image/png" sizes="512x512" href="https://3aasm.github.io/narde/narde.png">
+    <link id="appShortcutIcon" rel="shortcut icon" type="image/png" href="https://3aasm.github.io/narde/narde.png">
+    <link id="appAppleIcon" rel="apple-touch-icon" sizes="180x180" href="https://3aasm.github.io/narde/narde.png">
+    <link id="appAppleIconPre" rel="apple-touch-icon-precomposed" href="https://3aasm.github.io/narde/narde.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- خطوط هندسية مطابقة لنمط الصورة (Plus Jakarta Sans للأرقام واللاتيني + Readex Pro للعربي) -->
@@ -3625,8 +3634,122 @@
             });
         }
 
+        // تجهيز وتوليد أيقونة سطح المكتب (Home Screen Icon) وملف Web Manifest لضمان ظهورها في آيفون وأندرويد
+        function setupHomeScreenAppIcon() {
+            const remoteIconUrl = new URL('narde.png', 'https://3aasm.github.io/narde/').href;
+
+            // دالة رسم أيقونة احتياطية عالية الدقة 512x512 في حال تعذر تحميل narde.png
+            function generateFallbackIconDataUrl() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                // خلفية داكنة فاخرة مطابقة لهوية التطبيق
+                const grad = ctx.createLinearGradient(0, 0, 512, 512);
+                grad.addColorStop(0, '#22262a');
+                grad.addColorStop(1, '#121415');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(0, 0, 512, 512, 115);
+                ctx.fill();
+
+                // إطار داخلي بلون النعناع
+                ctx.strokeStyle = 'rgba(149, 230, 184, 0.35)';
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.roundRect(28, 28, 456, 456, 92);
+                ctx.stroke();
+
+                // مربع النرد الأوسط
+                ctx.fillStyle = '#1d2022';
+                ctx.beginPath();
+                ctx.roundRect(106, 106, 300, 300, 68);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+                ctx.lineWidth = 6;
+                ctx.stroke();
+
+                // نقاط النرد الخمس (الوسطى باللون الأخضر النعناعي والأركان بالأبيض)
+                const drawPip = (x, y, r, color, glow = false) => {
+                    ctx.save();
+                    if (glow) {
+                        ctx.shadowColor = '#95e6b8';
+                        ctx.shadowBlur = 24;
+                    }
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                };
+
+                drawPip(176, 176, 24, '#ffffff');
+                drawPip(336, 176, 24, '#ffffff');
+                drawPip(256, 256, 30, '#95e6b8', true);
+                drawPip(176, 336, 24, '#ffffff');
+                drawPip(336, 336, 24, '#ffffff');
+
+                return canvas.toDataURL('image/png');
+            }
+
+            const applyIconsAndManifest = (finalIconHref) => {
+                ['appFavicon', 'appShortcutIcon', 'appAppleIcon', 'appAppleIconPre'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.href = finalIconHref;
+                });
+
+                const manifestObj = {
+                    name: 'DICEROLL™ — Smart Roller',
+                    short_name: 'MYDICE',
+                    description: 'النرد الذكي ونظام بنك المونوبولي الفوري',
+                    start_url: window.location.href,
+                    display: 'standalone',
+                    orientation: 'portrait',
+                    background_color: '#121415',
+                    theme_color: '#121415',
+                    icons: [
+                        { src: finalIconHref, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+                        { src: finalIconHref, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+                    ]
+                };
+
+                const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+                const manifestUrl = URL.createObjectURL(manifestBlob);
+                let manifestLink = document.getElementById('appWebManifest');
+                if (!manifestLink) {
+                    manifestLink = document.createElement('link');
+                    manifestLink.id = 'appWebManifest';
+                    manifestLink.rel = 'manifest';
+                    document.head.appendChild(manifestLink);
+                }
+                manifestLink.href = manifestUrl;
+            };
+
+            // التحقق من تحميل صورة narde.png وإن لم تتوفر يتم اعتماد الأيقونة المولدة عالية الدقة
+            const testImg = new Image();
+            testImg.crossOrigin = 'anonymous';
+            testImg.onload = function () {
+                try {
+                    const c = document.createElement('canvas');
+                    c.width = 512;
+                    c.height = 512;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(testImg, 0, 0, 512, 512);
+                    applyIconsAndManifest(c.toDataURL('image/png'));
+                } catch (e) {
+                    applyIconsAndManifest(remoteIconUrl);
+                }
+            };
+            testImg.onerror = function () {
+                applyIconsAndManifest(generateFallbackIconDataUrl());
+            };
+            testImg.src = remoteIconUrl;
+        }
+
         // التهيئة عند التشغيل
         window.onload = function () {
+            setupHomeScreenAppIcon();
             lockNativeAppViewport();
             build3DCube('cube1');
             build3DCube('cube2');
