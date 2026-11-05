@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICEROLL™ — Smart Roller</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- خطوط هندسية مطابقة لنمط الصورة (Plus Jakarta Sans للأرقام واللاتيني + Readex Pro للعربي) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Readex+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- أيقونات خطية رفيعة Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --bg-main: #121415;
+            --bg-card: #1d2022;
+            --bg-pill: #262a2d;
+            --mint: #95e6b8;
+            --text-main: #ffffff;
+            --text-muted: #7c8288;
+            --cube-size: 98px;
+            --cube-half: 49px;
+        }
+
+        body {
+            font-family: 'Readex Pro', 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0c0d;
+            color: var(--text-main);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .num-font {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* حاوية التطبيق بنمط الهاتف العصري */
+        .app-shell {
+            background-color: var(--bg-main);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.75);
+        }
+
+        /* البطاقات المطفية الناعمة */
+        .matte-card {
+            background-color: var(--bg-card);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* الشريط السفلي العائم (Dock) */
+        .floating-dock {
+            background: rgba(34, 38, 41, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 9999px;
+        }
+
+        /* إعدادات مكعب النرد ثلاثي الأبعاد بنفس الهوية الداكنة */
+        .scene {
+            width: var(--cube-size);
+            height: var(--cube-size);
+            perspective: 650px;
+            position: relative;
+        }
+
+        .scene.jumping {
+            animation: softBounce 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes softBounce {
+            0% { transform: translateY(0) scale(1); }
+            40% { transform: translateY(-38px) scale(1.1); }
+            75% { transform: translateY(-8px) scale(1.02); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: var(--cube-size);
+            height: var(--cube-size);
+            background: linear-gradient(145deg, #282c30 0%, #1b1e20 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 16%;
+            gap: 8%;
+            backface-visibility: hidden;
+        }
+
+        .face-1 { transform: rotateY(0deg) translateZ(var(--cube-half)); }
+        .face-6 { transform: rotateY(180deg) translateZ(var(--cube-half)); }
+        .face-2 { transform: rotateY(-90deg) translateZ(var(--cube-half)); }
+        .face-5 { transform: rotateY(90deg) translateZ(var(--cube-half)); }
+        .face-3 { transform: rotateX(-90deg) translateZ(var(--cube-half)); }
+        .face-4 { transform: rotateX(90deg) translateZ(var(--cube-half)); }
+
+        /* نقاط النرد (Pips) باللون الأبيض والنعناعي للرقم 1 */
+        .pip {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #ffffff;
+            align-self: center;
+        }
+
+        .face-1 .pip {
+            background-color: var(--mint);
+            box-shadow: 0 0 6px rgba(149, 230, 184, 0.6);
+        }
+
+        /* نقاط القوس العلوي */
+        .arc-dot {
+            transition: fill 0.35s ease, filter 0.35s ease;
+        }
+        .arc-dot.active {
+            fill: var(--mint);
+            filter: drop-shadow(0 0 4px rgba(149, 230, 184, 0.75));
+        }
+
+        /* أنميشن إخفاء العناصر للتركيز */
+        .collapsible-section {
+            transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        margin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            max-height: 300px;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            overflow: hidden;
+        }
+
+        .app-shell.focus-mode .collapsible-section {
+            opacity: 0;
+            max-height: 0;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            transform: translateY(-12px) scale(0.96);
+            pointer-events: none;
+        }
+
+        .center-stage {
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), margin 0.45s ease;
+        }
+
+        .app-shell.focus-mode .center-stage {
+            transform: scale(1.06);
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        /* حركة زر الرمي عند الضغط */
+        .roll-trigger:active {
+            transform: scale(0.92);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-6">
+
+    <!-- الواجهة الرئيسية (تأخذ شكل شاشة الموبايل في الصورة) -->
+    <main id="appShell" class="app-shell w-full max-w-[410px] min-h-screen sm:min-h-[820px] sm:rounded-[48px] p-6 flex flex-col justify-between relative overflow-hidden">
+
+        <!-- القسم العلوي: الهيدر + العنوان + أزرار اختيار (حجر / حجرين) -->
+        <div id="topSection" class="collapsible-section">
+            <!-- الشريط العلوي البسيط -->
+            <header class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-2" dir="ltr">
+                    <i class="ph-fill ph-lightning text-[#95e6b8] text-lg"></i>
+                    <span class="num-font font-bold text-xs tracking-[0.18em] text-white">MYDICE.</span>
+                </div>
+
+                <!-- زر الصوت الدائري ورمز الحالة -->
+                <div class="flex items-center gap-2">
+                    <button id="soundBtn" onclick="toggleSound()" class="w-11 h-11 rounded-full bg-[#1d2022] border border-white/5 flex items-center justify-center text-white/80 hover:text-white transition relative">
+                        <span id="soundDot" class="w-2 h-2 rounded-full bg-[#95e6b8] absolute top-1.5 right-1.5"></span>
+                        <i id="soundIcon" class="ph ph-bell-Simple text-lg"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- العنوان الرئيسي بخط رفيع وأنيق مثل ModuleOne™ في الصورة -->
+            <div class="mb-5 text-right">
+                <h1 class="text-[28px] font-light tracking-tight text-white leading-tight flex items-center justify-between">
+                    <span>محاكي النرد</span>
+                    <span class="num-font text-xs font-medium text-[#7c8288] tracking-widest uppercase">CubeOne™</span>
+                </h1>
+                <p class="text-xs text-[#7c8288] font-light mt-1">اختر نمط الرمي الفردي أو المزدوج</p>
+            </div>
+
+            <!-- كبسولات الاختيار البيضاوية (مطابقة لأزرار Produced / Exported في الصورة) -->
+            <div class="flex items-center gap-2.5">
+                <button id="pill1" onclick="setDiceCount(1)" class="flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-white text-[#121415] shadow-md">
+                    حجر واحد
+                </button>
+                <button id="pill2" onclick="setDiceCount(2)" class="flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-[#1d2022] text-[#7c8288] hover:text-white border border-white/[0.03]">
+                    حجرين معاً
+                </button>
+            </div>
+        </div>
+
+        <!-- القسم الأوسط: القوس المنقط + الدائرة المركزية + المكعبات -->
+        <div class="center-stage my-4 flex flex-col items-center justify-center relative">
+            
+            <!-- القوس المنقط والمؤشر الدائري (مثل 860 Wh في الصورة الوسطى) -->
+            <div class="relative w-[220px] h-[155px] flex items-center justify-center">
+                <!-- القوس المنقط SVG -->
+                <svg class="w-full h-full overflow-visible" viewBox="0 0 220 155">
+                    <!-- مسار دائري داخلي رفيع -->
+                    <circle cx="110" cy="105" r="56" fill="none" stroke="#222629" stroke-width="2" />
+                    <circle id="gaugeRing" cx="110" cy="105" r="56" fill="none" stroke="#ffffff" stroke-width="2"
+                        stroke-dasharray="240 360" stroke-dashoffset="60" stroke-linecap="round"
+                        transform="rotate(135 110 105)" class="transition-all duration-500" />
+                    
+                    <!-- مجموعة النقاط المضيئة حول القوس (يتم توليدها بالـ JS) -->
+                    <g id="arcDotsGroup"></g>
+
+                    <!-- أرقام الحد الأدنى والأقصى على جانبي القوس -->
+                    <text x="20" y="115" fill="#7c8288" font-size="11" class="num-font" text-anchor="middle">0</text>
+                    <text id="maxGaugeLabel" x="200" y="115" fill="#7c8288" font-size="11" class="num-font" text-anchor="middle">6</text>
+                </svg>
+
+                <!-- الرقم الكبير في منتصف الدائرة -->
+                <div class="absolute top-[64px] flex flex-col items-center justify-center text-center">
+                    <span id="totalValue" class="num-font text-4xl font-light text-white tracking-tight leading-none">1</span>
+                    <span id="statusLabel" class="text-[11px] text-[#7c8288] font-light mt-1">مجموع النرد</span>
+                </div>
+            </div>
+
+            <!-- حاوية المكعبات ثلاثية الأبعاد -->
+            <div class="flex items-center justify-center gap-6 my-2 min-h-[115px]">
+                <!-- النرد الأول -->
+                <div id="scene1" class="scene" onclick="triggerRoll()">
+                    <div id="cube1" class="cube"></div>
+                </div>
+
+                <!-- النرد الثاني -->
+                <div id="scene2" class="scene hidden" onclick="triggerRoll()">
+                    <div id="cube2" class="cube"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- القسم السفلي: بطاقتا القراءة + الشريط السفلي لرمي النرد -->
+        <div class="flex flex-col gap-3.5">
+
+            <!-- بطاقتا عرض قيم الأحجار (مطابقة لبطاقتي 200 KW/H و 120 KW/H في الصورة) -->
+            <div id="statsSection" class="collapsible-section grid grid-cols-2 gap-3">
+                <!-- بطاقة الحجر الأول -->
+                <div class="matte-card p-4 flex flex-col justify-between h-[112px]">
+                    <div class="flex justify-between items-start">
+                        <span class="w-2 h-2 rounded-full bg-[#95e6b8] mt-1"></span>
+                        <div class="w-9 h-9 rounded-full bg-[#262a2d] flex items-center justify-center text-white/75">
+                            <i class="ph ph-dice-one text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1" dir="ltr">
+                            <span id="die1Stat" class="num-font text-2xl font-normal text-white">1</span>
+                            <span class="num-font text-[10px] text-[#7c8288] uppercase tracking-wider">PTS</span>
+                        </div>
+                        <p class="text-[11px] text-[#7c8288] font-light mt-0.5">الحجر الأول</p>
+                    </div>
+                </div>
+
+                <!-- بطاقة الحجر الثاني -->
+                <div id="die2Card" class="matte-card p-4 flex flex-col justify-between h-[112px] opacity-45 transition-opacity duration-300">
+                    <div class="flex justify-between items-start">
+                        <span id="doubleBadge" class="hidden text-[10px] bg-[#95e6b8] text-[#121415] font-medium px-2 py-0.5 rounded-full">تطابق</span>
+                        <span id="die2Dot" class="w-2 h-2 rounded-full bg-white/20 mt-1"></span>
+                        <div class="w-9 h-9 rounded-full bg-[#262a2d] flex items-center justify-center text-white/75">
+                            <i class="ph ph-dice-two text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-1" dir="ltr">
+                            <span id="die2Stat" class="num-font text-2xl font-normal text-white">—</span>
+                            <span class="num-font text-[10px] text-[#7c8288] uppercase tracking-wider">PTS</span>
+                        </div>
+                        <p class="text-[11px] text-[#7c8288] font-light mt-0.5">الحجر الثاني</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الشريط السفلي الخاص بالصفحات (مخصص لزر رمي النرد كما طلبت) -->
+            <div class="floating-dock p-2 flex items-center justify-between mt-1">
+                
+                <!-- زر التبديل السريع لعدد الأحجار -->
+                <button onclick="toggleModeQuick()" class="w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition" title="تبديل حجر / حجرين">
+                    <i id="quickModeIcon" class="ph ph-number-circle-one text-xl"></i>
+                </button>
+
+                <!-- زر رمي النرد الرئيسي في الشريط السفلي (الدائرة البيضاء البارزة مثل الصورة) -->
+                <button id="rollDockBtn" onclick="triggerRoll()" class="roll-trigger flex-1 mx-2 bg-white hover:bg-[#f2f4f5] text-[#121415] h-12 rounded-full flex items-center justify-center gap-2.5 shadow-lg transition-all duration-200">
+                    <i id="rollBtnIcon" class="ph-fill ph-dice-five text-xl"></i>
+                    <span class="text-xs font-semibold tracking-wide">رمي النرد</span>
+                </button>
+
+                <!-- زر إخفاء/إظهار الواجهة للتركيز -->
+                <button id="focusBtn" onclick="toggleFocusMode()" class="w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition-all duration-300" title="وضع التركيز (إخفاء/إظهار العناصر)">
+                    <i id="focusIcon" class="ph ph-eye-slash text-lg transition-transform duration-300"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // حالة التطبيق
+        let diceCount = 1;
+        let isRolling = false;
+        let soundEnabled = true;
+        let focusMode = false;
+        let val1 = 1;
+        let val2 = 6;
+
+        // تخطيط النقاط لأوجه النرد (شبكة 3x3)
+        const pipLayouts = {
+            1: [4],
+            2: [0, 8],
+            3: [0, 4, 8],
+            4: [0, 2, 6, 8],
+            5: [0, 2, 4, 6, 8],
+            6: [0, 2, 3, 5, 6, 8]
+        };
+
+        // تتبع زوايا دوران المكعبات
+        const rotations = {
+            cube1: { x: 0, y: 0 },
+            cube2: { x: 0, y: 0 }
+        };
+
+        // زوايا الأوجه الستة
+        const faceTargets = {
+            1: { x: 0,   y: 0 },
+            6: { x: 0,   y: 180 },
+            2: { x: 0,   y: 90 },
+            5: { x: 0,   y: -90 },
+            3: { x: 90,  y: 0 },
+            4: { x: -90, y: 0 }
+        };
+
+        // إنشاء نقاط القوس العلوي (متطابقة تماماً بالحجم والمكان)
+        function createArcDots() {
+            const group = document.getElementById('arcDotsGroup');
+            group.innerHTML = '';
+            const totalDots = 19;
+            const radius = 78;
+            const centerX = 110;
+            const centerY = 105;
+
+            for (let i = 0; i < totalDots; i++) {
+                const angleDeg = 180 - (i * (180 / (totalDots - 1)));
+                const angleRad = (angleDeg * Math.PI) / 180;
+                const x = centerX + radius * Math.cos(angleRad);
+                const y = centerY - radius * Math.sin(angleRad);
+
+                const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot.setAttribute('cx', x.toFixed(2));
+                dot.setAttribute('cy', y.toFixed(2));
+                dot.setAttribute('r', '2.8');
+                dot.setAttribute('fill', '#2a2f33');
+                dot.setAttribute('class', 'arc-dot');
+                dot.setAttribute('id', `arc-dot-${i}`);
+                group.appendChild(dot);
+            }
+        }
+
+        // تحديث إضاءة نقاط القوس العلوي والحلقة الداخلية بناءً على النتيجة
+        function updateArcGauge(score, maxPossible) {
+            const totalDots = 19;
+            const ratio = Math.min(Math.max(score / maxPossible, 0), 1);
+            const activeCount = Math.round(ratio * totalDots);
+
+            for (let i = 0; i < totalDots; i++) {
+                const dot = document.getElementById(`arc-dot-${i}`);
+                if (!dot) continue;
+                if (i < activeCount) {
+                    dot.setAttribute('fill', '#95e6b8');
+                    dot.classList.add('active');
+                } else {
+                    dot.setAttribute('fill', '#2a2f33');
+                    dot.classList.remove('active');
+                }
+            }
+
+            const gaugeRing = document.getElementById('gaugeRing');
+            if (gaugeRing) {
+                const maxArcLength = 264;
+                const currentArc = Math.max(12, ratio * maxArcLength);
+                gaugeRing.setAttribute('stroke-dasharray', `${currentArc} 360`);
+            }
+        }
+
+        // بناء المكعب ثلاثي الأبعاد
+        function createCubeFaces(cubeId) {
+            const cube = document.getElementById(cubeId);
+            cube.innerHTML = '';
+            for (let f = 1; f <= 6; f++) {
+                const face = document.createElement('div');
+                face.className = `cube-face face-${f}`;
+                const pips = pipLayouts[f];
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'w-full h-full flex items-center justify-center';
+                    if (pips.includes(i)) {
+                        const pip = document.createElement('div');
+                        pip.className = 'pip';
+                        cell.appendChild(pip);
+                    }
+                    face.appendChild(cell);
+                }
+                cube.appendChild(face);
+            }
+        }
+
+        // مؤثرات صوتية ناعمة (Soft UI Clicks)
+        let audioCtx = null;
+        function playSoftTicks() {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const times = [0, 0.09, 0.19, 0.31, 0.45, 0.62];
+                times.forEach((t, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320 + i * 45, audioCtx.currentTime + t);
+                    osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + t + 0.04);
+
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime + t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.045);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + t);
+                    osc.stop(audioCtx.currentTime + t + 0.05);
+                });
+            } catch (e) {}
+        }
+
+        // تدوير المكعب إلى الرقم المحدد
+        function spinCubeTo(cubeId, number) {
+            const cube = document.getElementById(cubeId);
+            const target = faceTargets[number];
+
+            const spinsX = (Math.floor(Math.random() * 2) + 2) * 360;
+            const spinsY = (Math.floor(Math.random() * 2) + 2) * 360;
+
+            const modX = ((rotations[cubeId].x % 360) + 360) % 360;
+            const modY = ((rotations[cubeId].y % 360) + 360) % 360;
+
+            rotations[cubeId].x += spinsX + (target.x - modX);
+            rotations[cubeId].y += spinsY + (target.y - modY);
+
+            cube.style.transform = `rotateX(${rotations[cubeId].x}deg) rotateY(${rotations[cubeId].y}deg)`;
+        }
+
+        // اختيار عدد الأحجار (1 أو 2)
+        function setDiceCount(count) {
+            if (isRolling || diceCount === count) return;
+            diceCount = count;
+
+            const pill1 = document.getElementById('pill1');
+            const pill2 = document.getElementById('pill2');
+            const scene2 = document.getElementById('scene2');
+            const die2Card = document.getElementById('die2Card');
+            const maxGaugeLabel = document.getElementById('maxGaugeLabel');
+            const quickModeIcon = document.getElementById('quickModeIcon');
+
+            if (count === 1) {
+                pill1.className = "flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-white text-[#121415] shadow-md";
+                pill2.className = "flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-[#1d2022] text-[#7c8288] hover:text-white border border-white/[0.03]";
+                scene2.classList.add('hidden');
+                die2Card.classList.add('opacity-45');
+                document.getElementById('die2Stat').textContent = '—';
+                document.getElementById('doubleBadge').classList.add('hidden');
+                document.getElementById('die2Dot').classList.remove('hidden');
+                maxGaugeLabel.textContent = '6';
+                quickModeIcon.className = 'ph ph-number-circle-one text-xl';
+                document.getElementById('totalValue').textContent = val1;
+                updateArcGauge(val1, 6);
+            } else {
+                pill2.className = "flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-white text-[#121415] shadow-md";
+                pill1.className = "flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-[#1d2022] text-[#7c8288] hover:text-white border border-white/[0.03]";
+                scene2.classList.remove('hidden');
+                die2Card.classList.remove('opacity-45');
+                document.getElementById('die2Stat').textContent = val2;
+                maxGaugeLabel.textContent = '12';
+                quickModeIcon.className = 'ph ph-number-circle-two text-xl text-[#95e6b8]';
+                const sum = val1 + val2;
+                document.getElementById('totalValue').textContent = sum;
+                updateArcGauge(sum, 12);
+            }
+        }
+
+        // تبديل سريع من الزر الجانبي في الشريط السفلي
+        function toggleModeQuick() {
+            setDiceCount(diceCount === 1 ? 2 : 1);
+        }
+
+        // رمي النرد
+        function triggerRoll() {
+            if (isRolling) return;
+            isRolling = true;
+
+            const rollBtnIcon = document.getElementById('rollBtnIcon');
+            const scene1 = document.getElementById('scene1');
+            const scene2 = document.getElementById('scene2');
+
+            rollBtnIcon.classList.add('animate-spin');
+
+            val1 = Math.floor(Math.random() * 6) + 1;
+            val2 = diceCount === 2 ? (Math.floor(Math.random() * 6) + 1) : 0;
+
+            scene1.classList.remove('jumping');
+            void scene1.offsetWidth;
+            scene1.classList.add('jumping');
+            spinCubeTo('cube1', val1);
+
+            if (diceCount === 2) {
+                scene2.classList.remove('jumping');
+                void scene2.offsetWidth;
+                scene2.classList.add('jumping');
+                spinCubeTo('cube2', val2);
+            }
+
+            playSoftTicks();
+
+            setTimeout(() => {
+                const total = diceCount === 2 ? (val1 + val2) : val1;
+                const maxVal = diceCount === 2 ? 12 : 6;
+                const isDouble = (diceCount === 2 && val1 === val2);
+
+                document.getElementById('totalValue').textContent = total;
+                document.getElementById('die1Stat').textContent = val1;
+
+                if (diceCount === 2) {
+                    document.getElementById('die2Stat').textContent = val2;
+                    if (isDouble) {
+                        document.getElementById('doubleBadge').classList.remove('hidden');
+                        document.getElementById('die2Dot').classList.add('hidden');
+                    } else {
+                        document.getElementById('doubleBadge').classList.add('hidden');
+                        document.getElementById('die2Dot').classList.remove('hidden');
+                    }
+                }
+
+                updateArcGauge(total, maxVal);
+                rollBtnIcon.classList.remove('animate-spin');
+                isRolling = false;
+            }, 850);
+        }
+
+        // تفعيل/إلغاء وضع التركيز (إخفاء كل شيء ما عدا المجموع والنرد والشريط السفلي)
+        function toggleFocusMode() {
+            focusMode = !focusMode;
+            const appShell = document.getElementById('appShell');
+            const focusBtn = document.getElementById('focusBtn');
+            const focusIcon = document.getElementById('focusIcon');
+
+            if (focusMode) {
+                appShell.classList.add('focus-mode');
+                focusBtn.className = "w-12 h-12 rounded-full bg-[#95e6b8] text-[#121415] flex items-center justify-center transition-all duration-300 shadow-md";
+                focusIcon.className = "ph-fill ph-eye text-lg scale-110 transition-transform duration-300";
+            } else {
+                appShell.classList.remove('focus-mode');
+                focusBtn.className = "w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition-all duration-300";
+                focusIcon.className = "ph ph-eye-slash text-lg transition-transform duration-300";
+            }
+        }
+
+        // كتم/تشغيل الصوت
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const dot = document.getElementById('soundDot');
+            const icon = document.getElementById('soundIcon');
+            if (soundEnabled) {
+                dot.classList.remove('hidden');
+                icon.className = 'ph ph-bell-simple text-lg';
+            } else {
+                dot.classList.add('hidden');
+                icon.className = 'ph ph-bell-simple-slash text-lg text-[#7c8288]';
+            }
+        }
+
+        // دعم الرمي بمفتاح المسافة Spacebar
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+                triggerRoll();
+            }
+        });
+
+        // تهيئة الواجهة عند التحميل
+        window.onload = () => {
+            createArcDots();
+            createCubeFaces('cube1');
+            createCubeFaces('cube2');
+            updateArcGauge(1, 6);
+        };
+    </script>
+</body>
+</html>
