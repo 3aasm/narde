@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DICE</title>
     <!-- ربط الأيقونة المصغرة للتطبيق -->
     <link rel="icon" type="image/png" href="narde.png">
@@ -25,16 +25,37 @@
             --cube-half: 49px;
         }
 
-        body {
+        html, body {
             font-family: 'Readex Pro', 'Plus Jakarta Sans', sans-serif;
             background-color: #0b0c0d;
             color: var(--text-main);
             user-select: none;
+            -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior: none;
+            touch-action: none;
         }
 
         .num-font {
             font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* السماح بالتمرير العمودي فقط داخل القوائم المهمة المخصصة */
+        .custom-scroll {
+            touch-action: pan-y;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
+        }
+
+        /* السماح بالسحب الأفقي فقط لبطاقة الفيزا الذكية */
+        #adminSmartVisa {
+            touch-action: pan-x;
         }
 
         /* حاوية التطبيق بنمط الهاتف العصري */
@@ -252,10 +273,10 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-0 sm:p-6">
+<body class="h-full w-full flex items-center justify-center p-0 sm:p-6 overflow-hidden select-none">
 
     <!-- الواجهة الرئيسية (تأخذ شكل شاشة الموبايل في الصورة) -->
-    <main id="appShell" class="app-shell w-full max-w-[410px] min-h-screen sm:min-h-[820px] sm:rounded-[48px] p-6 flex flex-col justify-between relative overflow-hidden">
+    <main id="appShell" class="app-shell w-full max-w-[410px] h-full sm:h-[820px] sm:max-h-[92vh] sm:rounded-[48px] p-6 flex flex-col justify-between relative overflow-hidden">
 
         <!-- القسم العلوي: الهيدر + العنوان + أزرار اختيار (حجر / حجرين) -->
         <div id="topSection" class="collapsible-section">
@@ -494,7 +515,27 @@
 
                         <!-- خياران: إنشاء غرفة أو دخول غرفة -->
                         <div class="space-y-2.5">
-                            <button onclick="createMonopolyRoom()" class="w-full py-3.5 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-semibold text-xs flex items-center justify-between shadow-lg transition active:scale-98">
+                            <!-- لافتة الدعوة السريعة عند مسح الباركود (تظهر تلقائياً عند وجود كود غرفة في الرابط) -->
+                            <div id="qrDirectJoinBanner" class="hidden matte-card p-4 border-2 border-[#95e6b8] bg-[#95e6b8]/10 space-y-3 shadow-lg">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-9 h-9 rounded-xl bg-[#95e6b8] text-[#121415] flex items-center justify-center font-bold shadow">
+                                            <i class="ph-fill ph-qr-code text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-white">تم مسح باركود الغرفة بنجاح!</div>
+                                            <div class="text-[10px] text-[#95e6b8]">أدخل اسمك واختر صورتك بالأعلى ثم اضغط دخول</div>
+                                        </div>
+                                    </div>
+                                    <span id="qrBannerRoomCode" class="num-font text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#121415] text-[#95e6b8] border border-[#95e6b8]/30 tracking-widest">#----</span>
+                                </div>
+                                <button onclick="joinMonopolyRoom()" class="w-full py-3 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                                    <i class="ph-bold ph-sign-in text-base"></i>
+                                    <span>ادخل للغرفة المباشرة الآن</span>
+                                </button>
+                            </div>
+
+                            <button id="createRoomMainBtn" onclick="createMonopolyRoom()" class="w-full py-3.5 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-semibold text-xs flex items-center justify-between shadow-lg transition active:scale-98">
                                 <div class="flex items-center gap-2.5">
                                     <i class="ph-fill ph-crown text-lg"></i>
                                     <div class="text-right">
@@ -729,21 +770,21 @@
                         </button>
                     </div>
 
-                    <!-- صورة الباركود لموقع https://3aasm.github.io/narde/ -->
+                    <!-- صورة الباركود لموقع https://3aasm.github.io/narde/ مع كود الغرفة التلقائي -->
                     <div class="bg-white p-3.5 rounded-3xl shadow-inner flex items-center justify-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=https%3A%2F%2F3aasm.github.io%2Fnarde%2F" 
+                        <img id="qrCodeDynamicImg" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=https%3A%2F%2F3aasm.github.io%2Fnarde%2F" 
                              alt="QR Code https://3aasm.github.io/narde/" 
                              class="w-44 h-44 object-contain rounded-xl" />
                     </div>
 
                     <div class="w-full bg-[#121415] border border-white/10 rounded-2xl px-3 py-2 flex items-center justify-between gap-2" dir="ltr">
-                        <span class="num-font text-[10.5px] text-[#95e6b8] truncate">https://3aasm.github.io/narde/</span>
+                        <span id="qrInviteUrlText" class="num-font text-[10.5px] text-[#95e6b8] truncate">https://3aasm.github.io/narde/</span>
                         <button onclick="copyGameUrl()" class="text-[10px] bg-[#262a2d] hover:bg-white/15 text-white px-2.5 py-1 rounded-lg transition shrink-0">
                             نسخ الرابط
                         </button>
                     </div>
 
-                    <p class="text-[10px] text-[#7c8288]">كود الغرفة الحالي للدخول: <strong id="qrModalRoomCode" class="num-font text-white tracking-widest">----</strong></p>
+                    <p class="text-[10px] text-[#7c8288]">عند مسح الباركود سيكتب اللاعب اسمه وصورته ويدخل الغرفة <strong id="qrModalRoomCode" class="num-font text-white tracking-widest">----</strong> مباشرة</p>
                 </div>
             </div>
 
@@ -1799,8 +1840,7 @@
                 codePill.classList.remove('hidden');
                 codePill.classList.add('flex');
                 document.getElementById('activeRoomCodeText').textContent = activeRoomCode || '----';
-                const qrRoomEl = document.getElementById('qrModalRoomCode');
-                if (qrRoomEl) qrRoomEl.textContent = activeRoomCode || '----';
+                updateQrCodeForActiveRoom();
 
                 // إظهار أيقونة الباركود الدائرية بجانب زر نسخ الكود في صفحة الأدمن
                 if (adminQrBtn) {
@@ -1825,16 +1865,71 @@
             }
         }
 
-        // نسخ رابط موقع اللعبة من نافذة الباركود
+        // تحديث صورة الباركود والرابط ليتضمن كود الغرفة الحالي للدخول السريع
+        function getDirectRoomInviteUrl() {
+            const baseUrl = 'https://3aasm.github.io/narde/';
+            return activeRoomCode ? `${baseUrl}?room=${activeRoomCode}` : baseUrl;
+        }
+
+        function updateQrCodeForActiveRoom() {
+            const inviteUrl = getDirectRoomInviteUrl();
+            const qrImg = document.getElementById('qrCodeDynamicImg');
+            const urlText = document.getElementById('qrInviteUrlText');
+            const qrRoomEl = document.getElementById('qrModalRoomCode');
+
+            if (qrImg) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=${encodeURIComponent(inviteUrl)}`;
+            }
+            if (urlText) {
+                urlText.textContent = inviteUrl;
+            }
+            if (qrRoomEl) {
+                qrRoomEl.textContent = activeRoomCode || '----';
+            }
+        }
+
+        // نسخ رابط موقع اللعبة مع كود الغرفة من نافذة الباركود
         function copyGameUrl() {
-            const url = 'https://3aasm.github.io/narde/';
+            const url = getDirectRoomInviteUrl();
             const temp = document.createElement('textarea');
             temp.value = url;
             document.body.appendChild(temp);
             temp.select();
             document.execCommand('copy');
             document.body.removeChild(temp);
-            showMonoToast('تم نسخ رابط اللعبة بنجاح');
+            showMonoToast('تم نسخ رابط الدعوة المباشر للغرفة');
+        }
+
+        // التحقق التلقائي عند فتح الرابط من الباركود (?room=XXXX) لفتح شاشة الاسم والصورة وتعبئة الكود مباشرة
+        function checkUrlForDirectRoomJoin() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const roomParam = (params.get('room') || '').trim();
+                if (roomParam && /^\d{4}$/.test(roomParam)) {
+                    // فتح نظام المونوبولي مباشرة
+                    openMonopolySystem();
+                    // تعبئة خانة الكود تلقائياً
+                    const joinInput = document.getElementById('joinRoomCodeInput');
+                    if (joinInput) joinInput.value = roomParam;
+
+                    // إظهار لافتة الانضمام المباشر للغرفة الممسوحة
+                    const qrBanner = document.getElementById('qrDirectJoinBanner');
+                    const qrBannerCode = document.getElementById('qrBannerRoomCode');
+                    if (qrBanner && qrBannerCode) {
+                        qrBannerCode.textContent = `#${roomParam}`;
+                        qrBanner.classList.remove('hidden');
+                    }
+
+                    // تركيز المؤشر في حقل اسم اللاعب ليسهل عليه كتابة اسمه فوراً
+                    setTimeout(() => {
+                        const nameInput = document.getElementById('playerNameInput');
+                        if (nameInput) nameInput.focus();
+                        showMonoToast(`مرحباً! اكتب اسمك واختر صورتك للدخول للغرفة #${roomParam}`);
+                    }, 350);
+                }
+            } catch (e) {
+                console.warn("URL room param check error:", e);
+            }
         }
 
         // إظهار نافذة تأكيد الخروج قبل مغادرة الغرفة
@@ -3274,8 +3369,33 @@
             showMonoToast(st.houses === 5 ? `مبارك! تم تشييد فندق في ${prop.arName}` : `تم بناء منزل (${st.houses}) في ${prop.arName}`);
         }
 
+        // منع سحب الشاشة أو ارتدادها في المتصفح (iOS / Android) خارج القوائم القابلة للتمرير
+        function lockNativeAppViewport() {
+            document.addEventListener('touchmove', function (e) {
+                // السماح بالسحب على بطاقة الفيزا الذكية لتبديلها
+                if (e.target.closest('#adminSmartVisa')) return;
+
+                // السماح بالتمرير فقط داخل الحاويات المهمة التي تحمل كلاس custom-scroll وبها محتوى أطول من مساحتها
+                const scrollable = e.target.closest('.custom-scroll');
+                if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
+                    return;
+                }
+
+                // منع أي تحريك عشوائي للشاشة في باقي أجزاء التطبيق
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // منع التكبير باللمس المزدوج أو القرص (Pinch Zoom) ليبقى كتطبيق حقيقي
+            document.addEventListener('gesturestart', function (e) {
+                e.preventDefault();
+            });
+        }
+
         // التهيئة عند التشغيل
         window.onload = function () {
+            lockNativeAppViewport();
             build3DCube('cube1');
             build3DCube('cube2');
             buildArcDots();
@@ -3283,6 +3403,7 @@
             rotateCubeTo(2, 6, false);
             updateArcGauge(1, 6);
             initMonopolyAuthUI();
+            checkUrlForDirectRoomJoin();
         };
     </script>
 </body>
