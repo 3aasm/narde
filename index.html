@@ -169,6 +169,87 @@
         .roll-trigger:active {
             transform: scale(0.92);
         }
+
+        /* ==========================================
+           إضافات وتصاميم نظام مونوبولي أونلاين
+           ========================================== */
+        .mono-view {
+            transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .mono-view.hidden-view {
+            opacity: 0;
+            transform: translateY(18px) scale(0.98);
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+        }
+        .mono-view.active-view {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* تصميم بطاقة سند التملك الحقيقية (مطابق للصورة المرفقة) */
+        .deed-card {
+            background-color: #f3f4ef;
+            color: #16181a;
+            border-radius: 10px;
+            padding: 7px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+            font-family: 'Plus Jakarta Sans', 'Readex Pro', sans-serif;
+            position: relative;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            user-select: none;
+        }
+        .deed-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.6);
+        }
+        .deed-inner {
+            border: 1.5px solid #22252a;
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+        .deed-header {
+            border: 1.5px solid #22252a;
+            padding: 6px 4px;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .deed-mortgaged-overlay {
+            background: rgba(15, 17, 19, 0.82);
+            backdrop-filter: blur(2px);
+        }
+
+        /* تصميم بطاقة الفيزا الذكية القابلة للسحب */
+        .visa-card-bank {
+            background: linear-gradient(135deg, #1f2427 0%, #141719 55%, #24382e 100%);
+            border: 1px solid rgba(149, 230, 184, 0.28);
+            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.55);
+        }
+        .visa-card-personal {
+            background: linear-gradient(135deg, #23272b 0%, #16181b 55%, #2b323c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.55);
+        }
+
+        /* شريط التمرير المخصص للغرف والمودالات */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-0 sm:p-6">
@@ -185,11 +266,22 @@
                     <span class="num-font font-bold text-xs tracking-[0.18em] text-white">MYDICE.</span>
                 </div>
 
-                <!-- زر الصوت الدائري ورمز الحالة -->
+                <!-- زر نظام المونوبولي + زر تحميل اللعبة + زر الصوت الدائري -->
                 <div class="flex items-center gap-2">
+                    <button id="monopolyNavBtn" onclick="openMonopolySystem()" class="h-11 px-3.5 rounded-full bg-[#1d2022] border border-[#95e6b8]/25 flex items-center gap-2 text-white hover:bg-[#262a2d] active:scale-95 transition relative shadow-sm" title="نظام مونوبولي أونلاين">
+                        <span class="w-2 h-2 rounded-full bg-[#95e6b8] animate-pulse"></span>
+                        <i class="ph-fill ph-bank text-[#95e6b8] text-lg"></i>
+                        <span class="text-[11px] font-medium text-white/90">مونوبولي</span>
+                    </button>
+
+                    <!-- زر تحميل اللعبة الدائري لتثبيتها على الشاشة الرئيسية -->
+                    <button id="installAppNavBtn" onclick="openInstallGuideModal()" class="w-11 h-11 rounded-full bg-[#1d2022] border border-white/10 hover:border-[#95e6b8]/40 flex items-center justify-center text-[#95e6b8] hover:text-white hover:bg-[#262a2d] active:scale-95 transition relative shadow-sm" title="تحميل وتثبيت اللعبة">
+                        <i class="ph ph-download-simple text-lg"></i>
+                    </button>
+
                     <button id="soundBtn" onclick="toggleSound()" class="w-11 h-11 rounded-full bg-[#1d2022] border border-white/5 flex items-center justify-center text-white/80 hover:text-white transition relative">
                         <span id="soundDot" class="w-2 h-2 rounded-full bg-[#95e6b8] absolute top-1.5 right-1.5"></span>
-                        <i id="soundIcon" class="ph ph-bell-Simple text-lg"></i>
+                        <i id="soundIcon" class="ph ph-bell-simple text-lg"></i>
                     </button>
                 </div>
             </header>
@@ -197,7 +289,7 @@
             <!-- العنوان الرئيسي بخط رفيع وأنيق مثل ModuleOne™ في الصورة -->
             <div class="mb-5 text-right">
                 <h1 class="text-[28px] font-light tracking-tight text-white leading-tight flex items-center justify-between">
-                    <span>محاكي النرد</span>
+                    <span class="num-font font-semibold tracking-wider">DICE</span>
                     <span class="num-font text-xs font-medium text-[#7c8288] tracking-widest uppercase">CubeOne™</span>
                 </h1>
                 <p class="text-xs text-[#7c8288] font-light mt-1">اختر نمط الرمي الفردي أو المزدوج</p>
@@ -321,35 +413,814 @@
 
         </div>
 
+        <!-- ==========================================================
+             نظام مونوبولي أونلاين (البنك الذكي وإدارة العقارات)
+             ========================================================== -->
+        <div id="monopolyOverlay" class="fixed sm:absolute inset-0 bg-[#121415] z-40 flex flex-col justify-between p-5 overflow-hidden transition-all duration-500 opacity-0 pointer-events-none translate-y-6">
+            
+            <!-- شريط علوي مشترك لنظام المونوبولي -->
+            <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] shrink-0">
+                <div class="flex items-center gap-2">
+                    <button onclick="closeMonopolySystem()" class="w-9 h-9 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition" title="العودة للنرد">
+                        <i class="ph ph-dice-five text-lg text-[#95e6b8]"></i>
+                    </button>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-semibold text-white">مونوبولي باي</span>
+                            <span id="connBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-[#95e6b8]/15 text-[#95e6b8] num-font">متصل</span>
+                        </div>
+                        <p id="roomSubHeader" class="text-[10px] text-[#7c8288]">إدارة الأموال والعقارات الفورية</p>
+                    </div>
+                </div>
+
+                <!-- شارة كود الغرفة + زر باركود اللعبة للأدمن + زر الخروج الدائري -->
+                <div class="flex items-center gap-1.5">
+                    <div id="roomCodePill" onclick="copyRoomCode()" class="hidden cursor-pointer items-center gap-1.5 bg-[#1d2022] hover:bg-[#262a2d] border border-[#95e6b8]/30 px-3 py-1.5 rounded-full transition active:scale-95" title="انسخ كود الغرفة">
+                        <span class="text-[10px] text-[#7c8288]">كود:</span>
+                        <span id="activeRoomCodeText" class="num-font text-xs font-bold text-[#95e6b8] tracking-widest">----</span>
+                        <i class="ph ph-copy text-xs text-white/60"></i>
+                    </div>
+
+                    <!-- أيقونة دائرية بجانب زر نسخ الكود لصفحة الأدمن لإظهار باركود موقع اللعبة -->
+                    <button id="adminQrBtn" onclick="openModal('qrCodeModal')" class="hidden w-9 h-9 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-[#95e6b8]/35 items-center justify-center text-[#95e6b8] transition active:scale-95 shadow-sm" title="باركود موقع اللعبة">
+                        <i class="ph ph-qr-code text-base"></i>
+                    </button>
+
+                    <button id="headerLeaveRoomBtn" onclick="promptLeaveRoom()" class="hidden w-9 h-9 rounded-full bg-[#1d2022] hover:bg-red-500/15 border border-white/10 hover:border-red-500/30 items-center justify-center text-red-400 transition active:scale-95" title="مغادرة الغرفة">
+                        <i class="ph ph-sign-out text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- حاوية الصفحات المتعددة داخل المونوبولي -->
+            <div class="relative flex-1 overflow-hidden my-2">
+
+                <!-- 1. صفحة الدخول والتحقق (للجميع) -->
+                <div id="monoAuthView" class="mono-view active-view h-full flex flex-col justify-between overflow-y-auto custom-scroll pr-0.5">
+                    <div class="space-y-4 my-auto py-2">
+                        <div class="text-center">
+                            <div class="w-14 h-14 rounded-3xl bg-[#1d2022] border border-[#95e6b8]/25 flex items-center justify-center mx-auto mb-2.5 shadow-lg">
+                                <i class="ph-fill ph-bank text-2xl text-[#95e6b8]"></i>
+                            </div>
+                            <h2 class="text-lg font-medium text-white">بطاقة الهوية البنكية</h2>
+                            <p class="text-[11px] text-[#7c8288] mt-0.5">أدخل اسمك واختر صورتك الشخصية للبدء</p>
+                        </div>
+
+                        <!-- اختيار الصورة الشخصية (أفاتار أو رفع من الجهاز) -->
+                        <div class="matte-card p-4 space-y-3">
+                            <div class="flex items-center gap-3.5">
+                                <div class="relative w-16 h-16 rounded-2xl bg-[#262a2d] border-2 border-[#95e6b8] overflow-hidden shrink-0 flex items-center justify-center shadow-md">
+                                    <img id="selectedAvatarPreview" src="" alt="Avatar" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="flex-1">
+                                    <label class="text-[11px] text-[#7c8288] block mb-1.5">اختر أفاتار جاهز أو ارفع صورتك</label>
+                                    <label class="inline-flex items-center gap-1.5 text-[11px] bg-[#262a2d] hover:bg-[#303539] text-white px-3 py-1.5 rounded-full cursor-pointer transition border border-white/10">
+                                        <i class="ph ph-upload-simple text-[#95e6b8]"></i>
+                                        <span>رفع صورة من الجهاز</span>
+                                        <input type="file" id="avatarFileInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- قائمة الأفاتارات الجاهزة -->
+                            <div id="presetAvatarsRow" class="flex items-center justify-between gap-1.5 pt-1"></div>
+
+                            <!-- إدخال اسم اللاعب -->
+                            <div class="pt-1">
+                                <label class="text-[11px] text-[#7c8288] block mb-1">اسم اللاعب</label>
+                                <input id="playerNameInput" type="text" maxlength="18" placeholder="مثال: الوليد، سارة..." class="w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-2xl px-3.5 py-2.5 text-xs text-white outline-none transition" />
+                            </div>
+                        </div>
+
+                        <!-- خياران: إنشاء غرفة أو دخول غرفة -->
+                        <div class="space-y-2.5">
+                            <button onclick="createMonopolyRoom()" class="w-full py-3.5 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-semibold text-xs flex items-center justify-between shadow-lg transition active:scale-98">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="ph-fill ph-crown text-lg"></i>
+                                    <div class="text-right">
+                                        <div class="font-bold">إنشاء غرفة مونوبولي جديدة</div>
+                                        <div class="text-[10px] opacity-75 font-normal">تصبح أنت قائد الغرفة ومدير البنك</div>
+                                    </div>
+                                </div>
+                                <i class="ph ph-arrow-left text-base"></i>
+                            </button>
+
+                            <div class="matte-card p-3.5 space-y-2.5">
+                                <div class="text-xs font-medium text-white flex items-center gap-1.5">
+                                    <i class="ph ph-key text-[#95e6b8]"></i>
+                                    <span>دخول غرفة مونوبولي بكود</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input id="joinRoomCodeInput" type="text" inputmode="numeric" maxlength="4" placeholder="أدخل كود من 4 أرقام" class="num-font flex-1 bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3 py-2.5 text-center text-sm tracking-[0.25em] font-bold text-white outline-none transition" />
+                                    <button onclick="joinMonopolyRoom()" class="bg-white hover:bg-white/90 text-[#121415] font-semibold text-xs px-4 py-2.5 rounded-xl transition active:scale-95">
+                                        انضمام
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. واجهة "قائد الغرفة" (الأدمن / البنك) -->
+                <div id="monoAdminView" class="mono-view hidden-view h-full flex flex-col justify-between gap-2.5">
+                    
+                    <!-- الأزرار الدائرية العلوية (4 أزرار تحكم للقائد) -->
+                    <div class="grid grid-cols-4 gap-2 shrink-0">
+                        <button onclick="promptLeaveRoom()" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-red-500/15 border border-white/5 hover:border-red-500/30 transition group">
+                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-red-500/20 flex items-center justify-center text-red-400 transition">
+                                <i class="ph ph-sign-out text-lg"></i>
+                            </div>
+                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">خروج</span>
+                        </button>
+
+                        <button onclick="openModal('propertiesModal')" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group">
+                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-[#95e6b8]/20 flex items-center justify-center text-[#95e6b8] transition">
+                                <i class="ph ph-buildings text-lg"></i>
+                            </div>
+                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">إدارة الأراضي</span>
+                        </button>
+
+                        <button onclick="openModal('requestsModal')" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group relative">
+                            <span id="requestsBadge" class="hidden absolute top-1.5 right-3 w-4 h-4 rounded-full bg-amber-400 text-[#121415] num-font text-[9px] font-bold items-center justify-center">0</span>
+                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition">
+                                <i class="ph ph-scales text-lg"></i>
+                            </div>
+                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">طلبات الرهن</span>
+                        </button>
+
+                        <button onclick="openModal('playersAdminModal')" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group">
+                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-sky-400/20 flex items-center justify-center text-sky-300 transition">
+                                <i class="ph ph-users-three text-lg"></i>
+                            </div>
+                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">اللاعبين</span>
+                        </button>
+                    </div>
+
+                    <!-- قسم إحصائيات المستخدمين (في المنتصف) -->
+                    <div class="flex-1 flex flex-col min-h-0">
+                        <div class="flex items-center justify-between mb-1.5 px-1">
+                            <span class="text-[11px] font-medium text-[#7c8288]">إحصائيات اللاعبين (انقر لعرض سندات الملكية)</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openMyPropertiesAsAdmin()" class="text-[10px] text-[#95e6b8] hover:underline flex items-center gap-1">
+                                    <i class="ph ph-cards"></i>
+                                    <span>عقاراتي وتطويرها</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="adminPlayersGrid" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-0.5">
+                            <!-- يتم تعبئتها ديناميكياً (القائد يظهر أولاً دائماً) -->
+                        </div>
+                    </div>
+
+                    <!-- قسم البنك الذكي (بطاقة الفيزا كارد القابلة للسحب في الأسفل) -->
+                    <div class="shrink-0 pt-1">
+                        <div class="flex items-center justify-between mb-1 px-1">
+                            <span id="adminVisaModeLabel" class="text-[10px] text-[#95e6b8] flex items-center gap-1">
+                                <i class="ph-fill ph-ArrowsLeftRight"></i>
+                                <span>اسحب البطاقة لليمين لعرض بطاقتك الشخصية</span>
+                            </span>
+                            <div class="flex items-center gap-1">
+                                <span id="dotBank" class="w-3.5 h-1.5 rounded-full bg-[#95e6b8] transition-all"></span>
+                                <span id="dotPersonal" class="w-1.5 h-1.5 rounded-full bg-white/25 transition-all"></span>
+                            </div>
+                        </div>
+
+                        <!-- بطاقة الفيزا الذكية (تدعم السحب والنقر) -->
+                        <div id="adminSmartVisa" 
+                             ontouchstart="handleVisaTouchStart(event)" 
+                             ontouchend="handleVisaTouchEnd(event)"
+                             onmousedown="handleVisaMouseDown(event)"
+                             onmouseup="handleVisaMouseUp(event)"
+                             onclick="handleAdminVisaClick()"
+                             class="visa-card-bank rounded-[26px] p-4 cursor-pointer transition-all duration-300 relative overflow-hidden select-none">
+                            
+                            <!-- زخرفة خلفية للبطاقة -->
+                            <div class="absolute -left-8 -bottom-10 w-36 h-36 rounded-full bg-white/[0.03] pointer-events-none"></div>
+
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <div id="adminVisaAvatarWrap" class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/40 flex items-center justify-center overflow-hidden">
+                                        <i id="adminVisaBankIcon" class="ph-fill ph-bank text-lg text-[#95e6b8]"></i>
+                                        <img id="adminVisaAvatarImg" src="" class="hidden w-full h-full object-cover" />
+                                    </div>
+                                    <div>
+                                        <div id="adminVisaTitle" class="text-xs font-semibold text-white">بنك مونوبولي المركزي</div>
+                                        <div id="adminVisaSub" class="text-[10px] text-[#95e6b8]">انقر لإرسال أموال أو فرض غرامة</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="event.stopPropagation(); toggleAdminVisaCardMode();" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 text-xs transition" title="تبديل البطاقة">
+                                        <i class="ph ph-arrows-left-right"></i>
+                                    </button>
+                                    <span class="num-font text-xs font-bold italic tracking-wider text-white/90">VISA</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <span class="text-[10px] text-white/60 block">الرصيد المتاح</span>
+                                    <div id="adminVisaBalance" class="num-font text-xl font-bold text-white tracking-tight" dir="ltr">∞ BANK</div>
+                                </div>
+                                <div class="text-left" dir="ltr">
+                                    <span id="adminVisaNumber" class="num-font text-[10px] text-white/60 tracking-[0.2em]">4921 •••• •••• BANK</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 3. واجهة "اللاعب العادي" (User Interface) أو استعراض عضو محلي بالكامل -->
+                <div id="monoPlayerView" class="mono-view hidden-view h-full flex flex-col justify-between gap-3">
+                    
+                    <!-- شريط العودة السريع لصفحة القائد/الأدمن عند فتح واجهة عضو محلي (بدون هاتف/وايفاي) -->
+                    <div id="impersonationReturnBar" class="hidden shrink-0 bg-[#95e6b8]/15 border border-[#95e6b8]/40 rounded-2xl p-2.5 items-center justify-between shadow-md">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#95e6b8] animate-pulse"></span>
+                            <div>
+                                <div class="text-[11px] font-bold text-white">وضع واجهة العضو: <span id="impersonatedMemberName" class="text-[#95e6b8]"></span></div>
+                                <div class="text-[9.5px] text-white/70">تتحكم الآن بكامل صفحة هذا العضو المحلي</div>
+                            </div>
+                        </div>
+                        <button onclick="exitMemberPageToAdmin()" class="px-3 py-1.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[10.5px] font-bold flex items-center gap-1 transition active:scale-95 shadow">
+                            <i class="ph-bold ph-crown text-xs"></i>
+                            <span>رجوع لصفحة القائد</span>
+                        </button>
+                    </div>
+
+                    <!-- بطاقة الفيزا الرقمية الخاصة باللاعب -->
+                    <div class="visa-card-personal rounded-[28px] p-4.5 relative overflow-hidden shrink-0">
+                        <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#95e6b8]/[0.05] pointer-events-none"></div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <img id="playerVisaAvatar" src="" class="w-11 h-11 rounded-2xl object-cover border border-[#95e6b8]/50" />
+                                <div>
+                                    <span id="playerVisaStatusBadge" class="text-[10px] text-[#95e6b8] block">حساب لاعب نشط</span>
+                                    <h3 id="playerVisaName" class="text-sm font-semibold text-white">اسم اللاعب</h3>
+                                </div>
+                            </div>
+                            <div class="text-left" dir="ltr">
+                                <span class="num-font text-sm font-bold italic tracking-wider text-white">VISA</span>
+                                <span class="block text-[9px] text-white/50 num-font">PLATINUM</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-end justify-between pt-1">
+                            <div>
+                                <span class="text-[10px] text-white/60 block">الرصيد المالي الحالي</span>
+                                <div class="flex items-baseline gap-1" dir="ltr">
+                                    <span class="num-font text-xs text-[#95e6b8]">$</span>
+                                    <span id="playerVisaBalance" class="num-font text-2xl font-bold text-white tracking-tight">1,500</span>
+                                </div>
+                            </div>
+                            <div class="text-left" dir="ltr">
+                                <span id="playerVisaCardCode" class="num-font text-[10px] text-white/50 tracking-widest">5211 •••• 2026</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- قسم البيانات الشخصية والأراضي (أسفل البطاقة) -->
+                    <div class="flex-1 flex flex-col min-h-0">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-1.5">
+                                <button id="tabOwnedBtn" onclick="switchPlayerPropTab('owned')" class="text-xs px-3 py-1.5 rounded-full bg-white text-[#121415] font-medium transition">
+                                    أراضي مملوكة (<span id="userOwnedCount">0</span>)
+                                </button>
+                                <button id="tabMortgagedBtn" onclick="switchPlayerPropTab('mortgaged')" class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition">
+                                    مرهونة (<span id="userMortgagedCount">0</span>)
+                                </button>
+                            </div>
+                            <button onclick="openAllPlayersOverviewForUser()" class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-white/10 text-white/90 flex items-center gap-1.5 transition active:scale-95">
+                                <i class="ph ph-users text-sm text-[#95e6b8]"></i>
+                                <span>اللاعبين</span>
+                            </button>
+                        </div>
+
+                        <!-- شبكة بطاقات أراضي اللاعب -->
+                        <div id="playerPropertiesContainer" class="flex-1 overflow-y-auto custom-scroll pr-0.5 grid grid-cols-2 gap-2.5 content-start pb-2">
+                            <!-- تُرسم هنا بطاقات المونوبولي الحقيقية -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ==========================================
+                 النوافذ المنبثقة (Modals) داخل نظام المونوبولي
+                 ========================================== -->
+
+            <!-- نافذة باركود موقع اللعبة (تظهر عند النقر على الأيقونة الدائرية بجانب الكود في صفحة الأدمن) -->
+            <div id="qrCodeModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[85] p-4 flex items-center justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 w-full max-w-[330px] flex flex-col items-center text-center shadow-2xl space-y-3.5">
+                    <div class="w-full flex items-center justify-between border-b border-white/10 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                                <i class="ph ph-qr-code text-base"></i>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-xs font-bold text-white">باركود موقع اللعبة</h3>
+                                <p class="text-[9.5px] text-[#7c8288]">امسح الباركود للدخول السريع</p>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('qrCodeModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <!-- صورة الباركود لموقع https://3aasm.github.io/narde/ -->
+                    <div class="bg-white p-3.5 rounded-3xl shadow-inner flex items-center justify-center">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=https%3A%2F%2F3aasm.github.io%2Fnarde%2F" 
+                             alt="QR Code https://3aasm.github.io/narde/" 
+                             class="w-44 h-44 object-contain rounded-xl" />
+                    </div>
+
+                    <div class="w-full bg-[#121415] border border-white/10 rounded-2xl px-3 py-2 flex items-center justify-between gap-2" dir="ltr">
+                        <span class="num-font text-[10.5px] text-[#95e6b8] truncate">https://3aasm.github.io/narde/</span>
+                        <button onclick="copyGameUrl()" class="text-[10px] bg-[#262a2d] hover:bg-white/15 text-white px-2.5 py-1 rounded-lg transition shrink-0">
+                            نسخ الرابط
+                        </button>
+                    </div>
+
+                    <p class="text-[10px] text-[#7c8288]">كود الغرفة الحالي للدخول: <strong id="qrModalRoomCode" class="num-font text-white tracking-widest">----</strong></p>
+                </div>
+            </div>
+
+            <!-- نافذة إدارة وبيع الأراضي (للقائد) -->
+            <div id="propertiesModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">سجل عقارات وأراضي المونوبولي</h3>
+                            <p class="text-[10px] text-[#7c8288]">حدد الأرض واللاعب لبيعها أو نقل ملكيتها</p>
+                        </div>
+                        <button onclick="closeModal('propertiesModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <!-- اختيار اللاعب المشتري + طريقة البيع -->
+                    <div class="grid grid-cols-2 gap-2 my-3 shrink-0">
+                        <div>
+                            <label class="text-[10px] text-[#7c8288] block mb-1">بيع/منح إلى اللاعب:</label>
+                            <select id="sellTargetPlayerSelect" class="w-full bg-[#121415] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-[#7c8288] block mb-1">خصم السعر تلقائياً؟</label>
+                            <select id="sellDeductMode" class="w-full bg-[#121415] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white outline-none">
+                                <option value="yes">نعم، خصم سعر الأرض</option>
+                                <option value="no">لا، منح مجاني / تفاوض</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- قائمة جميع الأراضي بتصميم البطاقات -->
+                    <div id="allPropertiesAdminList" class="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-2.5 pr-0.5 py-1"></div>
+                </div>
+            </div>
+
+            <!-- نافذة طلبات الرهن وفك الرهن (للقائد) -->
+            <div id="requestsModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[82%] flex flex-col shadow-2xl">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">طلبات الرهن العقاري وفك الرهن</h3>
+                            <p class="text-[10px] text-[#7c8288]">وافق لتحويل قيمة الرهن تلقائياً أو ارفض الطلب</p>
+                        </div>
+                        <button onclick="closeModal('requestsModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+                    <div id="mortgageRequestsList" class="flex-1 overflow-y-auto custom-scroll space-y-2 my-3 pr-0.5"></div>
+                </div>
+            </div>
+
+            <!-- نافذة إدارة اللاعبين وصلاحيات الغرفة + إضافة أعضاء بدون هاتف/وايفاي (للقائد) -->
+            <div id="playersAdminModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[90%] flex flex-col shadow-2xl">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">إدارة اللاعبين وإضافة الأعضاء</h3>
+                            <p class="text-[10px] text-[#7c8288]">إضافة عضو محلي (بدون هاتف)، دخول واجهته، أو إدارة الغرفة</p>
+                        </div>
+                        <button onclick="closeModal('playersAdminModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <!-- زر قفل/فتح الغرفة + زر إظهار نموذج إضافة عضو محلي -->
+                    <div class="grid grid-cols-2 gap-2 my-2.5 shrink-0">
+                        <div class="matte-card p-2.5 flex items-center justify-between">
+                            <div>
+                                <div class="text-[11px] font-medium text-white">حالة الغرفة</div>
+                                <div id="roomLockStatusText" class="text-[9.5px] text-[#95e6b8]">مفتوحة للانضمام</div>
+                            </div>
+                            <button id="toggleRoomLockBtn" onclick="toggleRoomLock()" class="px-2.5 py-1.5 rounded-xl bg-[#262a2d] hover:bg-[#32373b] text-[10px] font-medium text-white transition">
+                                إغلاق
+                            </button>
+                        </div>
+
+                        <button onclick="toggleAddOfflineMemberForm()" class="matte-card p-2.5 border border-[#95e6b8]/30 hover:bg-[#262a2d] flex items-center justify-center gap-2 text-[#95e6b8] transition active:scale-95">
+                            <i class="ph-fill ph-user-plus text-lg"></i>
+                            <div class="text-right">
+                                <div class="text-[11px] font-bold text-white">إضافة عضو محلي</div>
+                                <div class="text-[9px] text-[#95e6b8]">لغير المتصل أو بدون هاتف</div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- نموذج إضافة عضو جديد (لغير المتصل بالوايفاي أو لا يملك هاتف) -->
+                    <div id="addOfflineMemberBox" class="hidden matte-card p-3.5 mb-2.5 border border-[#95e6b8]/35 space-y-2.5 shrink-0 bg-[#141719]">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-[#95e6b8] flex items-center gap-1.5">
+                                <i class="ph-fill ph-user-circle-plus"></i>
+                                <span>بيانات العضو المضاف (بدون هاتف/إنترنت)</span>
+                            </span>
+                            <button onclick="toggleAddOfflineMemberForm()" class="text-[10px] text-[#7c8288] hover:text-white">إخفاء</button>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <div class="relative w-13 h-13 rounded-2xl bg-[#262a2d] border-2 border-[#95e6b8] overflow-hidden shrink-0 flex items-center justify-center">
+                                <img id="offlineMemberAvatarPreview" src="" class="w-12 h-12 object-cover" />
+                            </div>
+                            <div class="flex-1 space-y-1.5">
+                                <input id="offlineMemberNameInput" type="text" maxlength="18" placeholder="اسم العضو الجديد..." class="w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3 py-2 text-xs text-white outline-none" />
+                                <div class="flex items-center gap-1.5">
+                                    <!-- اختيار صورة من الاستوديو -->
+                                    <label class="flex-1 text-center text-[10px] bg-[#262a2d] hover:bg-[#32373b] text-white py-1.5 px-2 rounded-lg cursor-pointer border border-white/10 transition flex items-center justify-center gap-1">
+                                        <i class="ph ph-image text-[#95e6b8]"></i>
+                                        <span>من الاستوديو</span>
+                                        <input type="file" accept="image/*" class="hidden" onchange="handleOfflineMemberAvatarUpload(event)" />
+                                    </label>
+                                    <!-- اختيار صورة عشوائية -->
+                                    <button type="button" onclick="pickRandomOfflineMemberAvatar()" class="flex-1 text-[10px] bg-[#262a2d] hover:bg-[#32373b] text-white py-1.5 px-2 rounded-lg border border-white/10 transition flex items-center justify-center gap-1">
+                                        <i class="ph ph-shuffle text-amber-300"></i>
+                                        <span>صورة عشوائية</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="addOfflineMemberToRoom()" class="w-full py-2.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-98">
+                            <i class="ph-bold ph-check-circle text-sm"></i>
+                            <span>إضافة العضو للغرفة الآن</span>
+                        </button>
+                    </div>
+
+                    <!-- قائمة اللاعبين مع أزرار (دخول واجهته، ترقية، طرد) -->
+                    <div id="adminManagePlayersList" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-0.5"></div>
+                </div>
+            </div>
+
+            <!-- نافذة التحويل البنكي / الغرامات (عند النقر على فيزا البنك) -->
+            <div id="bankTransferModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 flex flex-col shadow-2xl space-y-3.5">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="flex items-center gap-2">
+                            <i class="ph-fill ph-bank text-xl text-[#95e6b8]"></i>
+                            <div>
+                                <h3 id="transferModalTitle" class="text-sm font-semibold text-white">عمليات بنك المونوبولي</h3>
+                                <p id="transferModalSub" class="text-[10px] text-[#7c8288]">إرسال مكافأة/راتب أو فرض غرامة على لاعب</p>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('bankTransferModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] text-[#7c8288] block mb-1">اختر اللاعب المستهدف</label>
+                        <select id="bankTargetPlayer" class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] text-[#7c8288] block mb-1">المبلغ المالي ($)</label>
+                        <input id="bankAmountInput" type="number" min="1" value="200" class="num-font w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3.5 py-2.5 text-base font-bold text-white outline-none" />
+                        <!-- أزرار مبالغ سريعة -->
+                        <div class="flex items-center gap-1.5 mt-2">
+                            <button onclick="setQuickAmount(50)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$50</button>
+                            <button onclick="setQuickAmount(100)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$100</button>
+                            <button onclick="setQuickAmount(200)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-[#95e6b8] font-semibold">$200 (GO)</button>
+                            <button onclick="setQuickAmount(500)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$500</button>
+                        </div>
+                    </div>
+
+                    <div id="bankActionButtonsWrap" class="grid grid-cols-2 gap-2.5 pt-1">
+                        <button onclick="executeBankTransaction('give')" class="py-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="ph-bold ph-plus-circle text-base"></i>
+                            <span>إيداع أموال للاعب</span>
+                        </button>
+                        <button onclick="executeBankTransaction('fine')" class="py-3 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5">
+                            <i class="ph-bold ph-minus-circle text-base"></i>
+                            <span>فرض غرامة / سحب</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نافذة عرض بطاقات أراضي لاعب محدد (عند النقر على مستطيل اللاعب) -->
+            <div id="playerDeedsModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[70] p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <div class="flex items-center gap-2.5">
+                            <img id="inspectedPlayerAvatar" src="" class="w-9 h-9 rounded-xl object-cover border border-[#95e6b8]/40" />
+                            <div>
+                                <h3 id="inspectedPlayerName" class="text-sm font-semibold text-white">أراضي اللاعب</h3>
+                                <p id="inspectedPlayerSub" class="text-[10px] text-[#95e6b8]">سندات الملكية والمنازل المشيدة</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <!-- زر فتح واجهة اللاعب بالكامل إذا كان القائد يتصفح لاعباً آخر -->
+                            <button id="enterFullMemberPageFromDeedsBtn" class="hidden px-2.5 py-1.5 rounded-xl bg-[#95e6b8] text-[#121415] text-[10px] font-bold items-center gap-1 shadow">
+                                <i class="ph-bold ph-arrows-out-simple"></i>
+                                <span>دخول صفحته</span>
+                            </button>
+                            <button onclick="closeModal('playerDeedsModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                                <i class="ph ph-x"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="inspectedPlayerDeedsGrid" class="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-2.5 py-3 pr-0.5"></div>
+                </div>
+            </div>
+
+            <!-- نافذة تفاصيل اللاعب الموسعة (للمشاهدة فقط عند النقر على لاعب من لوحة اللاعبين) -->
+            <div id="userReadOnlyProfileModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[60] p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
+                    <!-- رأس النافذة -->
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <button onclick="backToPlayersOverviewFromProfile()" class="w-8 h-8 rounded-full bg-[#262a2d] hover:bg-white/15 flex items-center justify-center text-white/80 transition" title="رجوع لقائمة اللاعبين">
+                                <i class="ph ph-arrow-right"></i>
+                            </button>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <h3 class="text-sm font-semibold text-white">ملف اللاعب العقاري والمالي</h3>
+                                    <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/75">للمشاهدة فقط</span>
+                                </div>
+                                <p class="text-[10px] text-[#7c8288]">عرض تفصيلي للثروة والأراضي المملوكة والمرهونة</p>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('userReadOnlyProfileModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <!-- محتوى ملف اللاعب والقوائم -->
+                    <div id="userReadOnlyProfileContent" class="flex-1 overflow-y-auto custom-scroll space-y-3 my-3 pr-0.5">
+                        <!-- يُعبأ ديناميكياً عند النقر على اللاعب -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- نافذة لوحة اللاعبين للمستخدم العادي (للمشاهدة فقط بدون أي صلاحية تعديل) -->
+            <div id="userPlayersOverviewModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[86%] flex flex-col shadow-2xl">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <div class="flex items-center gap-2">
+                            <div class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                                <i class="ph-fill ph-users-three text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">شوف شلة الشرقية</h3>
+                                <p class="text-[10px] text-[#7c8288]">وضع المشاهدة فقط — انقر على أي لاعب لعرض بطاقات أراضيه</p>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('userPlayersOverviewModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div id="userOverviewPlayersList" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 my-3 pr-0.5">
+                        <!-- مستطيلات اللاعبين للمشاهدة فقط -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- نافذة تأكيد مغادرة الغرفة -->
+            <div id="leaveConfirmModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[80] p-4 flex items-center justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 w-full max-w-[320px] flex flex-col items-center text-center shadow-2xl space-y-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
+                        <i class="ph-fill ph-warning-circle text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">تأكيد مغادرة الغرفة</h3>
+                        <p class="text-[11px] text-[#7c8288] mt-1 leading-relaxed">هل أنت متأكد من رغبتك في الخروج من الغرفة؟ ستعود أراضيك الحالية إلى البنك المركزي.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 w-full pt-1">
+                        <button onclick="confirmLeaveRoomAction()" class="py-2.5 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition active:scale-95">
+                            تأكيد الخروج
+                        </button>
+                        <button onclick="closeModal('leaveConfirmModal')" class="py-2.5 rounded-2xl bg-[#262a2d] hover:bg-[#32373b] text-white/85 font-medium text-xs transition active:scale-95">
+                            إلغاء
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- رسالة تنبيه داخلية أنيقة (Toast) بديلة عن alert -->
+            <div id="monoToast" class="pointer-events-none fixed sm:absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-[#262a2d] border border-[#95e6b8]/40 text-white px-4 py-2.5 rounded-full shadow-2xl text-xs flex items-center gap-2 opacity-0 -translate-y-3 transition-all duration-300">
+                <i class="ph-fill ph-info text-[#95e6b8] text-base"></i>
+                <span id="monoToastText">تمت العملية بنجاح</span>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================
+             نافذة شرح تحميل وتثبيت اللعبة على سطح المكتب (آيفون & أندرويد)
+             ========================================================== -->
+        <div id="installGuideModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+            <div class="bg-[#181b1d] border border-white/10 rounded-[34px] p-5 max-h-[90%] flex flex-col shadow-2xl space-y-4 overflow-hidden">
+                <!-- الهيدر -->
+                <div class="flex items-center justify-between border-b border-white/10 pb-3 shrink-0">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-10 h-10 rounded-2xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                            <i class="ph-fill ph-device-mobile-speaker text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">تثبيت اللعبة على شاشة الهاتف</h3>
+                            <p id="detectedDeviceHint" class="text-[10px] text-[#95e6b8]">اختر نظام هاتفك لعرض خطوات الإضافة لسطح المكتب</p>
+                        </div>
+                    </div>
+                    <button onclick="closeInstallGuideModal()" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white transition">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+
+                <!-- زرا اختيار النظام (آيفون / أندرويد) -->
+                <div class="grid grid-cols-2 gap-2.5 shrink-0">
+                    <button id="tabIosGuideBtn" onclick="switchInstallGuidePlatform('ios')" class="py-3 px-3 rounded-2xl border transition-all flex items-center justify-center gap-2 text-xs font-semibold">
+                        <i class="ph-fill ph-apple-logo text-lg"></i>
+                        <span>آيفون (iPhone)</span>
+                    </button>
+                    <button id="tabAndroidGuideBtn" onclick="switchInstallGuidePlatform('android')" class="py-3 px-3 rounded-2xl border transition-all flex items-center justify-center gap-2 text-xs font-semibold">
+                        <i class="ph-fill ph-android-logo text-lg"></i>
+                        <span>أندرويد (Android)</span>
+                    </button>
+                </div>
+
+                <!-- قسم خطوات الآيفون (iOS Safari) -->
+                <div id="iosInstallSteps" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-0.5">
+                    <div class="bg-[#95e6b8]/10 border border-[#95e6b8]/25 rounded-2xl p-3 flex items-center gap-2.5">
+                        <i class="ph-fill ph-compass text-xl text-[#95e6b8] shrink-0"></i>
+                        <p class="text-[11px] text-white/90 leading-relaxed">لأفضل تجربة على الآيفون، افتح اللعبة من متصفح <strong class="text-[#95e6b8]">Safari</strong> ثم اتبع الخطوات التالية:</p>
+                    </div>
+
+                    <!-- الخطوة 1 آيفون -->
+                    <div class="matte-card p-3.5 flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#38bdf8] shrink-0 shadow-inner">
+                            <i class="ph ph-export text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">1</span>
+                                <h4 class="text-xs font-semibold text-white">اضغط على زر المشاركة (Share)</h4>
+                            </div>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">ستجده في الشريط السفلي لمتصفح سفاري على شكل مربع يخرج منه سهم للأعلى <i class="ph ph-export text-white inline-block align-middle"></i>.</p>
+                        </div>
+                    </div>
+
+                    <!-- الخطوة 2 آيفون -->
+                    <div class="matte-card p-3.5 flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#95e6b8] shrink-0 shadow-inner">
+                            <i class="ph ph-plus-square text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">2</span>
+                                <h4 class="text-xs font-semibold text-white">اختر "إضافة إلى الشاشة الرئيسية"</h4>
+                            </div>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اسحب قائمة المشاركة للأعلى واختر <strong class="text-white">إضافة إلى الشاشة الرئيسية (Add to Home Screen)</strong> بجانب أيقونة <i class="ph ph-plus-square text-white inline-block align-middle"></i>.</p>
+                        </div>
+                    </div>
+
+                    <!-- الخطوة 3 آيفون -->
+                    <div class="matte-card p-3.5 flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
+                            <i class="ph-fill ph-check-circle text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">3</span>
+                                <h4 class="text-xs font-semibold text-white">اضغط على "إضافة" (Add)</h4>
+                            </div>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">في أعلى الزاوية اضغط على <strong class="text-white">إضافة</strong>، وستظهر أيقونة اللعبة فوراً على سطح مكتب الآيفون كتطبيق كامل.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- قسم خطوات الأندرويد (Android Chrome) -->
+                <div id="androidInstallSteps" class="hidden flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-0.5">
+                    <!-- زر التثبيت المباشر للأندرويد إن كان متاحاً من المتصفح -->
+                    <button id="directAndroidInstallBtn" onclick="triggerNativePwaInstall()" class="hidden w-full py-3 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs items-center justify-center gap-2 shadow-lg transition active:scale-95">
+                        <i class="ph-bold ph-download-simple text-base"></i>
+                        <span>تثبيت اللعبة بضغطة واحدة الآن</span>
+                    </button>
+
+                    <div class="bg-[#95e6b8]/10 border border-[#95e6b8]/25 rounded-2xl p-3 flex items-center gap-2.5">
+                        <i class="ph-fill ph-google-chrome-logo text-xl text-[#95e6b8] shrink-0"></i>
+                        <p class="text-[11px] text-white/90 leading-relaxed">لتثبيت اللعبة على سطح مكتب الأندرويد عبر متصفح <strong class="text-[#95e6b8]">Chrome</strong> اتبع الخطوات التالية:</p>
+                    </div>
+
+                    <!-- الخطوة 1 أندرويد -->
+                    <div class="matte-card p-3.5 flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#38bdf8] shrink-0 shadow-inner">
+                            <i class="ph-bold ph-dots-three-vertical text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">1</span>
+                                <h4 class="text-xs font-semibold text-white">افتح قائمة المتصفح أو المشاركة</h4>
+                            </div>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اضغط على أيقونة النقاط الثلاث <i class="ph-bold ph-dots-three-vertical text-white inline-block align-middle"></i> في أعلى المتصفح أو زر المشاركة <i class="ph ph-share-network text-white inline-block align-middle"></i>.</p>
+                        </div>
+                    </div>
+
+                    <!-- الخطوة 2 أندرويد -->
+                    <div class="matte-card p-3.5 flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#95e6b8] shrink-0 shadow-inner">
+                            <i class="ph ph-device-mobile-camera text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">2</span>
+                                <h4 class="text-xs font-semibold text-white">اختر "الإضافة إلى الشاشة الرئيسية"</h4>
+                            </div>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">من القائمة المنسدلة اختر <strong class="text-white">تثبيت التطبيق (Install App)</strong> أو <strong class="text-white">الإضافة إلى الشاشة الرئيسية (Add to Home screen)</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- الخطوة 3 أندرويد -->
+                    <div class="matte-card p-3.5 flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
+                            <i class="ph-fill ph-check-circle text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">3</span>
+                                <h4 class="text-xs font-semibold text-white">أكد الضغط على "تثبيت / إضافة"</h4>
+                            </div>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اضغط على <strong class="text-white">تثبيت (Install)</strong> في النافذة المنبثقة لتظهر أيقونة اللعبة على سطح مكتب هاتفك فوراً.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- زر إغلاق سفلي -->
+                <button onclick="closeInstallGuideModal()" class="w-full py-3 rounded-2xl bg-[#262a2d] hover:bg-[#32373b] text-white text-xs font-semibold transition shrink-0">
+                    فهمت الخطوات، إغلاق
+                </button>
+            </div>
+        </div>
+
     </main>
 
+    <!-- ربط قاعدة بيانات Firebase المرفقة للمزامنة الفورية بين اللاعبين -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyB3IDkykHcq7eOZ_psgqP1-Edgqgb7_2wY", 
+            authDomain: "monjez-5fef8.firebaseapp.com", 
+            projectId: "monjez-5fef8", 
+            storageBucket: "monjez-5fef8.firebasestorage.app", 
+            messagingSenderId: "389640182212", 
+            appId: "1:389640182212:web:3b67460cd41949c97aac91" 
+        };
+
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            window.__monoDB = { db, doc, setDoc, getDoc, updateDoc, onSnapshot };
+        } catch (err) {
+            console.warn("Firebase connection fallback:", err);
+        }
+    </script>
+
     <script>
-        // حالة التطبيق
+        // --- إعدادات حالة النرد ---
         let diceCount = 1;
         let isRolling = false;
         let soundEnabled = true;
-        let focusMode = false;
-        let val1 = 1;
-        let val2 = 6;
+        let isFocusMode = false;
+        let audioCtx = null;
+        const TOTAL_ARC_DOTS = 21;
 
-        // تخطيط النقاط لأوجه النرد (شبكة 3x3)
+        // تخطيط النقاط لأوجه النرد الستة
         const pipLayouts = {
-            1: [4],
-            2: [0, 8],
-            3: [0, 4, 8],
-            4: [0, 2, 6, 8],
-            5: [0, 2, 4, 6, 8],
-            6: [0, 2, 3, 5, 6, 8]
+            1: [5],
+            2: [1, 9],
+            3: [1, 5, 9],
+            4: [1, 3, 7, 9],
+            5: [1, 3, 5, 7, 9],
+            6: [1, 3, 4, 6, 7, 9]
         };
 
-        // تتبع زوايا دوران المكعبات
-        const rotations = {
-            cube1: { x: 0, y: 0 },
-            cube2: { x: 0, y: 0 }
-        };
-
-        // زوايا الأوجه الستة
-        const faceTargets = {
+        // زوايا الدوران لكل رقم
+        const faceRotations = {
             1: { x: 0,   y: 0 },
             6: { x: 0,   y: 180 },
             2: { x: 0,   y: 90 },
@@ -358,20 +1229,51 @@
             4: { x: -90, y: 0 }
         };
 
-        // إنشاء نقاط القوس العلوي (متطابقة تماماً بالحجم والمكان)
-        function createArcDots() {
+        let cubeRotations = {
+            1: { x: 0, y: 0, z: 0 },
+            2: { x: 0, y: 0, z: 0 }
+        };
+
+        // بناء المكعب ثلاثي الأبعاد
+        function build3DCube(cubeId) {
+            const cube = document.getElementById(cubeId);
+            cube.innerHTML = '';
+
+            for (let face = 1; face <= 6; face++) {
+                const faceEl = document.createElement('div');
+                faceEl.className = `cube-face face-${face}`;
+                const activePips = pipLayouts[face];
+
+                for (let cell = 1; cell <= 9; cell++) {
+                    const cellEl = document.createElement('div');
+                    cellEl.className = ' flex items-center justify-center';
+                    if (activePips.includes(cell)) {
+                        const pip = document.createElement('span');
+                        pip.className = 'pip';
+                        cellEl.appendChild(pip);
+                    }
+                    faceEl.appendChild(cellEl);
+                }
+                cube.appendChild(faceEl);
+            }
+        }
+
+        // بناء نقاط القوس العلوي المنقطة (مطابقة للصورة الوسطى)
+        function buildArcDots() {
             const group = document.getElementById('arcDotsGroup');
             group.innerHTML = '';
-            const totalDots = 19;
-            const radius = 78;
-            const centerX = 110;
-            const centerY = 105;
+            const cx = 110;
+            const cy = 105;
+            const r = 82;
+            const startAngle = -205; // بالدرجات
+            const endAngle = 25;
 
-            for (let i = 0; i < totalDots; i++) {
-                const angleDeg = 180 - (i * (180 / (totalDots - 1)));
-                const angleRad = (angleDeg * Math.PI) / 180;
-                const x = centerX + radius * Math.cos(angleRad);
-                const y = centerY - radius * Math.sin(angleRad);
+            for (let i = 0; i < TOTAL_ARC_DOTS; i++) {
+                const ratio = i / (TOTAL_ARC_DOTS - 1);
+                const deg = startAngle + ratio * (endAngle - startAngle);
+                const rad = (deg * Math.PI) / 180;
+                const x = cx + r * Math.cos(rad);
+                const y = cy + r * Math.sin(rad);
 
                 const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 dot.setAttribute('cx', x.toFixed(2));
@@ -379,104 +1281,94 @@
                 dot.setAttribute('r', '2.8');
                 dot.setAttribute('fill', '#2a2f33');
                 dot.setAttribute('class', 'arc-dot');
-                dot.setAttribute('id', `arc-dot-${i}`);
+                dot.setAttribute('id', `arcDot-${i}`);
                 group.appendChild(dot);
             }
         }
 
-        // تحديث إضاءة نقاط القوس العلوي والحلقة الداخلية بناءً على النتيجة
-        function updateArcGauge(score, maxPossible) {
-            const totalDots = 19;
-            const ratio = Math.min(Math.max(score / maxPossible, 0), 1);
-            const activeCount = Math.round(ratio * totalDots);
-
-            for (let i = 0; i < totalDots; i++) {
-                const dot = document.getElementById(`arc-dot-${i}`);
+        // تحديث إضاءة نقاط القوس والمؤشر الدائري الداخلي حسب النتيجة
+        function updateArcGauge(value, maxVal) {
+            const activeCount = Math.max(1, Math.round((value / maxVal) * TOTAL_ARC_DOTS));
+            for (let i = 0; i < TOTAL_ARC_DOTS; i++) {
+                const dot = document.getElementById(`arcDot-${i}`);
                 if (!dot) continue;
                 if (i < activeCount) {
-                    dot.setAttribute('fill', '#95e6b8');
                     dot.classList.add('active');
                 } else {
-                    dot.setAttribute('fill', '#2a2f33');
                     dot.classList.remove('active');
                 }
             }
 
-            const gaugeRing = document.getElementById('gaugeRing');
-            if (gaugeRing) {
-                const maxArcLength = 264;
-                const currentArc = Math.max(12, ratio * maxArcLength);
-                gaugeRing.setAttribute('stroke-dasharray', `${currentArc} 360`);
-            }
+            // تحديث القوس الأبيض الداخلي ليتحرك مع النسبة
+            const ring = document.getElementById('gaugeRing');
+            const arcLength = Math.round((value / maxVal) * 245);
+            ring.setAttribute('stroke-dasharray', `${arcLength} 360`);
         }
 
-        // بناء المكعب ثلاثي الأبعاد
-        function createCubeFaces(cubeId) {
-            const cube = document.getElementById(cubeId);
-            cube.innerHTML = '';
-            for (let f = 1; f <= 6; f++) {
-                const face = document.createElement('div');
-                face.className = `cube-face face-${f}`;
-                const pips = pipLayouts[f];
-                for (let i = 0; i < 9; i++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'w-full h-full flex items-center justify-center';
-                    if (pips.includes(i)) {
-                        const pip = document.createElement('div');
-                        pip.className = 'pip';
-                        cell.appendChild(pip);
-                    }
-                    face.appendChild(cell);
-                }
-                cube.appendChild(face);
+        // تدوير المكعب
+        function rotateCubeTo(cubeNum, value, animateRoll = true) {
+            const cubeEl = document.getElementById(`cube${cubeNum}`);
+            const target = faceRotations[value];
+
+            if (!animateRoll) {
+                cubeRotations[cubeNum] = { x: target.x, y: target.y, z: 0 };
+                cubeEl.style.transform = `rotateX(${target.x}deg) rotateY(${target.y}deg)`;
+                return;
             }
+
+            const extraSpinsX = (Math.floor(Math.random() * 2) + 2) * 360;
+            const extraSpinsY = (Math.floor(Math.random() * 2) + 2) * 360;
+
+            const currentXMod = ((cubeRotations[cubeNum].x % 360) + 360) % 360;
+            const currentYMod = ((cubeRotations[cubeNum].y % 360) + 360) % 360;
+            const targetXMod = ((target.x % 360) + 360) % 360;
+            const targetYMod = ((target.y % 360) + 360) % 360;
+
+            cubeRotations[cubeNum].x += extraSpinsX + (targetXMod - currentXMod);
+            cubeRotations[cubeNum].y += extraSpinsY + (targetYMod - currentYMod);
+
+            cubeEl.style.transform = `rotateX(${cubeRotations[cubeNum].x}deg) rotateY(${cubeRotations[cubeNum].y}deg)`;
         }
 
-        // مؤثرات صوتية ناعمة (Soft UI Clicks)
-        let audioCtx = null;
-        function playSoftTicks() {
+        // مؤثرات صوتية ناعمة وعصرية
+        function playMinimalSound(type = 'roll') {
             if (!soundEnabled) return;
             try {
                 if (!audioCtx) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    audioCtx = new AudioContext();
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 }
-                if (audioCtx.state === 'suspended') audioCtx.resume();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
 
-                const times = [0, 0.09, 0.19, 0.31, 0.45, 0.62];
-                times.forEach((t, i) => {
+                if (type === 'roll') {
+                    for (let i = 0; i < 4; i++) {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(190 + i * 45, now + i * 0.08);
+                        gain.gain.setValueAtTime(0.05, now + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.06);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + i * 0.08);
+                        osc.stop(now + i * 0.08 + 0.06);
+                    }
+                } else if (type === 'done') {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(320 + i * 45, audioCtx.currentTime + t);
-                    osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + t + 0.04);
-
-                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime + t);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.045);
-
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(660, now + 0.14);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-                    osc.start(audioCtx.currentTime + t);
-                    osc.stop(audioCtx.currentTime + t + 0.05);
-                });
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                }
             } catch (e) {}
-        }
-
-        // تدوير المكعب إلى الرقم المحدد
-        function spinCubeTo(cubeId, number) {
-            const cube = document.getElementById(cubeId);
-            const target = faceTargets[number];
-
-            const spinsX = (Math.floor(Math.random() * 2) + 2) * 360;
-            const spinsY = (Math.floor(Math.random() * 2) + 2) * 360;
-
-            const modX = ((rotations[cubeId].x % 360) + 360) % 360;
-            const modY = ((rotations[cubeId].y % 360) + 360) % 360;
-
-            rotations[cubeId].x += spinsX + (target.x - modX);
-            rotations[cubeId].y += spinsY + (target.y - modY);
-
-            cube.style.transform = `rotateX(${rotations[cubeId].x}deg) rotateY(${rotations[cubeId].y}deg)`;
         }
 
         // اختيار عدد الأحجار (1 أو 2)
@@ -501,23 +1393,28 @@
                 document.getElementById('die2Dot').classList.remove('hidden');
                 maxGaugeLabel.textContent = '6';
                 quickModeIcon.className = 'ph ph-number-circle-one text-xl';
-                document.getElementById('totalValue').textContent = val1;
-                updateArcGauge(val1, 6);
+                
+                const current1 = parseInt(document.getElementById('die1Stat').textContent) || 1;
+                document.getElementById('totalValue').textContent = current1;
+                updateArcGauge(current1, 6);
             } else {
                 pill2.className = "flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-white text-[#121415] shadow-md";
                 pill1.className = "flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-[#1d2022] text-[#7c8288] hover:text-white border border-white/[0.03]";
                 scene2.classList.remove('hidden');
                 die2Card.classList.remove('opacity-45');
-                document.getElementById('die2Stat').textContent = val2;
                 maxGaugeLabel.textContent = '12';
-                quickModeIcon.className = 'ph ph-number-circle-two text-xl text-[#95e6b8]';
-                const sum = val1 + val2;
+                quickModeIcon.className = 'ph ph-number-circle-two text-xl';
+
+                const current1 = parseInt(document.getElementById('die1Stat').textContent) || 1;
+                rotateCubeTo(2, 6, false);
+                document.getElementById('die2Stat').textContent = '6';
+                const sum = current1 + 6;
                 document.getElementById('totalValue').textContent = sum;
                 updateArcGauge(sum, 12);
             }
         }
 
-        // تبديل سريع من الزر الجانبي في الشريط السفلي
+        // تبديل سريع من الشريط السفلي
         function toggleModeQuick() {
             setDiceCount(diceCount === 1 ? 2 : 1);
         }
@@ -527,49 +1424,52 @@
             if (isRolling) return;
             isRolling = true;
 
+            const rollDockBtn = document.getElementById('rollDockBtn');
             const rollBtnIcon = document.getElementById('rollBtnIcon');
             const scene1 = document.getElementById('scene1');
             const scene2 = document.getElementById('scene2');
+            const statusLabel = document.getElementById('statusLabel');
 
+            rollDockBtn.classList.add('opacity-80');
             rollBtnIcon.classList.add('animate-spin');
+            statusLabel.textContent = 'جاري الرمي...';
 
-            val1 = Math.floor(Math.random() * 6) + 1;
-            val2 = diceCount === 2 ? (Math.floor(Math.random() * 6) + 1) : 0;
+            playMinimalSound('roll');
+
+            const val1 = Math.floor(Math.random() * 6) + 1;
+            const val2 = diceCount === 2 ? Math.floor(Math.random() * 6) + 1 : 0;
 
             scene1.classList.remove('jumping');
             void scene1.offsetWidth;
             scene1.classList.add('jumping');
-            spinCubeTo('cube1', val1);
+            rotateCubeTo(1, val1, true);
 
             if (diceCount === 2) {
                 scene2.classList.remove('jumping');
                 void scene2.offsetWidth;
                 scene2.classList.add('jumping');
-                spinCubeTo('cube2', val2);
+                rotateCubeTo(2, val2, true);
             }
 
-            playSoftTicks();
-
             setTimeout(() => {
-                const total = diceCount === 2 ? (val1 + val2) : val1;
-                const maxVal = diceCount === 2 ? 12 : 6;
-                const isDouble = (diceCount === 2 && val1 === val2);
+                const total = val1 + val2;
+                const maxVal = diceCount === 1 ? 6 : 12;
 
                 document.getElementById('totalValue').textContent = total;
                 document.getElementById('die1Stat').textContent = val1;
+                statusLabel.textContent = 'مجموع النرد';
 
                 if (diceCount === 2) {
                     document.getElementById('die2Stat').textContent = val2;
-                    if (isDouble) {
-                        document.getElementById('doubleBadge').classList.remove('hidden');
-                        document.getElementById('die2Dot').classList.add('hidden');
-                    } else {
-                        document.getElementById('doubleBadge').classList.add('hidden');
-                        document.getElementById('die2Dot').classList.remove('hidden');
-                    }
+                    const isDouble = val1 === val2;
+                    document.getElementById('doubleBadge').classList.toggle('hidden', !isDouble);
+                    document.getElementById('die2Dot').classList.toggle('hidden', isDouble);
                 }
 
                 updateArcGauge(total, maxVal);
+                playMinimalSound('done');
+
+                rollDockBtn.classList.remove('opacity-80');
                 rollBtnIcon.classList.remove('animate-spin');
                 isRolling = false;
             }, 850);
@@ -577,50 +1477,1812 @@
 
         // تفعيل/إلغاء وضع التركيز (إخفاء كل شيء ما عدا المجموع والنرد والشريط السفلي)
         function toggleFocusMode() {
-            focusMode = !focusMode;
+            isFocusMode = !isFocusMode;
             const appShell = document.getElementById('appShell');
             const focusBtn = document.getElementById('focusBtn');
             const focusIcon = document.getElementById('focusIcon');
 
-            if (focusMode) {
-                appShell.classList.add('focus-mode');
+            appShell.classList.toggle('focus-mode', isFocusMode);
+
+            if (isFocusMode) {
                 focusBtn.className = "w-12 h-12 rounded-full bg-[#95e6b8] text-[#121415] flex items-center justify-center transition-all duration-300 shadow-md";
-                focusIcon.className = "ph-fill ph-eye text-lg scale-110 transition-transform duration-300";
+                focusIcon.className = "ph-fill ph-eye text-lg transition-transform duration-300 scale-110";
             } else {
-                appShell.classList.remove('focus-mode');
                 focusBtn.className = "w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition-all duration-300";
                 focusIcon.className = "ph ph-eye-slash text-lg transition-transform duration-300";
             }
         }
 
-        // كتم/تشغيل الصوت
+        // كتم / تشغيل الصوت
         function toggleSound() {
             soundEnabled = !soundEnabled;
-            const dot = document.getElementById('soundDot');
             const icon = document.getElementById('soundIcon');
+            const dot = document.getElementById('soundDot');
+
             if (soundEnabled) {
-                dot.classList.remove('hidden');
                 icon.className = 'ph ph-bell-simple text-lg';
+                dot.classList.remove('hidden');
             } else {
-                dot.classList.add('hidden');
                 icon.className = 'ph ph-bell-simple-slash text-lg text-[#7c8288]';
+                dot.classList.add('hidden');
             }
         }
 
-        // دعم الرمي بمفتاح المسافة Spacebar
+        // دعم المسطرة (Space) لرمي النرد (فقط عند إغلاق شاشة المونوبولي)
         window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && document.activeElement.tagName !== 'BUTTON') {
+            const monoOpen = !document.getElementById('monopolyOverlay').classList.contains('pointer-events-none');
+            const installOpen = !document.getElementById('installGuideModal').classList.contains('hidden');
+            if (e.code === 'Space' && !monoOpen && !installOpen) {
                 e.preventDefault();
                 triggerRoll();
             }
         });
 
-        // تهيئة الواجهة عند التحميل
-        window.onload = () => {
-            createArcDots();
-            createCubeFaces('cube1');
-            createCubeFaces('cube2');
+        // ==========================================================
+        // نافذة تحميل اللعبة وتثبيتها على سطح المكتب (آيفون / أندرويد)
+        // ==========================================================
+        let deferredPwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            const directBtn = document.getElementById('directAndroidInstallBtn');
+            if (directBtn) {
+                directBtn.classList.remove('hidden');
+                directBtn.classList.add('flex');
+            }
+        });
+
+        function detectUserMobileOS() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                return 'ios';
+            }
+            if (/android/i.test(ua)) {
+                return 'android';
+            }
+            return 'ios'; // افتراضي
+        }
+
+        function openInstallGuideModal() {
+            const modal = document.getElementById('installGuideModal');
+            modal.classList.remove('hidden');
+            const detected = detectUserMobileOS();
+            const hint = document.getElementById('detectedDeviceHint');
+            if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+                hint.textContent = 'تم التعرف على جهازك: آيفون (iOS) — اتبع الخطوات بالأسفل';
+            } else if (navigator.userAgent.match(/Android/i)) {
+                hint.textContent = 'تم التعرف على جهازك: أندرويد (Android) — اتبع الخطوات بالأسفل';
+            } else {
+                hint.textContent = 'اختر نظام هاتفك (آيفون أو أندرويد) لعرض خطوات التثبيت';
+            }
+            switchInstallGuidePlatform(detected);
+        }
+
+        function closeInstallGuideModal() {
+            document.getElementById('installGuideModal').classList.add('hidden');
+        }
+
+        function switchInstallGuidePlatform(platform) {
+            const iosBtn = document.getElementById('tabIosGuideBtn');
+            const androidBtn = document.getElementById('tabAndroidGuideBtn');
+            const iosSteps = document.getElementById('iosInstallSteps');
+            const androidSteps = document.getElementById('androidInstallSteps');
+
+            if (platform === 'ios') {
+                iosBtn.className = 'py-3 px-3 rounded-2xl border border-[#95e6b8] bg-[#95e6b8] text-[#121415] transition-all flex items-center justify-center gap-2 text-xs font-bold shadow-md';
+                androidBtn.className = 'py-3 px-3 rounded-2xl border border-white/10 bg-[#1d2022] text-[#7c8288] hover:text-white transition-all flex items-center justify-center gap-2 text-xs font-semibold';
+                iosSteps.classList.remove('hidden');
+                androidSteps.classList.add('hidden');
+            } else {
+                androidBtn.className = 'py-3 px-3 rounded-2xl border border-[#95e6b8] bg-[#95e6b8] text-[#121415] transition-all flex items-center justify-center gap-2 text-xs font-bold shadow-md';
+                iosBtn.className = 'py-3 px-3 rounded-2xl border border-white/10 bg-[#1d2022] text-[#7c8288] hover:text-white transition-all flex items-center justify-center gap-2 text-xs font-semibold';
+                androidSteps.classList.remove('hidden');
+                iosSteps.classList.add('hidden');
+            }
+        }
+
+        async function triggerNativePwaInstall() {
+            if (!deferredPwaPrompt) return;
+            deferredPwaPrompt.prompt();
+            const { outcome } = await deferredPwaPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredPwaPrompt = null;
+                closeInstallGuideModal();
+            }
+        }
+
+        // ==========================================================
+        // برمجة نظام مونوبولي أونلاين المتكامل (البنك + العقارات + المزامنة)
+        // ==========================================================
+
+        // قائمة عقارات مونوبولي الحقيقية المستخرجة من لوحة اللعب وبطاقة Belleville المرفقة
+        const MONOPOLY_PROPERTIES = [
+            // المجموعة البنفسجية / البنية
+            { id: 'belleville', name: 'BOULEVARD OF BELLEVILLE', arName: 'بوليفارد بيلفيل', group: 'purple', color: '#7b2cbf', price: 60, rent: [2, 10, 30, 90, 160, 250], mortgage: 30, houseCost: 50, code: '5211-25' },
+            { id: 'lecourbe', name: 'STREET LECOURBE', arName: 'شارع ليكورب', group: 'purple', color: '#7b2cbf', price: 60, rent: [4, 20, 60, 180, 320, 450], mortgage: 30, houseCost: 50, code: '5211-26' },
+            // المجموعة السماوية
+            { id: 'vaugirard', name: 'STREET OF VAUGIRARD', arName: 'شارع فوجيرار', group: 'lightblue', color: '#38bdf8', price: 100, rent: [6, 30, 90, 270, 400, 550], mortgage: 50, houseCost: 50, code: '5211-27' },
+            { id: 'courcelles', name: 'STREET OF COURCELLES', arName: 'شارع كورسيل', group: 'lightblue', color: '#38bdf8', price: 100, rent: [6, 30, 90, 270, 400, 550], mortgage: 50, houseCost: 50, code: '5211-28' },
+            { id: 'republic', name: 'AVENUE OF THE REPUBLIC', arName: 'جادة الجمهورية', group: 'lightblue', color: '#38bdf8', price: 120, rent: [8, 40, 100, 300, 450, 600], mortgage: 60, houseCost: 50, code: '5211-29' },
+            // المجموعة الوردية / الأرجوانية
+            { id: 'villette', name: 'BOULEVARD OF THE VILLETTE', arName: 'بوليفارد لافيليت', group: 'pink', color: '#db2777', price: 140, rent: [10, 50, 150, 450, 625, 750], mortgage: 70, houseCost: 100, code: '5211-30' },
+            { id: 'neuilly', name: 'AVENUE OF NEUILLY', arName: 'جادة نويي', group: 'pink', color: '#db2777', price: 140, rent: [10, 50, 150, 450, 625, 750], mortgage: 70, houseCost: 100, code: '5211-31' },
+            { id: 'paradise', name: 'RUE OF PARADISE', arName: 'شارع الفردوس', group: 'pink', color: '#db2777', price: 160, rent: [12, 60, 180, 500, 700, 900], mortgage: 80, houseCost: 100, code: '5211-32' },
+            // المجموعة البرتقالية
+            { id: 'mozart', name: 'MOZART AVENUE', arName: 'جادة موزارت', group: 'orange', color: '#ea580c', price: 180, rent: [14, 70, 200, 550, 750, 950], mortgage: 90, houseCost: 100, code: '5211-33' },
+            { id: 'saintmichel', name: 'BOULEVARD SAINT-MICHEL', arName: 'بوليفارد سان ميشيل', group: 'orange', color: '#ea580c', price: 180, rent: [14, 70, 200, 550, 750, 950], mortgage: 90, houseCost: 100, code: '5211-34' },
+            { id: 'pigalle', name: 'PLACE PIGALLE', arName: 'ساحة بيغال', group: 'orange', color: '#ea580c', price: 200, rent: [16, 80, 220, 600, 800, 1000], mortgage: 100, houseCost: 100, code: '5211-35' },
+            // المجموعة الحمراء
+            { id: 'matignon', name: 'MATIGNON AVENUE', arName: 'جادة ماتينيون', group: 'red', color: '#dc2626', price: 220, rent: [18, 90, 250, 700, 875, 1050], mortgage: 110, houseCost: 150, code: '5211-36' },
+            { id: 'malesherbes', name: 'BOULEVARD MALESHERBES', arName: 'بوليفارد مالزيرب', group: 'red', color: '#dc2626', price: 220, rent: [18, 90, 250, 700, 875, 1050], mortgage: 110, houseCost: 150, code: '5211-37' },
+            { id: 'henrimartin', name: 'AVENUE HENRI-MARTIN', arName: 'جادة هنري مارتن', group: 'red', color: '#dc2626', price: 240, rent: [20, 100, 300, 750, 925, 1100], mortgage: 120, houseCost: 150, code: '5211-38' },
+            // المجموعة الصفراء
+            { id: 'sainthonore', name: 'SUBURB SAINT-HONORE', arName: 'ضاحية سانت أونوريه', group: 'yellow', color: '#eab308', price: 260, rent: [22, 110, 330, 800, 975, 1150], mortgage: 130, houseCost: 150, code: '5211-39' },
+            { id: 'placepurse', name: 'PLACE PURSE', arName: 'ساحة البورصة', group: 'yellow', color: '#eab308', price: 260, rent: [22, 110, 330, 800, 975, 1150], mortgage: 130, houseCost: 150, code: '5211-40' },
+            { id: 'fayette', name: 'STREET THE FAYETTE', arName: 'شارع لافاييت', group: 'yellow', color: '#eab308', price: 280, rent: [24, 120, 360, 850, 1025, 1200], mortgage: 140, houseCost: 150, code: '5211-41' },
+            // المجموعة الخضراء
+            { id: 'breteuil', name: 'AVENUE OF BRETEUIL', arName: 'جادة بريتوي', group: 'green', color: '#16a34a', price: 300, rent: [26, 130, 390, 900, 1100, 1275], mortgage: 150, houseCost: 200, code: '5211-42' },
+            { id: 'foch', name: 'AVENUE FOCH', arName: 'جادة فوش', group: 'green', color: '#16a34a', price: 300, rent: [26, 130, 390, 900, 1100, 1275], mortgage: 150, houseCost: 200, code: '5211-43' },
+            { id: 'nasturtiums', name: 'BOULEVARD OF THE NASTURTIUMS', arName: 'بوليفارد كابوسين', group: 'green', color: '#16a34a', price: 320, rent: [28, 150, 450, 1000, 1200, 1400], mortgage: 160, houseCost: 200, code: '5211-44' },
+            // المجموعة الزرقاء الداكنة الملكية
+            { id: 'champs', name: 'AVENUE OF THE CHAMPS-ELYSEES', arName: 'جادة الشانزليزيه', group: 'darkblue', color: '#1d4ed8', price: 350, rent: [35, 175, 500, 1100, 1300, 1500], mortgage: 175, houseCost: 200, code: '5211-45' },
+            { id: 'peace', name: 'STREET OF PEACE', arName: 'شارع السلام', group: 'darkblue', color: '#1d4ed8', price: 400, rent: [50, 200, 600, 1400, 1700, 2000], mortgage: 200, houseCost: 200, code: '5211-46' }
+        ];
+
+        // دالة لتوليد أفاتار SVG مشفر بـ Base64 بالكامل (يمنع كسر كود الـ HTML أو ظهور نص طويل)
+        function createSafeSvgAvatar(bgHex, fgHex) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="${bgHex}"/><circle cx="50" cy="38" r="20" fill="${fgHex}"/><path d="M18 90 C18 65 82 65 82 90" fill="${fgHex}"/></svg>`;
+            return 'data:image/svg+xml;base64,' + btoa(svg);
+        }
+
+        // قائمة الأفاتارات الملونة الجاهزة (مطابقة للأيقونة المرفقة مع ألوان متنوعة)
+        const PRESET_AVATARS = [
+            createSafeSvgAvatar('#312e81', '#38bdf8'), // أزرق سماوي
+            createSafeSvgAvatar('#1f2937', '#95e6b8'), // أخضر نعناعي
+            createSafeSvgAvatar('#3f1d2e', '#f472b6'), // وردي
+            createSafeSvgAvatar('#3b2f1e', '#fbbf24'), // ذهبي
+            createSafeSvgAvatar('#142e24', '#34d399'), // زمردي
+            createSafeSvgAvatar('#2e1065', '#c084fc')  // بنفسجي ملكي
+        ];
+
+        // دالة لضمان سلامة رابط الصورة واستبدال أي نص غير صالح بأفاتار افتراضي
+        function getSafeAvatarSrc(avatarStr, fallbackIdx = 0) {
+            if (!avatarStr || typeof avatarStr !== 'string') {
+                return PRESET_AVATARS[fallbackIdx % PRESET_AVATARS.length];
+            }
+            if (avatarStr.includes('"') || (!avatarStr.startsWith('data:image/') && !avatarStr.startsWith('http'))) {
+                return PRESET_AVATARS[fallbackIdx % PRESET_AVATARS.length];
+            }
+            return avatarStr;
+        }
+
+        // حالة اللاعب والغرفة الحالية
+        let myPlayerId = 'p_' + Math.random().toString(36).substring(2, 10);
+        let myProfile = {
+            name: '',
+            avatar: PRESET_AVATARS[Math.floor(Math.random() * PRESET_AVATARS.length)]
+        };
+        let activeRoomCode = null;
+        let currentRoomData = null;
+        let roomUnsubscribe = null;
+        let adminVisaIsPersonal = false; // false = بطاقة البنك، true = البطاقة الشخصية للقائد
+        let playerActiveTab = 'owned'; // 'owned' | 'mortgaged'
+        let inspectedPlayerId = null;
+        let inspectedReadOnlyMode = false;
+        let readOnlyProfilePlayerId = null;
+
+        // متغيرات ميزة الأعضاء المحليين (لغير المتصلين بالوايفاي أو بدون هاتف) وتبديل واجهة القائد لصفحتهم
+        let impersonatedMemberId = null;
+        let offlineMemberAvatarDraft = PRESET_AVATARS[Math.floor(Math.random() * PRESET_AVATARS.length)];
+
+        // إرجاع المعرف الفعال حالياً في واجهة اللاعب (إما اللاعب نفسه أو العضو الذي دخل القائد لصفحته)
+        function getEffectiveUserViewPlayerId() {
+            if (impersonatedMemberId && currentRoomData && currentRoomData.players && currentRoomData.players[impersonatedMemberId]) {
+                return impersonatedMemberId;
+            }
+            return myPlayerId;
+        }
+
+        // تهيئة الأفاتارات في شاشة الدخول
+        function initMonopolyAuthUI() {
+            const row = document.getElementById('presetAvatarsRow');
+            const preview = document.getElementById('selectedAvatarPreview');
+            preview.src = getSafeAvatarSrc(myProfile.avatar);
+            row.innerHTML = '';
+
+            PRESET_AVATARS.forEach((src) => {
+                const isSelected = myProfile.avatar === src;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `w-11 h-11 rounded-xl overflow-hidden border-2 transition ${isSelected ? 'border-[#95e6b8] scale-105' : 'border-white/10 opacity-70 hover:opacity-100'}`;
+                const imgEl = document.createElement('img');
+                imgEl.src = src;
+                imgEl.className = 'w-full h-full object-cover';
+                btn.appendChild(imgEl);
+
+                btn.onclick = () => {
+                    myProfile.avatar = src;
+                    preview.src = src;
+                    Array.from(row.children).forEach(c => c.className = 'w-11 h-11 rounded-xl overflow-hidden border-2 border-white/10 opacity-70 hover:opacity-100 transition');
+                    btn.className = 'w-11 h-11 rounded-xl overflow-hidden border-2 border-[#95e6b8] scale-105 transition';
+                };
+                row.appendChild(btn);
+            });
+
+            // تهيئة الصورة الافتراضية لنموذج إضافة عضو محلي
+            const offlinePreview = document.getElementById('offlineMemberAvatarPreview');
+            if (offlinePreview) offlinePreview.src = offlineMemberAvatarDraft;
+        }
+
+        // رفع وضغط الصورة الشخصية من جهاز المستخدم
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const size = 120;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, size, size);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    myProfile.avatar = dataUrl;
+                    document.getElementById('selectedAvatarPreview').src = dataUrl;
+                    showMonoToast('تم اختيار صورتك الشخصية بنجاح');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // فتح وإغلاق نظام المونوبولي
+        function openMonopolySystem() {
+            const overlay = document.getElementById('monopolyOverlay');
+            overlay.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-6');
+            overlay.classList.add('opacity-100', 'translate-y-0');
+        }
+
+        function closeMonopolySystem() {
+            const overlay = document.getElementById('monopolyOverlay');
+            overlay.classList.add('opacity-0', 'pointer-events-none', 'translate-y-6');
+            overlay.classList.remove('opacity-100', 'translate-y-0');
+        }
+
+        // إشعار أنيق داخل التطبيق
+        let toastTimer = null;
+        function showMonoToast(msg) {
+            const toast = document.getElementById('monoToast');
+            document.getElementById('monoToastText').textContent = msg;
+            toast.classList.remove('opacity-0', '-translate-y-3');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-3');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2600);
+        }
+
+        // التبديل السلس بين الصفحات الثلاث (Auth / Admin / Player)
+        function switchMonopolyView(viewId) {
+            ['monoAuthView', 'monoAdminView', 'monoPlayerView'].forEach(id => {
+                const el = document.getElementById(id);
+                if (id === viewId) {
+                    el.classList.remove('hidden-view');
+                    el.classList.add('active-view');
+                } else {
+                    el.classList.remove('active-view');
+                    el.classList.add('hidden-view');
+                }
+            });
+
+            const codePill = document.getElementById('roomCodePill');
+            const adminQrBtn = document.getElementById('adminQrBtn');
+            const headerLeaveBtn = document.getElementById('headerLeaveRoomBtn');
+            const isLeader = currentRoomData && currentRoomData.leaderId === myPlayerId;
+
+            if (viewId === 'monoAuthView') {
+                codePill.classList.add('hidden');
+                codePill.classList.remove('flex');
+                if (adminQrBtn) {
+                    adminQrBtn.classList.add('hidden');
+                    adminQrBtn.classList.remove('flex');
+                }
+                if (headerLeaveBtn) {
+                    headerLeaveBtn.classList.add('hidden');
+                    headerLeaveBtn.classList.remove('flex');
+                }
+                document.getElementById('roomSubHeader').textContent = 'إدارة الأموال والعقارات الفورية';
+            } else {
+                codePill.classList.remove('hidden');
+                codePill.classList.add('flex');
+                document.getElementById('activeRoomCodeText').textContent = activeRoomCode || '----';
+                const qrRoomEl = document.getElementById('qrModalRoomCode');
+                if (qrRoomEl) qrRoomEl.textContent = activeRoomCode || '----';
+
+                // إظهار أيقونة الباركود الدائرية بجانب زر نسخ الكود في صفحة الأدمن
+                if (adminQrBtn) {
+                    if (isLeader) {
+                        adminQrBtn.classList.remove('hidden');
+                        adminQrBtn.classList.add('flex');
+                    } else {
+                        adminQrBtn.classList.add('hidden');
+                        adminQrBtn.classList.remove('flex');
+                    }
+                }
+
+                if (headerLeaveBtn) {
+                    if (viewId === 'monoPlayerView' && !impersonatedMemberId) {
+                        headerLeaveBtn.classList.remove('hidden');
+                        headerLeaveBtn.classList.add('flex');
+                    } else {
+                        headerLeaveBtn.classList.add('hidden');
+                        headerLeaveBtn.classList.remove('flex');
+                    }
+                }
+            }
+        }
+
+        // نسخ رابط موقع اللعبة من نافذة الباركود
+        function copyGameUrl() {
+            const url = 'https://3aasm.github.io/narde/';
+            const temp = document.createElement('textarea');
+            temp.value = url;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showMonoToast('تم نسخ رابط اللعبة بنجاح');
+        }
+
+        // إظهار نافذة تأكيد الخروج قبل مغادرة الغرفة
+        function promptLeaveRoom() {
+            openModal('leaveConfirmModal');
+        }
+
+        async function confirmLeaveRoomAction() {
+            closeModal('leaveConfirmModal');
+            await leaveRoom();
+        }
+
+        // نسخ كود الغرفة
+        function copyRoomCode() {
+            if (!activeRoomCode) return;
+            const temp = document.createElement('textarea');
+            temp.value = activeRoomCode;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showMonoToast(`تم نسخ كود الغرفة: ${activeRoomCode}`);
+        }
+
+        // دالة مساعدة لحفظ/تحديث بيانات الغرفة في Firebase (مع نسخة محلية احتياطية)
+        async function saveRoomData(roomCode, data) {
+            currentRoomData = data;
+            if (window.__monoDB && window.__monoDB.db) {
+                try {
+                    const { db, doc, setDoc } = window.__monoDB;
+                    await setDoc(doc(db, 'monopoly_rooms', roomCode), data);
+                } catch (e) {
+                    console.warn("Firestore write fallback:", e);
+                }
+            }
+            renderActiveRoomState();
+        }
+
+        // الاستماع الفوري لتحديثات الغرفة
+        function subscribeToRoom(roomCode) {
+            if (roomUnsubscribe) {
+                roomUnsubscribe();
+                roomUnsubscribe = null;
+            }
+            if (window.__monoDB && window.__monoDB.db) {
+                const { db, doc, onSnapshot } = window.__monoDB;
+                roomUnsubscribe = onSnapshot(doc(db, 'monopoly_rooms', roomCode), (snap) => {
+                    if (snap.exists()) {
+                        currentRoomData = snap.data();
+                        renderActiveRoomState();
+                    }
+                }, (err) => {
+                    console.warn("Realtime listener error:", err);
+                });
+            }
+        }
+
+        // التحقق من إدخال الاسم
+        function validateUserIdentity() {
+            const nameInput = document.getElementById('playerNameInput').value.trim();
+            if (!nameInput) {
+                showMonoToast('يرجى إدخال اسمك أولاً للمتابعة');
+                document.getElementById('playerNameInput').focus();
+                return false;
+            }
+            myProfile.name = nameInput;
+            return true;
+        }
+
+        // 1. إنشاء غرفة مونوبولي جديدة (يصبح المستخدم هو قائد الغرفة / البنك)
+        async function createMonopolyRoom() {
+            if (!validateUserIdentity()) return;
+
+            const code = Math.floor(1000 + Math.random() * 9000).toString();
+            activeRoomCode = code;
+            impersonatedMemberId = null;
+
+            const initialRoom = {
+                code: code,
+                leaderId: myPlayerId,
+                isOpen: true,
+                createdAt: Date.now(),
+                players: {
+                    [myPlayerId]: {
+                        id: myPlayerId,
+                        name: myProfile.name,
+                        avatar: myProfile.avatar,
+                        balance: 1500,
+                        joinedAt: Date.now()
+                    }
+                },
+                propertyState: {}, // { propId: { ownerId, mortgaged: false, houses: 0 } }
+                mortgageRequests: [] // [{ id, propId, playerId, type: 'mortgage' | 'unmortgage', amount }]
+            };
+
+            await saveRoomData(code, initialRoom);
+            subscribeToRoom(code);
+            showMonoToast(`تم إنشاء الغرفة بنجاح! الكود: ${code}`);
+        }
+
+        // 2. الدخول إلى غرفة مونوبولي بواسطة الكود المكون من 4 أرقام
+        async function joinMonopolyRoom() {
+            if (!validateUserIdentity()) return;
+            const codeInput = document.getElementById('joinRoomCodeInput').value.trim();
+            if (codeInput.length !== 4) {
+                showMonoToast('يرجى إدخال كود صحيح مكون من 4 أرقام');
+                return;
+            }
+
+            let roomData = null;
+            if (window.__monoDB && window.__monoDB.db) {
+                try {
+                    const { db, doc, getDoc } = window.__monoDB;
+                    const snap = await getDoc(doc(db, 'monopoly_rooms', codeInput));
+                    if (snap.exists()) {
+                        roomData = snap.data();
+                    }
+                } catch (e) {
+                    console.warn("Error fetching room:", e);
+                }
+            }
+
+            if (!roomData) {
+                showMonoToast('لم يتم العثور على غرفة بهذا الكود');
+                return;
+            }
+
+            if (!roomData.isOpen && (!roomData.players || !roomData.players[myPlayerId])) {
+                showMonoToast('عذراً، هذه الغرفة مغلقة حالياً من قِبل القائد');
+                return;
+            }
+
+            activeRoomCode = codeInput;
+            impersonatedMemberId = null;
+            roomData.players = roomData.players || {};
+            if (!roomData.players[myPlayerId]) {
+                roomData.players[myPlayerId] = {
+                    id: myPlayerId,
+                    name: myProfile.name,
+                    avatar: myProfile.avatar,
+                    balance: 1500,
+                    joinedAt: Date.now()
+                };
+            } else {
+                roomData.players[myPlayerId].name = myProfile.name;
+                roomData.players[myPlayerId].avatar = myProfile.avatar;
+            }
+
+            await saveRoomData(codeInput, roomData);
+            subscribeToRoom(codeInput);
+            showMonoToast(`مرحباً بك في غرفة المونوبولي #${codeInput}`);
+        }
+
+        // الخروج من الغرفة (مع تعيين قائد عشوائي تلقائياً في حال خروج القائد)
+        async function leaveRoom() {
+            if (!currentRoomData || !activeRoomCode) {
+                switchMonopolyView('monoAuthView');
+                return;
+            }
+
+            const players = { ...(currentRoomData.players || {}) };
+            delete players[myPlayerId];
+
+            // تحرير أراضي اللاعب الخارج للبنك
+            const propState = { ...(currentRoomData.propertyState || {}) };
+            Object.keys(propState).forEach(pid => {
+                if (propState[pid].ownerId === myPlayerId) {
+                    delete propState[pid];
+                }
+            });
+
+            const remainingIds = Object.keys(players);
+            if (remainingIds.length > 0 && currentRoomData.leaderId === myPlayerId) {
+                // اختيار قائد بديل عشوائياً تلقائياً (يفضل غير المحلي إن وجد)
+                const onlineIds = remainingIds.filter(id => !players[id].isOfflineMember);
+                const pool = onlineIds.length > 0 ? onlineIds : remainingIds;
+                const randomIndex = Math.floor(Math.random() * pool.length);
+                currentRoomData.leaderId = pool[randomIndex];
+            }
+
+            currentRoomData.players = players;
+            currentRoomData.propertyState = propState;
+            currentRoomData.mortgageRequests = (currentRoomData.mortgageRequests || []).filter(r => r.playerId !== myPlayerId);
+
+            const leavingCode = activeRoomCode;
+            if (roomUnsubscribe) {
+                roomUnsubscribe();
+                roomUnsubscribe = null;
+            }
+            activeRoomCode = null;
+            impersonatedMemberId = null;
+
+            if (window.__monoDB && window.__monoDB.db) {
+                try {
+                    const { db, doc, setDoc } = window.__monoDB;
+                    await setDoc(doc(db, 'monopoly_rooms', leavingCode), currentRoomData);
+                } catch (e) {}
+            }
+
+            currentRoomData = null;
+            switchMonopolyView('monoAuthView');
+            showMonoToast('تم تسجيل الخروج من الغرفة');
+        }
+
+        // الدخول الكامل لواجهة عضو مضاف (تمتلئ الصفحة بواجهته بالكامل مع زر رجوع لصفحة القائد)
+        function enterMemberFullPage(memberId) {
+            if (!currentRoomData || !currentRoomData.players || !currentRoomData.players[memberId]) return;
+            impersonatedMemberId = memberId;
+            playerActiveTab = 'owned';
+            closeModal('playersAdminModal');
+            closeModal('playerDeedsModal');
+            renderActiveRoomState();
+            showMonoToast(`تم الدخول لواجهة العضو: ${currentRoomData.players[memberId].name}`);
+        }
+
+        // زر الرجوع من صفحة العضو المحلي إلى صفحة القائد / الأدمن
+        function exitMemberPageToAdmin() {
+            impersonatedMemberId = null;
+            renderActiveRoomState();
+            showMonoToast('تمت العودة إلى صفحة القائد / الأدمن');
+        }
+
+        // تحديث الواجهة بناءً على دور اللاعب (قائد الغرفة أو لاعب عادي أو استعراض واجهة عضو محلي)
+        function renderActiveRoomState() {
+            if (!currentRoomData || !activeRoomCode) return;
+
+            const players = currentRoomData.players || {};
+            // إذا تم طرد اللاعب من الغرفة
+            if (!players[myPlayerId]) {
+                if (roomUnsubscribe) roomUnsubscribe();
+                activeRoomCode = null;
+                currentRoomData = null;
+                impersonatedMemberId = null;
+                switchMonopolyView('monoAuthView');
+                showMonoToast('تم إخراجك من الغرفة');
+                return;
+            }
+
+            // إذا كان القائد يستعرض عضو محلي وتم حذفه، يعود تلقائياً لصفحة القائد
+            if (impersonatedMemberId && !players[impersonatedMemberId]) {
+                impersonatedMemberId = null;
+            }
+
+            const isLeader = currentRoomData.leaderId === myPlayerId;
+
+            if (isLeader && impersonatedMemberId) {
+                // القائد دخل إلى واجهة أحد الأعضاء بالكامل
+                const impPlayer = players[impersonatedMemberId];
+                document.getElementById('roomSubHeader').textContent = `واجهة العضو: ${impPlayer.name}`;
+                switchMonopolyView('monoPlayerView');
+                renderPlayerDashboard();
+            } else if (isLeader) {
+                document.getElementById('roomSubHeader').textContent = 'أنت قائد الغرفة ومدير البنك المركزي';
+                switchMonopolyView('monoAdminView');
+                renderAdminDashboard();
+            } else {
+                document.getElementById('roomSubHeader').textContent = `غرفة #${activeRoomCode} — لاعب نشط`;
+                switchMonopolyView('monoPlayerView');
+                renderPlayerDashboard();
+            }
+
+            // تحديث النوافذ المنبثقة المفتوحة تلقائياً
+            if (!document.getElementById('propertiesModal').classList.contains('hidden')) renderAdminPropertiesModal();
+            if (!document.getElementById('requestsModal').classList.contains('hidden')) renderAdminRequestsModal();
+            if (!document.getElementById('playersAdminModal').classList.contains('hidden')) renderAdminPlayersModal();
+            if (!document.getElementById('userPlayersOverviewModal').classList.contains('hidden')) renderUserPlayersOverviewModal();
+            if (readOnlyProfilePlayerId && !document.getElementById('userReadOnlyProfileModal').classList.contains('hidden')) {
+                openUserReadOnlyProfile(readOnlyProfilePlayerId);
+            }
+            if (inspectedPlayerId && !document.getElementById('playerDeedsModal').classList.contains('hidden')) {
+                openPlayerDeedsModal(inspectedPlayerId, inspectedReadOnlyMode);
+            }
+        }
+
+        // حساب عقارات اللاعب المملوكة والمرهونة
+        function getPlayerPropertiesSummary(playerId) {
+            const propState = (currentRoomData && currentRoomData.propertyState) || {};
+            const owned = [];
+            const mortgaged = [];
+
+            MONOPOLY_PROPERTIES.forEach(prop => {
+                const st = propState[prop.id];
+                if (st && st.ownerId === playerId) {
+                    if (st.mortgaged) {
+                        mortgaged.push({ ...prop, ...st });
+                    } else {
+                        owned.push({ ...prop, ...st });
+                    }
+                }
+            });
+            return { owned, mortgaged, all: [...owned, ...mortgaged] };
+        }
+
+        // التحقق مما إذا كان اللاعب يمتلك المجموعة اللونية كاملة (لبناء المنازل والفنادق)
+        function ownsFullColorGroup(playerId, groupName) {
+            const propState = (currentRoomData && currentRoomData.propertyState) || {};
+            const groupProps = MONOPOLY_PROPERTIES.filter(p => p.group === groupName);
+            return groupProps.every(p => {
+                const st = propState[p.id];
+                return st && st.ownerId === playerId && !st.mortgaged;
+            });
+        }
+
+        // رسم بطاقة سند ملكية حقيقية (مطابقة لبطاقة BOULEVARD OF BELLEVILLE المرفقة)
+        function createAuthenticDeedCardHTML(prop, state, options = {}) {
+            const houses = (state && state.houses) || 0;
+            const isMortgaged = !!(state && state.mortgaged);
+            const houseBadges = houses === 5
+                ? `<span class="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-bold">HOTEL 🏨</span>`
+                : houses > 0
+                    ? `<span class="px-1.5 py-0.5 rounded bg-emerald-700 text-white text-[9px] font-bold">${'🏠'.repeat(houses)}</span>`
+                    : '';
+
+            return `
+                <div class="deed-card flex flex-col justify-between" onclick="${options.onClick || ''}">
+                    <div class="deed-inner">
+                        <!-- رأس السند الملون -->
+                        <div class="deed-header" style="background-color: ${prop.color}; color: #ffffff;">
+                            <div class="text-[8px] tracking-[0.18em] uppercase opacity-90">TITRE DEED</div>
+                            <div class="text-[10px] font-extrabold leading-tight mt-0.5 uppercase">${prop.name}</div>
+                            <div class="text-[9px] opacity-90 font-medium">${prop.arName}</div>
+                        </div>
+
+                        <!-- جدول الإيجار والمنازل -->
+                        <div class="text-[9px] space-y-0.5 flex-1 text-[#1b1e22]" dir="ltr">
+                            <div class="flex justify-between font-bold border-b border-black/10 pb-0.5 mb-0.5">
+                                <span>Rent</span>
+                                <span>$ ${prop.rent[0]}</span>
+                            </div>
+                            <div class="flex justify-between ${houses === 1 ? 'font-bold text-emerald-700' : ''}">
+                                <span>With 1 House</span>
+                                <span>$ ${prop.rent[1]}</span>
+                            </div>
+                            <div class="flex justify-between ${houses === 2 ? 'font-bold text-emerald-700' : ''}">
+                                <span>With 2 House</span>
+                                <span>${prop.rent[2]}</span>
+                            </div>
+                            <div class="flex justify-between ${houses === 3 ? 'font-bold text-emerald-700' : ''}">
+                                <span>With 3 House</span>
+                                <span>${prop.rent[3]}</span>
+                            </div>
+                            <div class="flex justify-between ${houses === 4 ? 'font-bold text-emerald-700' : ''}">
+                                <span>With 4 House</span>
+                                <span>${prop.rent[4]}</span>
+                            </div>
+                            <div class="flex justify-between ${houses === 5 ? 'font-bold text-red-600' : ''}">
+                                <span>With HOTEL</span>
+                                <span>${prop.rent[5]}</span>
+                            </div>
+
+                            <div class="border-t border-black/15 pt-1 mt-1 space-y-0.5 text-[8.5px]">
+                                <div class="flex justify-between">
+                                    <span>Mortgage Value</span>
+                                    <span class="font-bold">$ ${prop.mortgage}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Houses Cost</span>
+                                    <span class="font-bold">$ ${prop.houseCost}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- شريط الحالة أو الأزرار التفاعلية أسفل السند -->
+                        <div class="mt-1.5 pt-1 border-t border-black/15 flex items-center justify-between text-[8px] text-black/65" dir="ltr">
+                            <span>${prop.code}</span>
+                            ${houseBadges}
+                            <span class="font-bold text-black">$${prop.price}</span>
+                        </div>
+
+                        ${options.footerActionHTML ? `<div class="mt-1.5" onclick="event.stopPropagation()">${options.footerActionHTML}</div>` : ''}
+
+                        <!-- طبقة التظليل والحجب للأراضي المرهونة -->
+                        ${isMortgaged ? `
+                            <div class="deed-mortgaged-overlay absolute inset-0 rounded-[8px] flex flex-col items-center justify-center p-2 text-center text-white">
+                                <i class="ph-fill ph-lock-key text-2xl text-amber-400 mb-1"></i>
+                                <span class="text-[11px] font-bold text-amber-300">أرض مرهونة ومحجوبة</span>
+                                <span class="text-[9px] text-white/75 mt-0.5">فك الرهن: $${prop.mortgage}</span>
+                                ${options.unmortgageBtnHTML ? `<div class="mt-2 w-full" onclick="event.stopPropagation()">${options.unmortgageBtnHTML}</div>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // عرض وتحديث واجهة قائد الغرفة (Admin / Bank)
+        // ==========================================
+        function renderAdminDashboard() {
+            const players = currentRoomData.players || {};
+            const grid = document.getElementById('adminPlayersGrid');
+            grid.innerHTML = '';
+
+            // شارة طلبات الرهن المعلقة
+            const pendingReqs = (currentRoomData.mortgageRequests || []);
+            const reqBadge = document.getElementById('requestsBadge');
+            if (pendingReqs.length > 0) {
+                reqBadge.textContent = pendingReqs.length;
+                reqBadge.classList.remove('hidden');
+                reqBadge.classList.add('flex');
+            } else {
+                reqBadge.classList.add('hidden');
+                reqBadge.classList.remove('flex');
+            }
+
+            // ترتيب قائمة اللاعبين في صفحة القائد بحيث يكون القائد هو الأول دائماً في صفحته
+            const sortedPlayersForAdmin = Object.values(players).sort((a, b) => {
+                if (a.id === currentRoomData.leaderId) return -1;
+                if (b.id === currentRoomData.leaderId) return 1;
+                return (a.joinedAt || 0) - (b.joinedAt || 0);
+            });
+
+            sortedPlayersForAdmin.forEach((p, idx) => {
+                const summary = getPlayerPropertiesSummary(p.id);
+                const isMeLeader = p.id === currentRoomData.leaderId;
+                const safeAvatar = getSafeAvatarSrc(p.avatar, idx);
+
+                const card = document.createElement('div');
+                card.className = 'matte-card p-3 flex items-center justify-between cursor-pointer hover:border-[#95e6b8]/40 transition active:scale-99';
+                card.onclick = () => openPlayerDeedsModal(p.id, false);
+
+                // مصغرات ملونة للأراضي المملوكة
+                const colorDots = summary.owned.slice(0, 6).map(pr =>
+                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${pr.color}" title="${pr.arName}"></span>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="relative shrink-0">
+                            <img src="${safeAvatar}" class="w-12 h-12 rounded-2xl object-cover border border-white/15" />
+                            ${isMeLeader ? `<span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#95e6b8] text-[#121415] flex items-center justify-center shadow"><i class="ph-fill ph-crown text-xs"></i></span>` : ''}
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-semibold text-white">${p.name}</span>
+                                ${p.id === myPlayerId ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/70">أنت</span>` : ''}
+                                ${p.isOfflineMember ? `<span class="text-[8.5px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/25">عضو محلي</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-2 mt-1 text-[10px]">
+                                <span class="text-[#95e6b8] font-medium">مملوكة: ${summary.owned.length}</span>
+                                <span class="text-amber-400/90">مرهونة: ${summary.mortgaged.length}</span>
+                            </div>
+                            <div class="flex items-center gap-1 mt-1">${colorDots || '<span class="text-[9px] text-[#7c8288]">لا توجد عقارات بعد</span>'}</div>
+                        </div>
+                    </div>
+
+                    <div class="text-left flex flex-col items-end gap-1" dir="ltr">
+                        <div class="num-font text-sm font-bold text-white">$${(p.balance || 0).toLocaleString()}</div>
+                        ${p.id !== myPlayerId ? `
+                            <button onclick="event.stopPropagation(); enterMemberFullPage('${p.id}')" class="px-2 py-0.5 rounded-lg bg-[#95e6b8]/15 hover:bg-[#95e6b8]/25 border border-[#95e6b8]/30 text-[#95e6b8] text-[9px] font-medium flex items-center gap-1 transition" dir="rtl">
+                                <i class="ph ph-arrows-out-simple"></i>
+                                <span>دخول صفحته</span>
+                            </button>
+                        ` : `
+                            <span class="text-[9px] text-[#7c8288] flex items-center justify-end gap-0.5">
+                                <span>عرض البطاقات</span>
+                                <i class="ph ph-caret-left"></i>
+                            </span>
+                        `}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            updateAdminSmartVisaUI();
+        }
+
+        // تحديث شكل وبيانات بطاقة الفيزا الذكية للقائد (البنك <-> البطاقة الشخصية)
+        function updateAdminSmartVisaUI() {
+            const visaEl = document.getElementById('adminSmartVisa');
+            const bankIcon = document.getElementById('adminVisaBankIcon');
+            const avatarImg = document.getElementById('adminVisaAvatarImg');
+            const titleEl = document.getElementById('adminVisaTitle');
+            const subEl = document.getElementById('adminVisaSub');
+            const balEl = document.getElementById('adminVisaBalance');
+            const numEl = document.getElementById('adminVisaNumber');
+            const dotBank = document.getElementById('dotBank');
+            const dotPersonal = document.getElementById('dotPersonal');
+            const modeLabel = document.getElementById('adminVisaModeLabel');
+
+            const me = (currentRoomData && currentRoomData.players && currentRoomData.players[myPlayerId]) || { name: myProfile.name, avatar: myProfile.avatar, balance: 1500 };
+
+            if (!adminVisaIsPersonal) {
+                visaEl.className = 'visa-card-bank rounded-[26px] p-4 cursor-pointer transition-all duration-300 relative overflow-hidden select-none';
+                bankIcon.classList.remove('hidden');
+                avatarImg.classList.add('hidden');
+                titleEl.textContent = 'بنك مونوبولي المركزي';
+                subEl.textContent = 'انقر لإرسال أموال أو فرض غرامة على لاعب';
+                balEl.textContent = '∞ BANK';
+                numEl.textContent = `4921 •••• •••• ${activeRoomCode || 'BANK'}`;
+                dotBank.className = 'w-3.5 h-1.5 rounded-full bg-[#95e6b8] transition-all';
+                dotPersonal.className = 'w-1.5 h-1.5 rounded-full bg-white/25 transition-all';
+                modeLabel.innerHTML = `<i class="ph-fill ph-arrows-left-right"></i><span>اسحب البطاقة لليمين لعرض فيزا القائد الشخصية</span>`;
+            } else {
+                visaEl.className = 'visa-card-personal rounded-[26px] p-4 cursor-pointer transition-all duration-300 relative overflow-hidden select-none';
+                bankIcon.classList.add('hidden');
+                avatarImg.src = getSafeAvatarSrc(me.avatar);
+                avatarImg.classList.remove('hidden');
+                titleEl.textContent = `${me.name} (محفظتي الشخصية)`;
+                subEl.textContent = 'انقر لتحويل مال من حسابك الشخصي للاعب';
+                balEl.textContent = `$ ${(me.balance || 0).toLocaleString()}`;
+                numEl.textContent = `5211 •••• •••• ${activeRoomCode || '2026'}`;
+                dotPersonal.className = 'w-3.5 h-1.5 rounded-full bg-white transition-all';
+                dotBank.className = 'w-1.5 h-1.5 rounded-full bg-white/25 transition-all';
+                modeLabel.innerHTML = `<i class="ph-fill ph-user-circle"></i><span>البطاقة الشخصية للقائد — اسحب للعودة للبنك</span>`;
+            }
+        }
+
+        function toggleAdminVisaCardMode() {
+            const visaEl = document.getElementById('adminSmartVisa');
+            visaEl.style.transform = 'translateX(14px) scale(0.97)';
+            setTimeout(() => {
+                adminVisaIsPersonal = !adminVisaIsPersonal;
+                updateAdminSmartVisaUI();
+                visaEl.style.transform = 'translateX(0) scale(1)';
+            }, 140);
+        }
+
+        // دعم السحب (Swipe) باللمس أو الماوس على بطاقة فيزا القائد
+        let visaTouchStartX = 0;
+        function handleVisaTouchStart(e) {
+            visaTouchStartX = e.changedTouches[0].screenX;
+        }
+        function handleVisaTouchEnd(e) {
+            const diff = e.changedTouches[0].screenX - visaTouchStartX;
+            if (Math.abs(diff) > 35) {
+                toggleAdminVisaCardMode();
+            }
+        }
+        function handleVisaMouseDown(e) {
+            visaTouchStartX = e.screenX;
+        }
+        function handleVisaMouseUp(e) {
+            const diff = e.screenX - visaTouchStartX;
+            if (Math.abs(diff) > 40) {
+                toggleAdminVisaCardMode();
+            }
+        }
+
+        // النقر على بطاقة الفيزا لفتح نافذة إرسال الأموال / فرض الغرامة
+        function handleAdminVisaClick() {
+            if (!currentRoomData) return;
+            const select = document.getElementById('bankTargetPlayer');
+            select.innerHTML = '';
+            Object.values(currentRoomData.players || {}).forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.name} ($${p.balance})`;
+                select.appendChild(opt);
+            });
+
+            if (adminVisaIsPersonal) {
+                document.getElementById('transferModalTitle').textContent = 'تحويل من محفظة القائد الشخصية';
+                document.getElementById('transferModalSub').textContent = 'يتم خصم المبلغ من رصيدك الشخصي وإرساله للاعب';
+            } else {
+                document.getElementById('transferModalTitle').textContent = 'عمليات بنك المونوبولي المركزي';
+                document.getElementById('transferModalSub').textContent = 'إرسال مكافأة/راتب أو فرض غرامة على لاعب';
+            }
+
+            openModal('bankTransferModal');
+        }
+
+        function setQuickAmount(val) {
+            document.getElementById('bankAmountInput').value = val;
+        }
+
+        // تنفيذ الإيداع أو فرض الغرامة
+        async function executeBankTransaction(mode) {
+            if (!currentRoomData) return;
+            const targetId = document.getElementById('bankTargetPlayer').value;
+            const amount = parseInt(document.getElementById('bankAmountInput').value) || 0;
+
+            if (!targetId || amount <= 0) {
+                showMonoToast('يرجى تحديد اللاعب وإدخال مبلغ صحيح');
+                return;
+            }
+
+            const players = currentRoomData.players || {};
+            const target = players[targetId];
+            if (!target) return;
+
+            if (adminVisaIsPersonal) {
+                const me = players[myPlayerId];
+                if (mode === 'fine') {
+                    showMonoToast('فرض الغرامات متاح فقط من بطاقة البنك المركزي');
+                    return;
+                }
+                if (targetId === myPlayerId) {
+                    showMonoToast('لا يمكنك التحويل لنفسك من بطاقتك الشخصية');
+                    return;
+                }
+                if ((me.balance || 0) < amount) {
+                    showMonoToast('رصيدك الشخصي غير كافٍ لإتمام التحويل');
+                    return;
+                }
+                me.balance -= amount;
+                target.balance = (target.balance || 0) + amount;
+                showMonoToast(`تم تحويل $${amount} من حسابك إلى ${target.name}`);
+            } else {
+                if (mode === 'give') {
+                    target.balance = (target.balance || 0) + amount;
+                    showMonoToast(`أودع البنك $${amount} في حساب ${target.name}`);
+                } else {
+                    target.balance = Math.max(0, (target.balance || 0) - amount);
+                    showMonoToast(`فرض البنك غرامة $${amount} على ${target.name}`);
+                }
+            }
+
+            closeModal('bankTransferModal');
+            await saveRoomData(activeRoomCode, currentRoomData);
+        }
+
+        // ==========================================
+        // نوافذ التحكم للقائد (إدارة الأراضي، الرهن، اللاعبين + إضافة عضو محلي)
+        // ==========================================
+        function openModal(id) {
+            if (id === 'propertiesModal') renderAdminPropertiesModal();
+            if (id === 'requestsModal') renderAdminRequestsModal();
+            if (id === 'playersAdminModal') renderAdminPlayersModal();
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            if (id === 'playerDeedsModal') inspectedPlayerId = null;
+            if (id === 'userReadOnlyProfileModal') readOnlyProfilePlayerId = null;
+        }
+
+        // إظهار أو إخفاء صندوق إضافة عضو محلي (بدون هاتف/وايفاي) في قائمة اللاعبين للقائد
+        function toggleAddOfflineMemberForm() {
+            const box = document.getElementById('addOfflineMemberBox');
+            if (!box) return;
+            box.classList.toggle('hidden');
+            if (!box.classList.contains('hidden')) {
+                document.getElementById('offlineMemberAvatarPreview').src = getSafeAvatarSrc(offlineMemberAvatarDraft);
+                document.getElementById('offlineMemberNameInput').focus();
+            }
+        }
+
+        // اختيار صورة عشوائية للعضو المحلي الجديد
+        function pickRandomOfflineMemberAvatar() {
+            const randomColors = [
+                ['#312e81', '#38bdf8'],
+                ['#1f2937', '#95e6b8'],
+                ['#3f1d2e', '#f472b6'],
+                ['#3b2f1e', '#fbbf24'],
+                ['#142e24', '#34d399'],
+                ['#2e1065', '#c084fc'],
+                ['#3b0764', '#f43f5e'],
+                ['#0f172a', '#22d3ee']
+            ];
+            const pair = randomColors[Math.floor(Math.random() * randomColors.length)];
+            offlineMemberAvatarDraft = createSafeSvgAvatar(pair[0], pair[1]);
+            document.getElementById('offlineMemberAvatarPreview').src = offlineMemberAvatarDraft;
+            showMonoToast('تم اختيار صورة رمزية عشوائية للعضو');
+        }
+
+        // رفع صورة من الاستوديو للعضو المحلي الجديد
+        function handleOfflineMemberAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const size = 120;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, size, size);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    offlineMemberAvatarDraft = dataUrl;
+                    document.getElementById('offlineMemberAvatarPreview').src = dataUrl;
+                    showMonoToast('تم رفع صورة العضو من الاستوديو');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // إضافة العضو المحلي للغرفة
+        async function addOfflineMemberToRoom() {
+            if (!currentRoomData) return;
+            const nameInput = document.getElementById('offlineMemberNameInput');
+            const name = nameInput.value.trim();
+            if (!name) {
+                showMonoToast('يرجى إدخال اسم العضو أولاً');
+                nameInput.focus();
+                return;
+            }
+
+            const newMemberId = 'local_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+            currentRoomData.players = currentRoomData.players || {};
+            currentRoomData.players[newMemberId] = {
+                id: newMemberId,
+                name: name,
+                avatar: offlineMemberAvatarDraft,
+                balance: 1500,
+                isOfflineMember: true,
+                joinedAt: Date.now()
+            };
+
+            nameInput.value = '';
+            pickRandomOfflineMemberAvatar();
+            document.getElementById('addOfflineMemberBox').classList.add('hidden');
+
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(`تمت إضافة العضو "${name}" بنجاح!`);
+        }
+
+        // الرجوع من ملف اللاعب إلى لوحة اللاعبين مباشرة
+        function backToPlayersOverviewFromProfile() {
+            closeModal('userReadOnlyProfileModal');
+            openAllPlayersOverviewForUser();
+        }
+
+        // نافذة إدارة الأراضي وبيعها للاعبين
+        function renderAdminPropertiesModal() {
+            if (!currentRoomData) return;
+            const select = document.getElementById('sellTargetPlayerSelect');
+            const prevVal = select.value;
+            select.innerHTML = '';
+
+            const players = currentRoomData.players || {};
+            Object.values(players).forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.name} ($${p.balance})`;
+                select.appendChild(opt);
+            });
+            if (prevVal && players[prevVal]) select.value = prevVal;
+
+            const container = document.getElementById('allPropertiesAdminList');
+            container.innerHTML = '';
+            const propState = currentRoomData.propertyState || {};
+
+            MONOPOLY_PROPERTIES.forEach(prop => {
+                const st = propState[prop.id];
+                const owner = st && st.ownerId ? players[st.ownerId] : null;
+
+                const footerHTML = owner
+                    ? `<div class="flex items-center justify-between gap-1 bg-black/10 rounded px-1.5 py-1">
+                         <span class="text-[9px] font-bold truncate text-emerald-900">المالك: ${owner.name}</span>
+                         <button onclick="reclaimPropertyToBank('${prop.id}')" class="text-[8.5px] bg-red-600 text-white px-1.5 py-0.5 rounded font-bold">استرداد</button>
+                       </div>`
+                    : `<button onclick="sellPropertyToSelectedPlayer('${prop.id}')" class="w-full py-1.5 rounded bg-[#121415] hover:bg-black text-[#95e6b8] text-[9.5px] font-bold transition">
+                         بيع الأرض ($${prop.price})
+                       </button>`;
+
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = createAuthenticDeedCardHTML(prop, st, { footerActionHTML: footerHTML });
+                container.appendChild(wrapper.firstElementChild);
+            });
+        }
+
+        // بيع أرض للاعب المحدد
+        async function sellPropertyToSelectedPlayer(propId) {
+            if (!currentRoomData) return;
+            const targetId = document.getElementById('sellTargetPlayerSelect').value;
+            const deductMode = document.getElementById('sellDeductMode').value;
+            const prop = MONOPOLY_PROPERTIES.find(p => p.id === propId);
+            const player = (currentRoomData.players || {})[targetId];
+
+            if (!prop || !player) return;
+
+            if (deductMode === 'yes') {
+                if ((player.balance || 0) < prop.price) {
+                    showMonoToast(`رصيد ${player.name} غير كافٍ لشراء ${prop.arName}`);
+                    return;
+                }
+                player.balance -= prop.price;
+            }
+
+            currentRoomData.propertyState = currentRoomData.propertyState || {};
+            currentRoomData.propertyState[propId] = {
+                ownerId: targetId,
+                mortgaged: false,
+                houses: 0
+            };
+
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(`تم بيع ${prop.arName} إلى ${player.name}`);
+        }
+
+        // استرداد أرض إلى البنك
+        async function reclaimPropertyToBank(propId) {
+            if (!currentRoomData || !currentRoomData.propertyState) return;
+            delete currentRoomData.propertyState[propId];
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast('تمت إعادة الأرض إلى البنك المركزي');
+        }
+
+        // نافذة طلبات الرهن وفك الرهن المرسلة من اللاعبين
+        function renderAdminRequestsModal() {
+            const list = document.getElementById('mortgageRequestsList');
+            list.innerHTML = '';
+            const reqs = (currentRoomData && currentRoomData.mortgageRequests) || [];
+            const players = (currentRoomData && currentRoomData.players) || {};
+
+            if (reqs.length === 0) {
+                list.innerHTML = `<div class="text-center py-8 text-xs text-[#7c8288]">لا توجد طلبات رهن أو فك رهن معلقة حالياً</div>`;
+                return;
+            }
+
+            reqs.forEach(req => {
+                const player = players[req.playerId];
+                const prop = MONOPOLY_PROPERTIES.find(p => p.id === req.propId);
+                if (!player || !prop) return;
+
+                const isMortgage = req.type === 'mortgage';
+                const item = document.createElement('div');
+                item.className = 'matte-card p-3 flex items-center justify-between gap-2';
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-3 h-9 rounded-full shrink-0" style="background:${prop.color}"></span>
+                        <div>
+                            <div class="text-xs font-semibold text-white">${player.name} — ${isMortgage ? 'طلب رهن أرض' : 'طلب فك رهن'}</div>
+                            <div class="text-[10px] text-[#7c8288]">${prop.arName} (${prop.name})</div>
+                            <div class="text-[10px] text-[#95e6b8] num-font mt-0.5">
+                                ${isMortgage ? `سيحصل اللاعب على: +$${prop.mortgage}` : `سيدفع اللاعب للبنك: -$${prop.mortgage}`}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="resolveMortgageRequest('${req.id}', true)" class="px-3 py-1.5 rounded-xl bg-[#95e6b8] text-[#121415] text-[10px] font-bold">موافقة</button>
+                        <button onclick="resolveMortgageRequest('${req.id}', false)" class="px-2.5 py-1.5 rounded-xl bg-red-500/20 text-red-300 text-[10px]">رفض</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        // موافقة أو رفض القائد لطلب الرهن / فك الرهن
+        async function resolveMortgageRequest(reqId, approved) {
+            if (!currentRoomData) return;
+            const reqs = currentRoomData.mortgageRequests || [];
+            const req = reqs.find(r => r.id === reqId);
+            if (!req) return;
+
+            const player = (currentRoomData.players || {})[req.playerId];
+            const prop = MONOPOLY_PROPERTIES.find(p => p.id === req.propId);
+            const st = (currentRoomData.propertyState || {})[req.propId];
+
+            if (approved && player && prop && st) {
+                if (req.type === 'mortgage' && !st.mortgaged) {
+                    st.mortgaged = true;
+                    st.houses = 0;
+                    player.balance = (player.balance || 0) + prop.mortgage;
+                    showMonoToast(`تم رهن ${prop.arName} وإيداع $${prop.mortgage} لـ ${player.name}`);
+                } else if (req.type === 'unmortgage' && st.mortgaged) {
+                    if ((player.balance || 0) < prop.mortgage) {
+                        showMonoToast(`رصيد ${player.name} غير كافٍ لفك الرهن`);
+                        return;
+                    }
+                    player.balance -= prop.mortgage;
+                    st.mortgaged = false;
+                    showMonoToast(`تم فك رهن ${prop.arName} للاعب ${player.name}`);
+                }
+            } else {
+                showMonoToast('تم رفض الطلب');
+            }
+
+            currentRoomData.mortgageRequests = reqs.filter(r => r.id !== reqId);
+            await saveRoomData(activeRoomCode, currentRoomData);
+        }
+
+        // نافذة إدارة اللاعبين (طرد، قفل الغرفة، ترقية لاعب لقائد جديد، ودخول صفحة أي عضو)
+        function renderAdminPlayersModal() {
+            if (!currentRoomData) return;
+            const isOpen = currentRoomData.isOpen !== false;
+            const statusText = document.getElementById('roomLockStatusText');
+            const lockBtn = document.getElementById('toggleRoomLockBtn');
+
+            if (isOpen) {
+                statusText.textContent = 'مفتوحة للانضمام';
+                statusText.className = 'text-[9.5px] text-[#95e6b8]';
+                lockBtn.textContent = 'إغلاق';
+            } else {
+                statusText.textContent = 'مغلقة حالياً';
+                statusText.className = 'text-[9.5px] text-amber-400';
+                lockBtn.textContent = 'فتح';
+            }
+
+            const list = document.getElementById('adminManagePlayersList');
+            list.innerHTML = '';
+
+            // ترتيب القائمة بحيث يكون القائد أولاً دائماً
+            const sortedPlayers = Object.values(currentRoomData.players || {}).sort((a, b) => {
+                if (a.id === currentRoomData.leaderId) return -1;
+                if (b.id === currentRoomData.leaderId) return 1;
+                return (a.joinedAt || 0) - (b.joinedAt || 0);
+            });
+
+            sortedPlayers.forEach((p, idx) => {
+                const isLeader = p.id === currentRoomData.leaderId;
+                const safeAvatar = getSafeAvatarSrc(p.avatar, idx);
+                const row = document.createElement('div');
+                row.className = 'matte-card p-3 flex items-center justify-between gap-2';
+                row.innerHTML = `
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <img src="${safeAvatar}" class="w-10 h-10 rounded-xl object-cover border border-white/10 shrink-0" />
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-semibold text-white truncate">${p.name}</span>
+                                ${p.isOfflineMember ? `<span class="text-[8.5px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300">محلي</span>` : ''}
+                            </div>
+                            <div class="text-[10px] text-[#7c8288] num-font">$${(p.balance || 0).toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+                        ${isLeader ? `<span class="text-[10px] px-2.5 py-1 rounded-full bg-[#95e6b8]/20 text-[#95e6b8] font-medium">القائد (أنت)</span>` : `
+                            <button onclick="enterMemberFullPage('${p.id}')" class="px-2.5 py-1.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[10px] font-bold transition flex items-center gap-1" title="دخول صفحته بالكامل">
+                                <i class="ph-bold ph-sign-in"></i>
+                                <span>دخول صفحته</span>
+                            </button>
+                            ${!p.isOfflineMember ? `
+                                <button onclick="promotePlayerToLeader('${p.id}')" class="px-2 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[10px] font-medium transition" title="ترقية لقائد">
+                                    ترقية
+                                </button>
+                            ` : ''}
+                            <button onclick="kickPlayerFromRoom('${p.id}')" class="px-2 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-medium transition" title="طرد / حذف">
+                                حذف
+                            </button>
+                        `}
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        async function toggleRoomLock() {
+            if (!currentRoomData) return;
+            currentRoomData.isOpen = currentRoomData.isOpen === false ? true : false;
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(currentRoomData.isOpen ? 'تم فتح الغرفة للانضمام' : 'تم قفل باب الغرفة');
+        }
+
+        // ترقية لاعب ليصبح هو القائد الجديد وتجريد القائد الحالي ليصبح لاعباً عادياً
+        async function promotePlayerToLeader(newLeaderId) {
+            if (!currentRoomData || !currentRoomData.players[newLeaderId]) return;
+            const newLeaderName = currentRoomData.players[newLeaderId].name;
+            currentRoomData.leaderId = newLeaderId;
+            impersonatedMemberId = null;
+            closeModal('playersAdminModal');
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(`تمت ترقية ${newLeaderName} ليصبح قائد الغرفة الجديد`);
+        }
+
+        // طرد لاعب من الغرفة
+        async function kickPlayerFromRoom(targetId) {
+            if (!currentRoomData || !currentRoomData.players[targetId]) return;
+            const kickedName = currentRoomData.players[targetId].name;
+            delete currentRoomData.players[targetId];
+            if (impersonatedMemberId === targetId) impersonatedMemberId = null;
+
+            if (currentRoomData.propertyState) {
+                Object.keys(currentRoomData.propertyState).forEach(pid => {
+                    if (currentRoomData.propertyState[pid].ownerId === targetId) {
+                        delete currentRoomData.propertyState[pid];
+                    }
+                });
+            }
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(`تم إخراج ${kickedName} من الغرفة`);
+        }
+
+        // فتح نافذة عرض جميع بطاقات الأراضي التي يمتلكها لاعب معين عند النقر على مستطيله
+        function openPlayerDeedsModal(playerId, forceReadOnly = false) {
+            if (!currentRoomData || !currentRoomData.players[playerId]) return;
+            inspectedPlayerId = playerId;
+            inspectedReadOnlyMode = forceReadOnly;
+            const player = currentRoomData.players[playerId];
+            const summary = getPlayerPropertiesSummary(playerId);
+            const isLeader = currentRoomData.leaderId === myPlayerId;
+            const isOwnDeeds = ((playerId === myPlayerId) || (isLeader && player.isOfflineMember)) && !forceReadOnly;
+
+            document.getElementById('inspectedPlayerAvatar').src = getSafeAvatarSrc(player.avatar);
+            document.getElementById('inspectedPlayerName').textContent = `عقارات ${player.name}`;
+            document.getElementById('inspectedPlayerSub').textContent = `مملوكة: ${summary.owned.length} | مرهونة: ${summary.mortgaged.length}${forceReadOnly ? ' (للمشاهدة فقط)' : ''}`;
+
+            // إظهار زر "دخول صفحته" للقائد إذا كان يتصفح لاعباً آخر
+            const enterPageBtn = document.getElementById('enterFullMemberPageFromDeedsBtn');
+            if (enterPageBtn) {
+                if (isLeader && playerId !== myPlayerId && !forceReadOnly) {
+                    enterPageBtn.classList.remove('hidden');
+                    enterPageBtn.classList.add('flex');
+                    enterPageBtn.onclick = () => enterMemberFullPage(playerId);
+                } else {
+                    enterPageBtn.classList.add('hidden');
+                    enterPageBtn.classList.remove('flex');
+                }
+            }
+
+            const grid = document.getElementById('inspectedPlayerDeedsGrid');
+            grid.innerHTML = '';
+
+            if (summary.all.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-10 text-xs text-[#7c8288]">لا يمتلك هذا اللاعب أي بطاقات أراضي حتى الآن</div>`;
+            } else {
+                summary.all.forEach(prop => {
+                    const st = currentRoomData.propertyState[prop.id];
+                    let footerHTML = '';
+                    let unmortgageBtn = '';
+
+                    if (isOwnDeeds) {
+                        const canBuild = ownsFullColorGroup(playerId, prop.group) && !st.mortgaged && (st.houses || 0) < 5;
+                        footerHTML = `
+                            <div class="flex flex-col gap-1">
+                                ${canBuild ? `<button onclick="buildHouseOrHotel('${prop.id}', '${playerId}')" class="w-full py-1 rounded bg-emerald-700 text-white text-[8.5px] font-bold">بناء منزل/فندق ($${prop.houseCost})</button>` : ''}
+                                <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${playerId}')" class="w-full py-1 rounded bg-amber-500/20 text-amber-950 border border-amber-700/40 text-[8.5px] font-bold">رهن الأرض (+$${prop.mortgage})</button>
+                            </div>
+                        `;
+                        unmortgageBtn = `<button onclick="requestOrExecuteMortgage('${prop.id}', 'unmortgage', '${playerId}')" class="w-full py-1.5 rounded-lg bg-[#95e6b8] text-[#121415] text-[9.5px] font-bold shadow">فك الرهن ($${prop.mortgage})</button>`;
+                    }
+
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = createAuthenticDeedCardHTML(prop, st, {
+                        footerActionHTML: footerHTML,
+                        unmortgageBtnHTML: unmortgageBtn
+                    });
+                    grid.appendChild(wrap.firstElementChild);
+                });
+            }
+
+            document.getElementById('playerDeedsModal').classList.remove('hidden');
+        }
+
+        function openMyPropertiesAsAdmin() {
+            openPlayerDeedsModal(myPlayerId, false);
+        }
+
+        // فتح لوحة اللاعبين للمستخدم العادي (للمشاهدة فقط لكل اللاعبين وأرصدتهم وأراضيهم المملوكة والمرهونة)
+        function openAllPlayersOverviewForUser() {
+            renderUserPlayersOverviewModal();
+            document.getElementById('userPlayersOverviewModal').classList.remove('hidden');
+        }
+
+        function renderUserPlayersOverviewModal() {
+            if (!currentRoomData) return;
+            const list = document.getElementById('userOverviewPlayersList');
+            list.innerHTML = '';
+
+            const effectiveViewerId = getEffectiveUserViewPlayerId();
+            const players = currentRoomData.players || {};
+            Object.values(players).forEach((p, idx) => {
+                const summary = getPlayerPropertiesSummary(p.id);
+                const isLeader = p.id === currentRoomData.leaderId;
+                const safeAvatar = getSafeAvatarSrc(p.avatar, idx);
+
+                const ownedPills = summary.owned.map(pr =>
+                    `<span class="inline-flex items-center gap-1 text-[9.5px] px-2 py-0.5 rounded-md bg-white/[0.06] text-white/90 border border-white/10">
+                        <span class="w-2 h-2 rounded-full" style="background:${pr.color}"></span>
+                        <span>${pr.arName}</span>
+                    </span>`
+                ).join('');
+
+                const mortgagedPills = summary.mortgaged.map(pr =>
+                    `<span class="inline-flex items-center gap-1 text-[9.5px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        <i class="ph-fill ph-lock-key text-[10px]"></i>
+                        <span>${pr.arName}</span>
+                    </span>`
+                ).join('');
+
+                const card = document.createElement('div');
+                card.className = 'matte-card p-3.5 flex flex-col gap-2.5 cursor-pointer hover:border-[#95e6b8]/40 transition';
+                card.onclick = () => openUserReadOnlyProfile(p.id);
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="relative shrink-0">
+                                <img src="${safeAvatar}" class="w-12 h-12 rounded-2xl object-cover border border-white/15" />
+                                ${isLeader ? `<span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#95e6b8] text-[#121415] flex items-center justify-center shadow" title="قائد الغرفة / البنك"><i class="ph-fill ph-crown text-xs"></i></span>` : ''}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-semibold text-white">${p.name}</span>
+                                    ${p.id === effectiveViewerId ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/70">أنت</span>` : ''}
+                                    ${isLeader ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-[#95e6b8]/15 text-[#95e6b8]">البنك</span>` : ''}
+                                </div>
+                                <div class="flex items-center gap-2.5 mt-1 text-[10px]">
+                                    <span class="text-[#95e6b8] font-medium">الأراضي المملوكة: ${summary.owned.length}</span>
+                                    <span class="text-amber-400">المرهونة: ${summary.mortgaged.length}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-left" dir="ltr">
+                            <div class="num-font text-sm font-bold text-white">$${(p.balance || 0).toLocaleString()}</div>
+                            <span class="text-[9px] text-[#95e6b8] flex items-center justify-end gap-0.5 mt-0.5">
+                                <span>عرض التفاصيل</span>
+                                <i class="ph ph-caret-left"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    ${(summary.owned.length > 0 || summary.mortgaged.length > 0) ? `
+                        <div class="pt-2 border-t border-white/[0.06] flex flex-wrap gap-1">
+                            ${ownedPills}
+                            ${mortgagedPills}
+                        </div>
+                    ` : `
+                        <div class="pt-1.5 border-t border-white/[0.04] text-[10px] text-[#7c8288]">
+                            لا يمتلك أي أراضي أو عقارات مرهونة حالياً
+                        </div>
+                    `}
+                `;
+
+                list.appendChild(card);
+            });
+        }
+
+        // فتح ملف اللاعب بشكل أكبر وكقائمة مفصلة للأراضي المملوكة والمرهونة (للمشاهدة فقط بدون تعديل)
+        function openUserReadOnlyProfile(playerId) {
+            if (!currentRoomData || !currentRoomData.players || !currentRoomData.players[playerId]) return;
+            readOnlyProfilePlayerId = playerId;
+
+            document.getElementById('userPlayersOverviewModal').classList.add('hidden');
+
+            const player = currentRoomData.players[playerId];
+            const summary = getPlayerPropertiesSummary(playerId);
+            const isLeader = player.id === currentRoomData.leaderId;
+            const safeAvatar = getSafeAvatarSrc(player.avatar);
+            const effectiveViewerId = getEffectiveUserViewPlayerId();
+
+            const totalRealEstateValue = summary.all.reduce((acc, pr) => acc + (pr.price || 0), 0);
+
+            const ownedListHTML = summary.owned.length > 0
+                ? summary.owned.map(prop => {
+                    const houses = prop.houses || 0;
+                    const currentRent = prop.rent ? prop.rent[Math.min(houses, 5)] : 0;
+                    const buildTag = houses === 5
+                        ? `<span class="px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 border border-red-500/30 text-[9.5px] font-semibold">فندق 🏨</span>`
+                        : houses > 0
+                            ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9.5px] font-semibold">${houses} منازل 🏠</span>`
+                            : `<span class="px-2 py-0.5 rounded-md bg-white/5 text-[#7c8288] text-[9.5px]">بدون مباني</span>`;
+
+                    return `
+                        <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-[#121415] border border-white/[0.06] hover:border-white/20 flex items-center justify-between gap-2 cursor-pointer transition">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3.5 h-10 rounded-lg shrink-0 shadow-sm border border-white/20" style="background:${prop.color}"></span>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">${prop.arName}</div>
+                                    <div class="text-[10px] text-[#7c8288] num-font">${prop.name}</div>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        ${buildTag}
+                                        <span class="text-[10px] text-[#95e6b8] num-font">الإيجار الحالي: $${currentRent}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-left shrink-0" dir="ltr">
+                                <div class="num-font text-xs font-bold text-white">$${prop.price}</div>
+                                <div class="text-[9px] text-[#7c8288] mt-0.5">سعر الأرض</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')
+                : `<div class="p-4 rounded-2xl bg-[#121415]/60 border border-white/5 text-center text-[11px] text-[#7c8288]">لا توجد أراضي مملوكة نشطة لدى هذا اللاعب</div>`;
+
+            const mortgagedListHTML = summary.mortgaged.length > 0
+                ? summary.mortgaged.map(prop => `
+                    <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-amber-500/[0.06] border border-amber-500/25 flex items-center justify-between gap-2 cursor-pointer transition">
+                        <div class="flex items-center gap-3">
+                            <span class="w-3.5 h-10 rounded-lg shrink-0 opacity-60 border border-white/20" style="background:${prop.color}"></span>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-semibold text-amber-200">${prop.arName}</span>
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-medium">مرهونة ومحجوبة</span>
+                                </div>
+                                <div class="text-[10px] text-[#7c8288] num-font mt-0.5">${prop.name}</div>
+                            </div>
+                        </div>
+                        <div class="text-left shrink-0" dir="ltr">
+                            <div class="num-font text-xs font-bold text-amber-300">$${prop.mortgage}</div>
+                            <div class="text-[9px] text-amber-200/70 mt-0.5">قيمة الرهن</div>
+                        </div>
+                    </div>
+                `).join('')
+                : `<div class="p-4 rounded-2xl bg-[#121415]/60 border border-white/5 text-center text-[11px] text-[#7c8288]">لا توجد أراضي مرهونة لدى هذا اللاعب</div>`;
+
+            const content = document.getElementById('userReadOnlyProfileContent');
+            content.innerHTML = `
+                <!-- بطاقة اللاعب المكبرة -->
+                <div class="visa-card-personal rounded-[26px] p-4 relative overflow-hidden">
+                    <div class="flex items-center gap-3.5">
+                        <div class="relative shrink-0">
+                            <img src="${safeAvatar}" class="w-16 h-16 rounded-2xl object-cover border-2 border-[#95e6b8]/50 shadow-md" />
+                            ${isLeader ? `<span class="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#95e6b8] text-[#121415] flex items-center justify-center shadow"><i class="ph-fill ph-crown text-xs"></i></span>` : ''}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <h4 class="text-base font-bold text-white">${player.name}</h4>
+                                ${player.id === effectiveViewerId ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-white/15 text-white">حسابك</span>` : ''}
+                                ${isLeader ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-[#95e6b8]/20 text-[#95e6b8]">قائد الغرفة / البنك</span>` : ''}
+                            </div>
+                            <p class="text-[10px] text-white/60 mt-0.5">جميع البيانات معروضة للرؤية فقط ولا يمكن تعديلها</p>
+                        </div>
+                    </div>
+
+                    <!-- إحصائيات اللاعب المالية والعقارية -->
+                    <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/10 text-center">
+                        <div class="bg-black/25 rounded-2xl p-2.5">
+                            <span class="text-[10px] text-white/60 block">الرصيد النقدي</span>
+                            <span class="num-font text-sm font-bold text-[#95e6b8] mt-0.5 block" dir="ltr">$${(player.balance || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="bg-black/25 rounded-2xl p-2.5">
+                            <span class="text-[10px] text-white/60 block">أراضي مملوكة</span>
+                            <span class="num-font text-sm font-bold text-white mt-0.5 block">${summary.owned.length}</span>
+                        </div>
+                        <div class="bg-black/25 rounded-2xl p-2.5">
+                            <span class="text-[10px] text-white/60 block">أراضي مرهونة</span>
+                            <span class="num-font text-sm font-bold text-amber-400 mt-0.5 block">${summary.mortgaged.length}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2.5 flex items-center justify-between text-[10px] text-white/70 px-1">
+                        <span>إجمالي قيمة الأصول العقارية: <strong class="num-font text-white">$${totalRealEstateValue.toLocaleString()}</strong></span>
+                        <button onclick="openPlayerDeedsModal('${player.id}', true)" class="text-[#95e6b8] hover:underline flex items-center gap-1 font-medium">
+                            <i class="ph ph-cards"></i>
+                            <span>معاينة بطاقات السندات</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- قائمة الأراضي المملوكة -->
+                <div class="space-y-2 pt-1">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-semibold text-white flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#95e6b8]"></span>
+                            <span>قائمة الأراضي المملوكة (${summary.owned.length})</span>
+                        </span>
+                        <span class="text-[10px] text-[#7c8288]">انقر لمعاينة البطاقة</span>
+                    </div>
+                    <div class="space-y-2">
+                        ${ownedListHTML}
+                    </div>
+                </div>
+
+                <!-- قائمة الأراضي المرهونة -->
+                <div class="space-y-2 pt-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+                            <i class="ph-fill ph-lock-key text-amber-400"></i>
+                            <span>قائمة الأراضي المرهونة (${summary.mortgaged.length})</span>
+                        </span>
+                    </div>
+                    <div class="space-y-2">
+                        ${mortgagedListHTML}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('userReadOnlyProfileModal').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // عرض وتحديث واجهة اللاعب العادي (User Interface) أو واجهة العضو المحلي
+        // ==========================================
+        function switchPlayerPropTab(tab) {
+            playerActiveTab = tab;
+            const ownedBtn = document.getElementById('tabOwnedBtn');
+            const mortBtn = document.getElementById('tabMortgagedBtn');
+
+            if (tab === 'owned') {
+                ownedBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-white text-[#121415] font-medium transition';
+                mortBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition';
+            } else {
+                mortBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-amber-400 text-[#121415] font-medium transition';
+                ownedBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition';
+            }
+            renderPlayerDashboard();
+        }
+
+        function renderPlayerDashboard() {
+            if (!currentRoomData) return;
+            const targetPlayerId = getEffectiveUserViewPlayerId();
+            const me = (currentRoomData.players || {})[targetPlayerId];
+            if (!me) return;
+
+            // إظهار أو إخفاء شريط الرجوع لصفحة القائد/الأدمن عند فتح واجهة عضو محلي
+            const returnBar = document.getElementById('impersonationReturnBar');
+            const statusBadge = document.getElementById('playerVisaStatusBadge');
+            if (impersonatedMemberId && currentRoomData.leaderId === myPlayerId) {
+                returnBar.classList.remove('hidden');
+                returnBar.classList.add('flex');
+                document.getElementById('impersonatedMemberName').textContent = me.name;
+                if (statusBadge) statusBadge.textContent = me.isOfflineMember ? 'عضو محلي (بإدارة القائد)' : 'حساب عضو نشط';
+            } else {
+                returnBar.classList.add('hidden');
+                returnBar.classList.remove('flex');
+                if (statusBadge) statusBadge.textContent = 'حساب لاعب نشط';
+            }
+
+            document.getElementById('playerVisaAvatar').src = getSafeAvatarSrc(me.avatar);
+            document.getElementById('playerVisaName').textContent = me.name;
+            document.getElementById('playerVisaBalance').textContent = (me.balance || 0).toLocaleString();
+            document.getElementById('playerVisaCardCode').textContent = `5211 •••• ${activeRoomCode || '2026'}`;
+
+            const summary = getPlayerPropertiesSummary(targetPlayerId);
+            document.getElementById('userOwnedCount').textContent = summary.owned.length;
+            document.getElementById('userMortgagedCount').textContent = summary.mortgaged.length;
+
+            const container = document.getElementById('playerPropertiesContainer');
+            container.innerHTML = '';
+
+            const listToShow = playerActiveTab === 'owned' ? summary.owned : summary.mortgaged;
+
+            if (listToShow.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 matte-card p-6 text-center my-auto">
+                        <i class="ph ph-cards text-2xl text-[#7c8288] mb-1"></i>
+                        <p class="text-xs text-white/80">${playerActiveTab === 'owned' ? 'لا تمتلك أراضي نشطة حالياً' : 'لا توجد لديك أراضي مرهونة'}</p>
+                        <p class="text-[10px] text-[#7c8288] mt-0.5">عند شرائك أرضاً من البنك ستظهر بطاقتها الحقيقية هنا</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listToShow.forEach(prop => {
+                const st = currentRoomData.propertyState[prop.id];
+                const fullGroup = ownsFullColorGroup(targetPlayerId, prop.group);
+                const canBuild = fullGroup && !st.mortgaged && (st.houses || 0) < 5;
+
+                const footerHTML = `
+                    <div class="flex flex-col gap-1">
+                        ${canBuild ? `
+                            <button onclick="buildHouseOrHotel('${prop.id}', '${targetPlayerId}')" class="w-full py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-[8.5px] font-bold transition">
+                                ${(st.houses || 0) === 4 ? `بناء فندق ($${prop.houseCost})` : `بناء منزل ($${prop.houseCost})`}
+                            </button>
+                        ` : `
+                            <div class="text-[8px] text-center text-black/55 py-0.5">
+                                ${(st.houses || 0) >= 5 ? 'تم بناء الفندق الأقصى' : 'امتلك المجموعة كاملة للبناء'}
+                            </div>
+                        `}
+                        <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${targetPlayerId}')" class="w-full py-1 rounded bg-[#121415] hover:bg-black text-amber-300 text-[8.5px] font-bold transition">
+                            طلب رهن الأرض (+$${prop.mortgage})
+                        </button>
+                    </div>
+                `;
+
+                const unmortgageBtn = `
+                    <button onclick="requestOrExecuteMortgage('${prop.id}', 'unmortgage', '${targetPlayerId}')" class="w-full py-1.5 rounded-lg bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[9.5px] font-bold shadow transition">
+                        طلب فك الرهن (-$${prop.mortgage})
+                    </button>
+                `;
+
+                const wrap = document.createElement('div');
+                wrap.innerHTML = createAuthenticDeedCardHTML(prop, st, {
+                    footerActionHTML: footerHTML,
+                    unmortgageBtnHTML: unmortgageBtn
+                });
+                container.appendChild(wrap.firstElementChild);
+            });
+        }
+
+        // طلب رهن أو فك رهن أرض (للاعب يرسل طلب للقائد، وللقائد ينفذ مباشرة لنفسه أو للعضو الذي يدير صفحته)
+        async function requestOrExecuteMortgage(propId, type, forPlayerId = null) {
+            if (!currentRoomData) return;
+            const actingPlayerId = forPlayerId || getEffectiveUserViewPlayerId();
+            const prop = MONOPOLY_PROPERTIES.find(p => p.id === propId);
+            const st = (currentRoomData.propertyState || {})[propId];
+            const actor = (currentRoomData.players || {})[actingPlayerId];
+            if (!prop || !st || !actor) return;
+
+            if (type === 'unmortgage' && (actor.balance || 0) < prop.mortgage) {
+                showMonoToast(`رصيد ${actor.name} غير كافٍ لفك رهن ${prop.arName} ($${prop.mortgage})`);
+                return;
+            }
+
+            // إذا كان المستخدم الفعلي هو القائد ينفذ الرهن مباشرة (سواء لنفسه أو للعضو المحلي الذي دخل صفحته)
+            if (currentRoomData.leaderId === myPlayerId) {
+                if (type === 'mortgage' && !st.mortgaged) {
+                    st.mortgaged = true;
+                    st.houses = 0;
+                    actor.balance = (actor.balance || 0) + prop.mortgage;
+                    showMonoToast(`تم رهن ${prop.arName} وإضافة $${prop.mortgage} لرصيد ${actor.name}`);
+                } else if (type === 'unmortgage' && st.mortgaged) {
+                    actor.balance -= prop.mortgage;
+                    st.mortgaged = false;
+                    showMonoToast(`تم فك رهن ${prop.arName} لـ ${actor.name}`);
+                }
+                await saveRoomData(activeRoomCode, currentRoomData);
+                return;
+            }
+
+            // للاعب العادي: إرسال الطلب إلى قائمة طلبات القائد للموافقة
+            currentRoomData.mortgageRequests = currentRoomData.mortgageRequests || [];
+            const exists = currentRoomData.mortgageRequests.some(r => r.propId === propId && r.playerId === actingPlayerId);
+            if (exists) {
+                showMonoToast('لديك طلب معلق بالفعل لهذه الأرض بانتظار موافقة القائد');
+                return;
+            }
+
+            currentRoomData.mortgageRequests.push({
+                id: 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                propId: propId,
+                playerId: actingPlayerId,
+                type: type,
+                amount: prop.mortgage
+            });
+
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(type === 'mortgage' ? 'تم إرسال طلب الرهن لقائد الغرفة' : 'تم إرسال طلب فك الرهن لقائد الغرفة');
+        }
+
+        // تطوير الأراضي وبناء المنازل والفنادق (بشرط امتلاك المجموعة اللونية كاملة)
+        async function buildHouseOrHotel(propId, forPlayerId = null) {
+            if (!currentRoomData) return;
+            const actingPlayerId = forPlayerId || getEffectiveUserViewPlayerId();
+            const prop = MONOPOLY_PROPERTIES.find(p => p.id === propId);
+            const st = (currentRoomData.propertyState || {})[propId];
+            const actor = (currentRoomData.players || {})[actingPlayerId];
+            if (!prop || !st || !actor) return;
+
+            if (!ownsFullColorGroup(actingPlayerId, prop.group)) {
+                showMonoToast('يجب امتلاك جميع أراضي المجموعة اللونية أولاً للبناء');
+                return;
+            }
+            if (st.mortgaged) {
+                showMonoToast('لا يمكن البناء على أرض مرهونة');
+                return;
+            }
+            if ((st.houses || 0) >= 5) {
+                showMonoToast('وصلت هذه الأرض للحد الأقصى (فندق)');
+                return;
+            }
+            if ((actor.balance || 0) < prop.houseCost) {
+                showMonoToast(`رصيد ${actor.name} غير كافٍ للبناء (التكلفة $${prop.houseCost})`);
+                return;
+            }
+
+            actor.balance -= prop.houseCost;
+            st.houses = (st.houses || 0) + 1;
+
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(st.houses === 5 ? `مبارك! تم تشييد فندق في ${prop.arName}` : `تم بناء منزل (${st.houses}) في ${prop.arName}`);
+        }
+
+        // التهيئة عند التشغيل
+        window.onload = function () {
+            build3DCube('cube1');
+            build3DCube('cube2');
+            buildArcDots();
+            rotateCubeTo(1, 1, false);
+            rotateCubeTo(2, 6, false);
             updateArcGauge(1, 6);
+            initMonopolyAuthUI();
         };
     </script>
 </body>
