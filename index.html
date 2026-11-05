@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DICE</title>
+    <title>DICEROLL™ — Smart Roller</title>
     <!-- ربط الأيقونة المصغرة للتطبيق -->
     <link rel="icon" type="image/png" href="narde.png">
     <!-- Tailwind CSS -->
@@ -690,8 +690,8 @@
                         </button>
                     </div>
 
-                    <!-- بطاقة الفيزا الرقمية الخاصة باللاعب -->
-                    <div class="visa-card-personal rounded-[28px] p-4.5 relative overflow-hidden shrink-0">
+                    <!-- بطاقة الفيزا الرقمية الخاصة باللاعب (قابلة للنقر لتحويل مبلغ لشخص معين) -->
+                    <div onclick="handleUserVisaClick()" class="visa-card-personal rounded-[28px] p-4.5 relative overflow-hidden shrink-0 cursor-pointer hover:border-[#95e6b8]/45 active:scale-[0.99] transition-all duration-200 group">
                         <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#95e6b8]/[0.05] pointer-events-none"></div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2.5">
@@ -699,6 +699,10 @@
                                 <div>
                                     <span id="playerVisaStatusBadge" class="text-[10px] text-[#95e6b8] block">حساب لاعب نشط</span>
                                     <h3 id="playerVisaName" class="text-sm font-semibold text-white">اسم اللاعب</h3>
+                                    <span class="text-[9.5px] text-[#95e6b8]/90 flex items-center gap-1 mt-0.5">
+                                        <i class="ph-fill ph-paper-plane-tilt text-[10px]"></i>
+                                        <span>انقر على البطاقة لدفع مبلغ للاعب</span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="text-left" dir="ltr">
@@ -715,7 +719,8 @@
                                     <span id="playerVisaBalance" class="num-font text-2xl font-bold text-white tracking-tight">1,500</span>
                                 </div>
                             </div>
-                            <div class="text-left" dir="ltr">
+                            <div class="text-left flex flex-col items-end gap-1" dir="ltr">
+                                <span class="text-[9.5px] px-2.5 py-0.5 rounded-full bg-[#95e6b8]/15 text-[#95e6b8] border border-[#95e6b8]/30 font-medium group-hover:bg-[#95e6b8] group-hover:text-[#121415] transition" dir="rtl">دفع / تحويل مال</span>
                                 <span id="playerVisaCardCode" class="num-font text-[10px] text-white/50 tracking-widest">5211 •••• 2026</span>
                             </div>
                         </div>
@@ -794,7 +799,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-white/10">
                         <div>
                             <h3 class="text-sm font-semibold text-white">سجل عقارات وأراضي المونوبولي</h3>
-                            <p class="text-[10px] text-[#7c8288]">حدد الأرض واللاعب لبيعها أو نقل ملكيتها</p>
+                            <p class="text-[10px] text-[#7c8288]">حدد الأرض أو محطة القطار واللاعب لبيعها أو نقل ملكيتها</p>
                         </div>
                         <button onclick="closeModal('propertiesModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
@@ -957,6 +962,48 @@
                             <span>فرض غرامة / سحب</span>
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- نافذة دفع وتحويل مبلغ من فيزا المستخدم العادي إلى لاعب آخر -->
+            <div id="userPayModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 flex flex-col shadow-2xl space-y-3.5">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                                <i class="ph-fill ph-credit-card text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">دفع وتحويل من بطاقة الفيزا</h3>
+                                <p id="userPayFromLabel" class="text-[10px] text-[#7c8288]">تحويل مباشر من رصيدك إلى لاعب آخر في الغرفة</p>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('userPayModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] text-[#7c8288] block mb-1">اختر الشخص المستلم</label>
+                        <select id="userPayTargetSelect" class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] text-[#7c8288] block mb-1">المبلغ المراد دفعه ($)</label>
+                        <input id="userPayAmountInput" type="number" min="1" value="50" class="num-font w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3.5 py-2.5 text-base font-bold text-white outline-none" />
+                        <!-- أزرار مبالغ سريعة للدفع -->
+                        <div class="flex items-center gap-1.5 mt-2">
+                            <button onclick="setUserQuickPayAmount(25)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$25</button>
+                            <button onclick="setUserQuickPayAmount(50)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$50</button>
+                            <button onclick="setUserQuickPayAmount(100)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-[#95e6b8] font-semibold">$100</button>
+                            <button onclick="setUserQuickPayAmount(200)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$200</button>
+                        </div>
+                    </div>
+
+                    <button onclick="executeUserVisaPayment()" class="w-full py-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                        <i class="ph-bold ph-paper-plane-tilt text-base"></i>
+                        <span>تأكيد دفع المبلغ الآن</span>
+                    </button>
                 </div>
             </div>
 
@@ -1636,7 +1683,7 @@
         // برمجة نظام مونوبولي أونلاين المتكامل (البنك + العقارات + المزامنة)
         // ==========================================================
 
-        // قائمة عقارات مونوبولي الحقيقية المستخرجة من لوحة اللعب وبطاقة Belleville المرفقة
+        // قائمة عقارات مونوبولي الحقيقية + محطات القطار الـ 4 المرفقة في الصورة
         const MONOPOLY_PROPERTIES = [
             // المجموعة البنفسجية / البنية
             { id: 'belleville', name: 'BOULEVARD OF BELLEVILLE', arName: 'بوليفارد بيلفيل', group: 'purple', color: '#7b2cbf', price: 60, rent: [2, 10, 30, 90, 160, 250], mortgage: 30, houseCost: 50, code: '5211-25' },
@@ -1667,7 +1714,12 @@
             { id: 'nasturtiums', name: 'BOULEVARD OF THE NASTURTIUMS', arName: 'بوليفارد كابوسين', group: 'green', color: '#16a34a', price: 320, rent: [28, 150, 450, 1000, 1200, 1400], mortgage: 160, houseCost: 200, code: '5211-44' },
             // المجموعة الزرقاء الداكنة الملكية
             { id: 'champs', name: 'AVENUE OF THE CHAMPS-ELYSEES', arName: 'جادة الشانزليزيه', group: 'darkblue', color: '#1d4ed8', price: 350, rent: [35, 175, 500, 1100, 1300, 1500], mortgage: 175, houseCost: 200, code: '5211-45' },
-            { id: 'peace', name: 'STREET OF PEACE', arName: 'شارع السلام', group: 'darkblue', color: '#1d4ed8', price: 400, rent: [50, 200, 600, 1400, 1700, 2000], mortgage: 200, houseCost: 200, code: '5211-46' }
+            { id: 'peace', name: 'STREET OF PEACE', arName: 'شارع السلام', group: 'darkblue', color: '#1d4ed8', price: 400, rent: [50, 200, 600, 1400, 1700, 2000], mortgage: 200, houseCost: 200, code: '5211-46' },
+            // محطات القطار الـ 4 المرفقة في الصورة
+            { id: 'station_montparnasse', name: 'PARK MONTPARNASSE', arName: 'محطة قطار مونبارناس', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-01' },
+            { id: 'station_lyon', name: 'PARK OF LYON', arName: 'محطة قطار ليون', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-02' },
+            { id: 'station_north', name: 'PARK NORTH', arName: 'محطة قطار الشمال', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-03' },
+            { id: 'station_saintlazare', name: 'PARK SAINFLAZARE', arName: 'محطة قطار سان لازار', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-04' }
         ];
 
         // دالة لتوليد أفاتار SVG مشفر بـ Base64 بالكامل (يمنع كسر كود الـ HTML أو ظهور نص طويل)
@@ -1722,6 +1774,17 @@
                 return impersonatedMemberId;
             }
             return myPlayerId;
+        }
+
+        // دالة التحقق من عدم تكرار الأسماء داخل نفس الغرفة
+        function isPlayerNameTakenInRoom(roomData, candidateName, ignorePlayerId = null) {
+            if (!roomData || !roomData.players) return false;
+            const normalizedTarget = candidateName.trim().replace(/\s+/g, ' ').toLowerCase();
+            return Object.values(roomData.players).some(p => {
+                if (ignorePlayerId && p.id === ignorePlayerId) return false;
+                const existing = (p.name || '').trim().replace(/\s+/g, ' ').toLowerCase();
+                return existing === normalizedTarget;
+            });
         }
 
         // تهيئة الأفاتارات في شاشة الدخول
@@ -2030,7 +2093,7 @@
             showMonoToast(`تم إنشاء الغرفة بنجاح! الكود: ${code}`);
         }
 
-        // 2. الدخول إلى غرفة مونوبولي بواسطة الكود المكون من 4 أرقام
+        // 2. الدخول إلى غرفة مونوبولي بواسطة الكود المكون من 4 أرقام (مع منع تكرار الأسماء)
         async function joinMonopolyRoom() {
             if (!validateUserIdentity()) return;
             const codeInput = document.getElementById('joinRoomCodeInput').value.trim();
@@ -2059,6 +2122,13 @@
 
             if (!roomData.isOpen && (!roomData.players || !roomData.players[myPlayerId])) {
                 showMonoToast('عذراً، هذه الغرفة مغلقة حالياً من قِبل القائد');
+                return;
+            }
+
+            // منع تكرار الاسم داخل الغرفة
+            if (isPlayerNameTakenInRoom(roomData, myProfile.name, myPlayerId)) {
+                showMonoToast('عذراً، هذا الاسم مستخدم بالفعل في الغرفة! اختر اسماً آخر');
+                document.getElementById('playerNameInput').focus();
                 return;
             }
 
@@ -2223,8 +2293,16 @@
             return { owned, mortgaged, all: [...owned, ...mortgaged] };
         }
 
-        // التحقق مما إذا كان اللاعب يمتلك المجموعة اللونية كاملة (لبناء المنازل والفنادق)
+        // حساب عدد محطات القطار النشطة المملوكة لنفس اللاعب
+        function getOwnedStationsCount(playerId) {
+            if (!playerId || !currentRoomData || !currentRoomData.propertyState) return 0;
+            const propState = currentRoomData.propertyState;
+            return MONOPOLY_PROPERTIES.filter(p => p.isStation && propState[p.id] && propState[p.id].ownerId === playerId && !propState[p.id].mortgaged).length;
+        }
+
+        // التحقق مما إذا كان اللاعب يمتلك المجموعة اللونية كاملة (لبناء المنازل والفنادق — لا ينطبق على محطات القطار)
         function ownsFullColorGroup(playerId, groupName) {
+            if (groupName === 'station') return false;
             const propState = (currentRoomData && currentRoomData.propertyState) || {};
             const groupProps = MONOPOLY_PROPERTIES.filter(p => p.group === groupName);
             return groupProps.every(p => {
@@ -2233,10 +2311,80 @@
             });
         }
 
-        // رسم بطاقة سند ملكية حقيقية (مطابقة لبطاقة BOULEVARD OF BELLEVILLE المرفقة)
+        // رسم بطاقة سند ملكية حقيقية (للأراضي العادية ولمحطات القطار الـ 4 المرفقة في الصورة)
         function createAuthenticDeedCardHTML(prop, state, options = {}) {
             const houses = (state && state.houses) || 0;
             const isMortgaged = !!(state && state.mortgaged);
+
+            // في حال كانت البطاقة محطة قطار (مطابقة للصورة المرفقة باللون الأخضر الفاتح ورمز القاطرة السوداء)
+            if (prop.isStation) {
+                const ownerId = state && state.ownerId;
+                const ownedStations = ownerId ? getOwnedStationsCount(ownerId) : 0;
+
+                return `
+                    <div class="deed-card flex flex-col justify-between" style="background-color: #93c456;" onclick="${options.onClick || ''}">
+                        <div class="deed-inner" style="border-color: #16181a;">
+                            <!-- رأس محطة القطار مع أيقونة القاطرة السوداء -->
+                            <div class="deed-header" style="background-color: #82b546; color: #111315; border-color: #16181a;">
+                                <div class="text-[8px] font-bold tracking-[0.14em] uppercase opacity-80">RAILROAD STATION</div>
+                                <div class="text-[10.5px] font-extrabold leading-tight mt-0.5 uppercase">${prop.name}</div>
+                                <div class="text-[9px] font-bold opacity-90">${prop.arName}</div>
+                            </div>
+
+                            <!-- رسم القاطرة السوداء مطابقة للصورة -->
+                            <div class="flex items-center justify-center my-1 py-1 bg-black/10 rounded">
+                                <i class="ph-fill ph-train-simple text-2xl text-[#111315]"></i>
+                            </div>
+
+                            <!-- جدول إيجار محطات القطار -->
+                            <div class="text-[8.8px] space-y-0.5 flex-1 text-[#111315] font-medium" dir="ltr">
+                                <div class="flex justify-between ${ownedStations === 1 ? 'font-extrabold underline' : ''}">
+                                    <span>Rent (1 Station)</span>
+                                    <span>$ ${prop.rent[0]}</span>
+                                </div>
+                                <div class="flex justify-between ${ownedStations === 2 ? 'font-extrabold underline' : ''}">
+                                    <span>If 2 Stations</span>
+                                    <span>$ ${prop.rent[1]}</span>
+                                </div>
+                                <div class="flex justify-between ${ownedStations === 3 ? 'font-extrabold underline' : ''}">
+                                    <span>If 3 Stations</span>
+                                    <span>$ ${prop.rent[2]}</span>
+                                </div>
+                                <div class="flex justify-between ${ownedStations === 4 ? 'font-extrabold underline' : ''}">
+                                    <span>If 4 Stations</span>
+                                    <span>$ ${prop.rent[3]}</span>
+                                </div>
+
+                                <div class="border-t border-black/25 pt-1 mt-1 space-y-0.5 text-[8.5px]">
+                                    <div class="flex justify-between">
+                                        <span>Mortgage Value</span>
+                                        <span class="font-bold">$ ${prop.mortgage}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- شريط السعر السفلي -->
+                            <div class="mt-1.5 pt-1 border-t border-black/25 flex items-center justify-between text-[8px] text-black/80" dir="ltr">
+                                <span class="font-semibold">${prop.code}</span>
+                                <span class="px-1.5 py-0.5 rounded bg-black text-[#93c456] text-[8px] font-bold">TRAIN 🚂</span>
+                                <span class="font-extrabold text-black text-[9.5px]">$ ${prop.price}</span>
+                            </div>
+
+                            ${options.footerActionHTML ? `<div class="mt-1.5" onclick="event.stopPropagation()">${options.footerActionHTML}</div>` : ''}
+
+                            ${isMortgaged ? `
+                                <div class="deed-mortgaged-overlay absolute inset-0 rounded-[8px] flex flex-col items-center justify-center p-2 text-center text-white">
+                                    <i class="ph-fill ph-lock-key text-2xl text-amber-400 mb-1"></i>
+                                    <span class="text-[11px] font-bold text-amber-300">محطة مرهونة ومحجوبة</span>
+                                    <span class="text-[9px] text-white/75 mt-0.5">فك الرهن: $${prop.mortgage}</span>
+                                    ${options.unmortgageBtnHTML ? `<div class="mt-2 w-full" onclick="event.stopPropagation()">${options.unmortgageBtnHTML}</div>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
             const houseBadges = houses === 5
                 ? `<span class="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-bold">HOTEL 🏨</span>`
                 : houses > 0
@@ -2353,7 +2501,7 @@
 
                 // مصغرات ملونة للأراضي المملوكة
                 const colorDots = summary.owned.slice(0, 6).map(pr =>
-                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${pr.color}" title="${pr.arName}"></span>`
+                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${pr.isStation ? '#82b546' : pr.color}" title="${pr.arName}"></span>`
                 ).join('');
 
                 card.innerHTML = `
@@ -2543,6 +2691,74 @@
         }
 
         // ==========================================
+        // ميزة نقر المستخدم العادي على بطاقة الفيزا لدفع مبلغ لشخص معين
+        // ==========================================
+        function handleUserVisaClick() {
+            if (!currentRoomData) return;
+            const senderId = getEffectiveUserViewPlayerId();
+            const players = currentRoomData.players || {};
+            const sender = players[senderId];
+            if (!sender) return;
+
+            const otherPlayers = Object.values(players).filter(p => p.id !== senderId);
+            if (otherPlayers.length === 0) {
+                showMonoToast('لا يوجد لاعبون آخرون في الغرفة حالياً للتحويل إليهم');
+                return;
+            }
+
+            const select = document.getElementById('userPayTargetSelect');
+            select.innerHTML = '';
+            otherPlayers.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.name} (رصيده: $${(p.balance || 0).toLocaleString()})`;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('userPayFromLabel').textContent = `الدفع من محفظة: ${sender.name} (الرصيد المتاح: $${(sender.balance || 0).toLocaleString()})`;
+            openModal('userPayModal');
+        }
+
+        function setUserQuickPayAmount(val) {
+            document.getElementById('userPayAmountInput').value = val;
+        }
+
+        async function executeUserVisaPayment() {
+            if (!currentRoomData) return;
+            const senderId = getEffectiveUserViewPlayerId();
+            const targetId = document.getElementById('userPayTargetSelect').value;
+            const amount = parseInt(document.getElementById('userPayAmountInput').value) || 0;
+
+            if (!targetId || amount <= 0) {
+                showMonoToast('يرجى اختيار الشخص وإدخال مبلغ صحيح');
+                return;
+            }
+
+            const players = currentRoomData.players || {};
+            const sender = players[senderId];
+            const receiver = players[targetId];
+
+            if (!sender || !receiver) return;
+
+            if (senderId === targetId) {
+                showMonoToast('لا يمكنك تحويل المبلغ لنفس الحساب');
+                return;
+            }
+
+            if ((sender.balance || 0) < amount) {
+                showMonoToast(`رصيد ${sender.name} غير كافٍ لدفع $${amount}`);
+                return;
+            }
+
+            sender.balance -= amount;
+            receiver.balance = (receiver.balance || 0) + amount;
+
+            closeModal('userPayModal');
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast(`تم دفع $${amount} بنجاح من ${sender.name} إلى ${receiver.name}`);
+        }
+
+        // ==========================================
         // نوافذ التحكم للقائد (إدارة الأراضي، الرهن، اللاعبين + إضافة عضو محلي)
         // ==========================================
         function openModal(id) {
@@ -2611,13 +2827,19 @@
             reader.readAsDataURL(file);
         }
 
-        // إضافة العضو المحلي للغرفة
+        // إضافة العضو المحلي للغرفة (مع منع تكرار الأسماء)
         async function addOfflineMemberToRoom() {
             if (!currentRoomData) return;
             const nameInput = document.getElementById('offlineMemberNameInput');
             const name = nameInput.value.trim();
             if (!name) {
                 showMonoToast('يرجى إدخال اسم العضو أولاً');
+                nameInput.focus();
+                return;
+            }
+
+            if (isPlayerNameTakenInRoom(currentRoomData, name)) {
+                showMonoToast('عذراً، هذا الاسم موجود بالفعل في الغرفة! اختر اسماً مختلفاً');
                 nameInput.focus();
                 return;
             }
@@ -2672,12 +2894,12 @@
                 const owner = st && st.ownerId ? players[st.ownerId] : null;
 
                 const footerHTML = owner
-                    ? `<div class="flex items-center justify-between gap-1 bg-black/10 rounded px-1.5 py-1">
-                         <span class="text-[9px] font-bold truncate text-emerald-900">المالك: ${owner.name}</span>
+                    ? `<div class="flex items-center justify-between gap-1 bg-black/15 rounded px-1.5 py-1">
+                         <span class="text-[9px] font-bold truncate text-emerald-950">المالك: ${owner.name}</span>
                          <button onclick="reclaimPropertyToBank('${prop.id}')" class="text-[8.5px] bg-red-600 text-white px-1.5 py-0.5 rounded font-bold">استرداد</button>
                        </div>`
                     : `<button onclick="sellPropertyToSelectedPlayer('${prop.id}')" class="w-full py-1.5 rounded bg-[#121415] hover:bg-black text-[#95e6b8] text-[9.5px] font-bold transition">
-                         بيع الأرض ($${prop.price})
+                         ${prop.isStation ? `بيع المحطة ($${prop.price})` : `بيع الأرض ($${prop.price})`}
                        </button>`;
 
                 const wrapper = document.createElement('div');
@@ -2720,7 +2942,7 @@
             if (!currentRoomData || !currentRoomData.propertyState) return;
             delete currentRoomData.propertyState[propId];
             await saveRoomData(activeRoomCode, currentRoomData);
-            showMonoToast('تمت إعادة الأرض إلى البنك المركزي');
+            showMonoToast('تمت إعادة العقار إلى البنك المركزي');
         }
 
         // نافذة طلبات الرهن وفك الرهن المرسلة من اللاعبين
@@ -2745,9 +2967,9 @@
                 item.className = 'matte-card p-3 flex items-center justify-between gap-2';
                 item.innerHTML = `
                     <div class="flex items-center gap-2.5">
-                        <span class="w-3 h-9 rounded-full shrink-0" style="background:${prop.color}"></span>
+                        <span class="w-3 h-9 rounded-full shrink-0" style="background:${prop.isStation ? '#82b546' : prop.color}"></span>
                         <div>
-                            <div class="text-xs font-semibold text-white">${player.name} — ${isMortgage ? 'طلب رهن أرض' : 'طلب فك رهن'}</div>
+                            <div class="text-xs font-semibold text-white">${player.name} — ${isMortgage ? 'طلب رهن عقار' : 'طلب فك رهن'}</div>
                             <div class="text-[10px] text-[#7c8288]">${prop.arName} (${prop.name})</div>
                             <div class="text-[10px] text-[#95e6b8] num-font mt-0.5">
                                 ${isMortgage ? `سيحصل اللاعب على: +$${prop.mortgage}` : `سيدفع اللاعب للبنك: -$${prop.mortgage}`}
@@ -2936,11 +3158,11 @@
                     let unmortgageBtn = '';
 
                     if (isOwnDeeds) {
-                        const canBuild = ownsFullColorGroup(playerId, prop.group) && !st.mortgaged && (st.houses || 0) < 5;
+                        const canBuild = !prop.isStation && ownsFullColorGroup(playerId, prop.group) && !st.mortgaged && (st.houses || 0) < 5;
                         footerHTML = `
                             <div class="flex flex-col gap-1">
                                 ${canBuild ? `<button onclick="buildHouseOrHotel('${prop.id}', '${playerId}')" class="w-full py-1 rounded bg-emerald-700 text-white text-[8.5px] font-bold">بناء منزل/فندق ($${prop.houseCost})</button>` : ''}
-                                <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${playerId}')" class="w-full py-1 rounded bg-amber-500/20 text-amber-950 border border-amber-700/40 text-[8.5px] font-bold">رهن الأرض (+$${prop.mortgage})</button>
+                                <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${playerId}')" class="w-full py-1 rounded bg-amber-500/20 text-amber-950 border border-amber-700/40 text-[8.5px] font-bold">رهن العقار (+$${prop.mortgage})</button>
                             </div>
                         `;
                         unmortgageBtn = `<button onclick="requestOrExecuteMortgage('${prop.id}', 'unmortgage', '${playerId}')" class="w-full py-1.5 rounded-lg bg-[#95e6b8] text-[#121415] text-[9.5px] font-bold shadow">فك الرهن ($${prop.mortgage})</button>`;
@@ -2982,7 +3204,7 @@
 
                 const ownedPills = summary.owned.map(pr =>
                     `<span class="inline-flex items-center gap-1 text-[9.5px] px-2 py-0.5 rounded-md bg-white/[0.06] text-white/90 border border-white/10">
-                        <span class="w-2 h-2 rounded-full" style="background:${pr.color}"></span>
+                        <span class="w-2 h-2 rounded-full" style="background:${pr.isStation ? '#82b546' : pr.color}"></span>
                         <span>${pr.arName}</span>
                     </span>`
                 ).join('');
@@ -3057,21 +3279,27 @@
             const effectiveViewerId = getEffectiveUserViewPlayerId();
 
             const totalRealEstateValue = summary.all.reduce((acc, pr) => acc + (pr.price || 0), 0);
+            const ownedStationsCount = getOwnedStationsCount(playerId);
 
             const ownedListHTML = summary.owned.length > 0
                 ? summary.owned.map(prop => {
                     const houses = prop.houses || 0;
-                    const currentRent = prop.rent ? prop.rent[Math.min(houses, 5)] : 0;
-                    const buildTag = houses === 5
-                        ? `<span class="px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 border border-red-500/30 text-[9.5px] font-semibold">فندق 🏨</span>`
-                        : houses > 0
-                            ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9.5px] font-semibold">${houses} منازل 🏠</span>`
-                            : `<span class="px-2 py-0.5 rounded-md bg-white/5 text-[#7c8288] text-[9.5px]">بدون مباني</span>`;
+                    const currentRent = prop.isStation
+                        ? prop.rent[Math.max(0, Math.min(ownedStationsCount - 1, 3))]
+                        : (prop.rent ? prop.rent[Math.min(houses, 5)] : 0);
+
+                    const buildTag = prop.isStation
+                        ? `<span class="px-2 py-0.5 rounded-md bg-lime-500/20 text-lime-300 border border-lime-500/30 text-[9.5px] font-semibold">محطة قطار 🚂 (${ownedStationsCount}/4)</span>`
+                        : houses === 5
+                            ? `<span class="px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 border border-red-500/30 text-[9.5px] font-semibold">فندق 🏨</span>`
+                            : houses > 0
+                                ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9.5px] font-semibold">${houses} منازل 🏠</span>`
+                                : `<span class="px-2 py-0.5 rounded-md bg-white/5 text-[#7c8288] text-[9.5px]">بدون مباني</span>`;
 
                     return `
                         <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-[#121415] border border-white/[0.06] hover:border-white/20 flex items-center justify-between gap-2 cursor-pointer transition">
                             <div class="flex items-center gap-3">
-                                <span class="w-3.5 h-10 rounded-lg shrink-0 shadow-sm border border-white/20" style="background:${prop.color}"></span>
+                                <span class="w-3.5 h-10 rounded-lg shrink-0 shadow-sm border border-white/20" style="background:${prop.isStation ? '#82b546' : prop.color}"></span>
                                 <div>
                                     <div class="text-xs font-semibold text-white">${prop.arName}</div>
                                     <div class="text-[10px] text-[#7c8288] num-font">${prop.name}</div>
@@ -3083,7 +3311,7 @@
                             </div>
                             <div class="text-left shrink-0" dir="ltr">
                                 <div class="num-font text-xs font-bold text-white">$${prop.price}</div>
-                                <div class="text-[9px] text-[#7c8288] mt-0.5">سعر الأرض</div>
+                                <div class="text-[9px] text-[#7c8288] mt-0.5">سعر العقار</div>
                             </div>
                         </div>
                     `;
@@ -3094,7 +3322,7 @@
                 ? summary.mortgaged.map(prop => `
                     <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-amber-500/[0.06] border border-amber-500/25 flex items-center justify-between gap-2 cursor-pointer transition">
                         <div class="flex items-center gap-3">
-                            <span class="w-3.5 h-10 rounded-lg shrink-0 opacity-60 border border-white/20" style="background:${prop.color}"></span>
+                            <span class="w-3.5 h-10 rounded-lg shrink-0 opacity-60 border border-white/20" style="background:${prop.isStation ? '#82b546' : prop.color}"></span>
                             <div>
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-xs font-semibold text-amber-200">${prop.arName}</span>
@@ -3243,7 +3471,7 @@
                     <div class="col-span-2 matte-card p-6 text-center my-auto">
                         <i class="ph ph-cards text-2xl text-[#7c8288] mb-1"></i>
                         <p class="text-xs text-white/80">${playerActiveTab === 'owned' ? 'لا تمتلك أراضي نشطة حالياً' : 'لا توجد لديك أراضي مرهونة'}</p>
-                        <p class="text-[10px] text-[#7c8288] mt-0.5">عند شرائك أرضاً من البنك ستظهر بطاقتها الحقيقية هنا</p>
+                        <p class="text-[10px] text-[#7c8288] mt-0.5">عند شرائك أرضاً أو محطة قطار من البنك ستظهر بطاقتها الحقيقية هنا</p>
                     </div>
                 `;
                 return;
@@ -3252,11 +3480,15 @@
             listToShow.forEach(prop => {
                 const st = currentRoomData.propertyState[prop.id];
                 const fullGroup = ownsFullColorGroup(targetPlayerId, prop.group);
-                const canBuild = fullGroup && !st.mortgaged && (st.houses || 0) < 5;
+                const canBuild = !prop.isStation && fullGroup && !st.mortgaged && (st.houses || 0) < 5;
 
                 const footerHTML = `
                     <div class="flex flex-col gap-1">
-                        ${canBuild ? `
+                        ${prop.isStation ? `
+                            <div class="text-[8px] text-center font-semibold text-black/75 py-0.5">
+                                إيجار يتضاعف بعدد المحطات المملوكة
+                            </div>
+                        ` : canBuild ? `
                             <button onclick="buildHouseOrHotel('${prop.id}', '${targetPlayerId}')" class="w-full py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-[8.5px] font-bold transition">
                                 ${(st.houses || 0) === 4 ? `بناء فندق ($${prop.houseCost})` : `بناء منزل ($${prop.houseCost})`}
                             </button>
@@ -3266,7 +3498,7 @@
                             </div>
                         `}
                         <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${targetPlayerId}')" class="w-full py-1 rounded bg-[#121415] hover:bg-black text-amber-300 text-[8.5px] font-bold transition">
-                            طلب رهن الأرض (+$${prop.mortgage})
+                            طلب رهن العقار (+$${prop.mortgage})
                         </button>
                     </div>
                 `;
@@ -3320,7 +3552,7 @@
             currentRoomData.mortgageRequests = currentRoomData.mortgageRequests || [];
             const exists = currentRoomData.mortgageRequests.some(r => r.propId === propId && r.playerId === actingPlayerId);
             if (exists) {
-                showMonoToast('لديك طلب معلق بالفعل لهذه الأرض بانتظار موافقة القائد');
+                showMonoToast('لديك طلب معلق بالفعل لهذا العقار بانتظار موافقة القائد');
                 return;
             }
 
@@ -3343,7 +3575,7 @@
             const prop = MONOPOLY_PROPERTIES.find(p => p.id === propId);
             const st = (currentRoomData.propertyState || {})[propId];
             const actor = (currentRoomData.players || {})[actingPlayerId];
-            if (!prop || !st || !actor) return;
+            if (!prop || !st || !actor || prop.isStation) return;
 
             if (!ownsFullColorGroup(actingPlayerId, prop.group)) {
                 showMonoToast('يجب امتلاك جميع أراضي المجموعة اللونية أولاً للبناء');
