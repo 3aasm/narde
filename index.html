@@ -272,7 +272,72 @@
             z-index: 10;
         }
 
-        /* تصميم بطاقة سند التملك الحقيقية (مطابق للصورة المرفقة) */
+        /* تصميم بطاقة سند التملك الحقيقية (مطابق للصورة المرفقة) مع أنميشن للخانات */
+        @keyframes monoSpacePopIn {
+            0% {
+                opacity: 0;
+                transform: translateY(14px) scale(0.94);
+            }
+            65% {
+                opacity: 1;
+                transform: translateY(-2px) scale(1.015);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes monoHeaderShimmer {
+            0% {
+                transform: translateX(130%) skewX(-22deg);
+            }
+            35%, 100% {
+                transform: translateX(-160%) skewX(-22deg);
+            }
+        }
+
+        @keyframes monoIconFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-2.5px) scale(1.06);
+            }
+        }
+
+        @keyframes monoElectricGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 2px rgba(250, 204, 21, 0.4));
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.95));
+                transform: scale(1.07);
+            }
+        }
+
+        @keyframes monoTrainChug {
+            0%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            25% {
+                transform: translateX(-1.5px) rotate(-2deg);
+            }
+            75% {
+                transform: translateX(1.5px) rotate(2deg);
+            }
+        }
+
+        @keyframes monoHouseBounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-2px);
+            }
+        }
+
         .deed-card {
             background-color: #f3f4ef;
             color: #16181a;
@@ -281,13 +346,18 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
             font-family: 'Plus Jakarta Sans', 'Readex Pro', sans-serif;
             position: relative;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
             user-select: none;
+            animation: monoSpacePopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         .deed-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.65), 0 0 14px rgba(149, 230, 184, 0.18);
+        }
+
+        .deed-card:active {
+            transform: scale(0.97);
         }
 
         .deed-inner {
@@ -304,6 +374,54 @@
             padding: 6px 4px;
             text-align: center;
             margin-bottom: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* لمعة ضوئية متحركة على الشريط الملون لخانات الأراضي */
+        .deed-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 45%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+            animation: monoHeaderShimmer 4.2s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .mono-space-icon-float {
+            animation: monoIconFloat 2.8s ease-in-out infinite;
+        }
+
+        .mono-space-icon-electric {
+            animation: monoElectricGlow 2.2s ease-in-out infinite;
+        }
+
+        .mono-space-icon-train {
+            display: inline-block;
+            animation: monoTrainChug 2.4s ease-in-out infinite;
+        }
+
+        .mono-house-badge-anim {
+            display: inline-block;
+            animation: monoHouseBounce 2s ease-in-out infinite;
+        }
+
+        /* أنميشن للبطاقات المصغرة والمتوسطة عند المرور أو اللمس */
+        .deed-scale-xs,
+        .deed-scale-sm,
+        .deed-scale-md {
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+            animation: monoSpacePopIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .deed-scale-xs:hover,
+        .deed-scale-sm:hover,
+        .deed-scale-md:hover {
+            transform: translateY(-3px) scale(1.06);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+            z-index: 5;
         }
 
         .deed-mortgaged-overlay {
@@ -2874,9 +2992,9 @@
 
                 let iconSVG = '';
                 if (prop.utilityType === 'electricity') {
-                    // رسم المصباح الأصفر المشع مطابق للصورة
+                    // رسم المصباح الأصفر المشع مطابق للصورة مع أنميشن توهج كهربائي
                     iconSVG = `
-                        <svg viewBox="0 0 80 80" class="w-11 h-11">
+                        <svg viewBox="0 0 80 80" class="w-11 h-11 mono-space-icon-electric">
                             <g stroke="#111315" stroke-width="2.5" stroke-linecap="round">
                                 <line x1="14" y1="30" x2="22" y2="33" />
                                 <line x1="10" y1="42" x2="19" y2="42" />
@@ -2892,9 +3010,9 @@
                         </svg>
                     `;
                 } else if (prop.utilityType === 'water') {
-                    // رسم صنبور المياه الأبيض مطابق للصورة
+                    // رسم صنبور المياه الأبيض مطابق للصورة مع أنميشن حركة انسيابية
                     iconSVG = `
-                        <svg viewBox="0 0 80 80" class="w-11 h-11">
+                        <svg viewBox="0 0 80 80" class="w-11 h-11 mono-space-icon-float">
                             <ellipse cx="44" cy="64" rx="13" ry="5" fill="#e5e7eb" stroke="#111315" stroke-width="2.5"/>
                             <path d="M39 63 V30 C39 20 45 16 55 16 H64 V24 H55 C50 24 48 26 48 31 V63 Z" fill="#f3f4f6" stroke="#111315" stroke-width="2.5"/>
                             <rect x="33" y="38" width="6" height="10" fill="#d1d5db" stroke="#111315" stroke-width="2.2"/>
@@ -2905,9 +3023,9 @@
                         </svg>
                     `;
                 } else {
-                    // رسم الخاتم الذهبي الماسي لضريبة السلع الفاخرة مطابق للصورة
+                    // رسم الخاتم الذهبي الماسي لضريبة السلع الفاخرة مطابق للصورة مع أنميشن بريق
                     iconSVG = `
-                        <svg viewBox="0 0 80 80" class="w-11 h-11">
+                        <svg viewBox="0 0 80 80" class="w-11 h-11 mono-space-icon-electric">
                             <g stroke="#111315" stroke-width="2" stroke-linecap="round">
                                 <line x1="40" y1="10" x2="40" y2="17" />
                                 <line x1="29" y1="13" x2="33" y2="19" />
@@ -3000,9 +3118,9 @@
                                 <div class="text-[9px] font-bold opacity-90">${prop.arName}</div>
                             </div>
 
-                            <!-- رسم القاطرة السوداء مطابقة للصورة -->
+                            <!-- رسم القاطرة السوداء مطابقة للصورة مع أنميشن حركة القطار -->
                             <div class="flex items-center justify-center my-1 py-1 bg-black/10 rounded">
-                                <i class="ph-fill ph-train-simple text-2xl text-[#111315]"></i>
+                                <i class="ph-fill ph-train-simple text-2xl text-[#111315] mono-space-icon-train"></i>
                             </div>
 
                             <!-- جدول إيجار محطات القطار -->
@@ -3055,9 +3173,9 @@
             }
 
             const houseBadges = houses === 5
-                ? `<span class="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-bold">HOTEL 🏨</span>`
+                ? `<span class="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-bold mono-house-badge-anim">HOTEL 🏨</span>`
                 : houses > 0
-                    ? `<span class="px-1.5 py-0.5 rounded bg-emerald-700 text-white text-[9px] font-bold">${'🏠'.repeat(houses)}</span>`
+                    ? `<span class="px-1.5 py-0.5 rounded bg-emerald-700 text-white text-[9px] font-bold mono-house-badge-anim">${'🏠'.repeat(houses)}</span>`
                     : '';
 
             return `
