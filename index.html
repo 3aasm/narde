@@ -717,26 +717,34 @@
                                 class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-sky-400/20 flex items-center justify-center text-sky-300 transition">
                                 <i class="ph ph-users-three text-lg"></i>
                             </div>
-                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">اللاعبين</span>
+                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">إحصائيات اللاعبين</span>
                         </button>
                     </div>
 
-                    <!-- قسم إحصائيات المستخدمين (في المنتصف) -->
+                    <!-- قسم أراضي القائد في المنتصف (مطابق للمستخدمين العاديين: أراضي مملوكة، مرهونة، وزر اللاعبين) -->
                     <div class="flex-1 flex flex-col min-h-0">
-                        <div class="flex items-center justify-between mb-1.5 px-1">
-                            <span class="text-[11px] font-medium text-[#7c8288]">إحصائيات اللاعبين (انقر لعرض سندات
-                                الملكية)</span>
-                            <div class="flex items-center gap-2">
-                                <button onclick="openMyPropertiesAsAdmin()"
-                                    class="text-[10px] text-[#95e6b8] hover:underline flex items-center gap-1">
-                                    <i class="ph ph-cards"></i>
-                                    <span>عقاراتي وتطويرها</span>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-1.5">
+                                <button id="adminTabOwnedBtn" onclick="switchAdminPropTab('owned')"
+                                    class="text-xs px-3 py-1.5 rounded-full bg-white text-[#121415] font-medium transition">
+                                    أراضي مملوكة (<span id="adminOwnedCount">0</span>)
+                                </button>
+                                <button id="adminTabMortgagedBtn" onclick="switchAdminPropTab('mortgaged')"
+                                    class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition">
+                                    مرهونة (<span id="adminMortgagedCount">0</span>)
                                 </button>
                             </div>
+                            <button onclick="openAllPlayersOverviewForUser()"
+                                class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-white/10 text-white/90 flex items-center gap-1.5 transition active:scale-95">
+                                <i class="ph ph-users text-sm text-[#95e6b8]"></i>
+                                <span>اللاعبين</span>
+                            </button>
                         </div>
 
-                        <div id="adminPlayersGrid" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-0.5">
-                            <!-- يتم تعبئتها ديناميكياً (القائد يظهر أولاً دائماً) -->
+                        <!-- شبكة بطاقات أراضي القائد -->
+                        <div id="adminPropertiesContainer"
+                            class="flex-1 overflow-y-auto custom-scroll pr-0.5 grid grid-cols-2 gap-2.5 content-start pb-2">
+                            <!-- تُرسم هنا بطاقات أراضي القائد المملوكة أو المرهونة -->
                         </div>
                     </div>
 
@@ -1110,16 +1118,15 @@
                 </div>
             </div>
 
-            <!-- نافذة إدارة اللاعبين وصلاحيات الغرفة + إضافة أعضاء بدون هاتف/وايفاي (للقائد) -->
+            <!-- نافذة إحصائيات اللاعبين وصلاحيات الغرفة + إضافة أعضاء بدون هاتف/وايفاي (للقائد) -->
             <div id="playersAdminModal"
                 class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
                 <div
                     class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[90%] flex flex-col shadow-2xl">
                     <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
                         <div>
-                            <h3 class="text-sm font-semibold text-white">إدارة اللاعبين وإضافة الأعضاء</h3>
-                            <p class="text-[10px] text-[#7c8288]">إضافة عضو محلي (بدون هاتف)، دخول واجهته، أو إدارة
-                                الغرفة</p>
+                            <h3 class="text-sm font-semibold text-white">إحصائيات اللاعبين وإدارة الأعضاء</h3>
+                            <p class="text-[10px] text-[#7c8288]">انقر على أي لاعب لعرض سندات ملكيته، أو أضف عضواً محلياً</p>
                         </div>
                         <button onclick="closeModal('playersAdminModal')"
                             class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
@@ -1428,8 +1435,7 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-white">تأكيد مغادرة الغرفة</h3>
-                        <p class="text-[11px] text-[#7c8288] mt-1 leading-relaxed">هل أنت متأكد من رغبتك في الخروج من
-                            الغرفة؟ ستعود أراضيك الحالية إلى البنك المركزي.</p>
+                        <p class="text-[11px] text-[#7c8288] mt-1 leading-relaxed">هل أنت متأكد من الخروج؟ سيتم حفظ رصيدك وأراضيك ومعلوماتك، ويمكنك العودة لنفس الغرفة لاحقاً بكتابة اسمك فقط.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5 w-full pt-1">
                         <button onclick="confirmLeaveRoomAction()"
@@ -1640,7 +1646,7 @@
     <!-- ربط قاعدة بيانات Firebase المرفقة للمزامنة الفورية بين اللاعبين -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB3IDkykHcq7eOZ_psgqP1-Edgqgb7_2wY",
@@ -1655,7 +1661,7 @@
         try {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
-            window.__monoDB = { db, doc, setDoc, getDoc, updateDoc, onSnapshot };
+            window.__monoDB = { db, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot };
         } catch (err) {
             console.warn("Firebase connection fallback:", err);
         }
@@ -2137,6 +2143,7 @@
         let roomUnsubscribe = null;
         let adminVisaIsPersonal = false; // false = بطاقة البنك، true = البطاقة الشخصية للقائد
         let playerActiveTab = 'owned'; // 'owned' | 'mortgaged'
+        let adminActiveTab = 'owned'; // 'owned' | 'mortgaged'
         let inspectedPlayerId = null;
         let inspectedReadOnlyMode = false;
         let readOnlyProfilePlayerId = null;
@@ -2156,6 +2163,16 @@
                 return impersonatedMemberId;
             }
             return myPlayerId;
+        }
+
+        // دالة للبحث عن لاعب موجود في الغرفة بنفس الاسم (لاستعادة حسابه ومعلوماته عند الدخول مجدداً)
+        function findExistingPlayerByNameInRoom(roomData, candidateName) {
+            if (!roomData || !roomData.players) return null;
+            const normalizedTarget = candidateName.trim().replace(/\s+/g, ' ').toLowerCase();
+            return Object.values(roomData.players).find(p => {
+                const existing = (p.name || '').trim().replace(/\s+/g, ' ').toLowerCase();
+                return existing === normalizedTarget;
+            }) || null;
         }
 
         // دالة التحقق من عدم تكرار الأسماء داخل نفس الغرفة
@@ -2399,6 +2416,26 @@
             showMonoToast(`تم نسخ كود الغرفة: ${activeRoomCode}`);
         }
 
+        // مدة صلاحية الغرفة القصوى: يومان (48 ساعة بالمللي ثانية)
+        const ROOM_MAX_AGE_MS = 2 * 24 * 60 * 60 * 1000;
+
+        function isRoomExpiredTwoDays(roomData) {
+            if (!roomData || !roomData.createdAt) return false;
+            return (Date.now() - roomData.createdAt) >= ROOM_MAX_AGE_MS;
+        }
+
+        // دالة مساعدة لحذف الغرفة بالكامل من قاعدة البيانات
+        async function deleteRoomFromDB(roomCode) {
+            if (window.__monoDB && window.__monoDB.db && window.__monoDB.deleteDoc) {
+                try {
+                    const { db, doc, deleteDoc } = window.__monoDB;
+                    await deleteDoc(doc(db, 'monopoly_rooms', roomCode));
+                } catch (e) {
+                    console.warn("Firestore delete fallback:", e);
+                }
+            }
+        }
+
         // دالة مساعدة لحفظ/تحديث بيانات الغرفة في Firebase (مع نسخة محلية احتياطية)
         async function saveRoomData(roomCode, data) {
             currentRoomData = data;
@@ -2413,7 +2450,7 @@
             renderActiveRoomState();
         }
 
-        // الاستماع الفوري لتحديثات الغرفة
+        // الاستماع الفوري لتحديثات الغرفة (مع فحص انتهاء مدة اليومين أو حذف الغرفة)
         function subscribeToRoom(roomCode) {
             if (roomUnsubscribe) {
                 roomUnsubscribe();
@@ -2421,11 +2458,40 @@
             }
             if (window.__monoDB && window.__monoDB.db) {
                 const { db, doc, onSnapshot } = window.__monoDB;
-                roomUnsubscribe = onSnapshot(doc(db, 'monopoly_rooms', roomCode), (snap) => {
-                    if (snap.exists()) {
-                        currentRoomData = snap.data();
-                        renderActiveRoomState();
+                roomUnsubscribe = onSnapshot(doc(db, 'monopoly_rooms', roomCode), async (snap) => {
+                    if (!snap.exists()) {
+                        if (activeRoomCode === roomCode) {
+                            if (roomUnsubscribe) {
+                                roomUnsubscribe();
+                                roomUnsubscribe = null;
+                            }
+                            activeRoomCode = null;
+                            currentRoomData = null;
+                            impersonatedMemberId = null;
+                            switchMonopolyView('monoAuthView');
+                            showMonoToast('تم إغلاق وحذف الغرفة لعدم وجود لاعبين');
+                        }
+                        return;
                     }
+
+                    const data = snap.data();
+                    // إذا مر يومان على إنشاء الغرفة يتم حذفها/إعادة ضبطها تلقائياً حتى لو كان فيها أحد
+                    if (isRoomExpiredTwoDays(data)) {
+                        await deleteRoomFromDB(roomCode);
+                        if (roomUnsubscribe) {
+                            roomUnsubscribe();
+                            roomUnsubscribe = null;
+                        }
+                        activeRoomCode = null;
+                        currentRoomData = null;
+                        impersonatedMemberId = null;
+                        switchMonopolyView('monoAuthView');
+                        showMonoToast('انتهت مدة الغرفة (يومان) وتم حذفها وإعادة ضبطها كغرفة جديدة');
+                        return;
+                    }
+
+                    currentRoomData = data;
+                    renderActiveRoomState();
                 }, (err) => {
                     console.warn("Realtime listener error:", err);
                 });
@@ -2475,7 +2541,7 @@
             showMonoToast(`تم إنشاء الغرفة بنجاح! الكود: ${code}`);
         }
 
-        // 2. الدخول إلى غرفة مونوبولي بواسطة الكود المكون من 4 أرقام (مع منع تكرار الأسماء)
+        // 2. الدخول إلى غرفة مونوبولي بواسطة الكود المكون من 4 أرقام (مع استعادة حساب اللاعب ومعلوماته إذا دخل بنفس اسمه السابق)
         async function joinMonopolyRoom() {
             if (!validateUserIdentity()) return;
             const codeInput = document.getElementById('joinRoomCodeInput').value.trim();
@@ -2502,21 +2568,61 @@
                 return;
             }
 
-            if (!roomData.isOpen && (!roomData.players || !roomData.players[myPlayerId])) {
-                showMonoToast('عذراً، هذه الغرفة مغلقة حالياً من قِبل القائد');
+            // إذا مر يومان (48 ساعة) على الغرفة، تُحذف بياناتها القديمة وتُعاد ضبطها كغرفة جديدة تماماً بنفس الكود
+            if (isRoomExpiredTwoDays(roomData)) {
+                activeRoomCode = codeInput;
+                impersonatedMemberId = null;
+                const resetRoom = {
+                    code: codeInput,
+                    leaderId: myPlayerId,
+                    isOpen: true,
+                    createdAt: Date.now(),
+                    players: {
+                        [myPlayerId]: {
+                            id: myPlayerId,
+                            name: myProfile.name,
+                            avatar: myProfile.avatar,
+                            balance: 1500,
+                            joinedAt: Date.now()
+                        }
+                    },
+                    propertyState: {},
+                    mortgageRequests: [],
+                    tradeRequests: [],
+                    pendingPurchaseOffers: []
+                };
+                await saveRoomData(codeInput, resetRoom);
+                subscribeToRoom(codeInput);
+                showMonoToast(`مر يومان على الغرفة #${codeInput} — تمت إعادة ضبطها كغرفة جديدة وأنت القائد!`);
                 return;
             }
 
-            // منع تكرار الاسم داخل الغرفة
-            if (isPlayerNameTakenInRoom(roomData, myProfile.name, myPlayerId)) {
-                showMonoToast('عذراً، هذا الاسم مستخدم بالفعل في الغرفة! اختر اسماً آخر');
-                document.getElementById('playerNameInput').focus();
+            // البحث عما إذا كان اللاعب مسجلاً مسبقاً في هذه الغرفة بنفس الاسم لاستعادة رصيده وأراضيه ومعلوماته
+            const existingPlayerByName = findExistingPlayerByNameInRoom(roomData, myProfile.name);
+
+            if (!roomData.isOpen && !existingPlayerByName && (!roomData.players || !roomData.players[myPlayerId])) {
+                showMonoToast('عذراً، هذه الغرفة مغلقة حالياً من قِبل القائد');
                 return;
             }
 
             activeRoomCode = codeInput;
             impersonatedMemberId = null;
             roomData.players = roomData.players || {};
+
+            if (existingPlayerByName) {
+                // استعادة نفس معرف اللاعب السابق ومعلوماته المحفوظة (الرصيد، الأراضي، طلبات الرهن، إلخ)
+                myPlayerId = existingPlayerByName.id;
+                myProfile.name = existingPlayerByName.name;
+                myProfile.avatar = existingPlayerByName.avatar || myProfile.avatar;
+                document.getElementById('selectedAvatarPreview').src = getSafeAvatarSrc(myProfile.avatar);
+                roomData.players[myPlayerId].isLeft = false;
+
+                await saveRoomData(codeInput, roomData);
+                subscribeToRoom(codeInput);
+                showMonoToast(`مرحباً بعودتك ${existingPlayerByName.name}! تم استرجاع رصيدك وأراضيك بنجاح`);
+                return;
+            }
+
             if (!roomData.players[myPlayerId]) {
                 roomData.players[myPlayerId] = {
                     id: myPlayerId,
@@ -2528,6 +2634,7 @@
             } else {
                 roomData.players[myPlayerId].name = myProfile.name;
                 roomData.players[myPlayerId].avatar = myProfile.avatar;
+                roomData.players[myPlayerId].isLeft = false;
             }
 
             await saveRoomData(codeInput, roomData);
@@ -2535,7 +2642,7 @@
             showMonoToast(`مرحباً بك في غرفة المونوبولي #${codeInput}`);
         }
 
-        // الخروج من الغرفة (مع تعيين قائد عشوائي تلقائياً في حال خروج القائد)
+        // الخروج من الغرفة (مع حفظ معلومات اللاعب إن بقي أحد، أو حذف الغرفة بالكامل إذا خرج الجميع والقائد)
         async function leaveRoom() {
             if (!currentRoomData || !activeRoomCode) {
                 switchMonopolyView('monoAuthView');
@@ -2543,28 +2650,14 @@
             }
 
             const players = { ...(currentRoomData.players || {}) };
-            delete players[myPlayerId];
-
-            // تحرير أراضي اللاعب الخارج للبنك
-            const propState = { ...(currentRoomData.propertyState || {}) };
-            Object.keys(propState).forEach(pid => {
-                if (propState[pid].ownerId === myPlayerId) {
-                    delete propState[pid];
-                }
-            });
-
-            const remainingIds = Object.keys(players);
-            if (remainingIds.length > 0 && currentRoomData.leaderId === myPlayerId) {
-                // اختيار قائد بديل عشوائياً تلقائياً (يفضل غير المحلي إن وجد)
-                const onlineIds = remainingIds.filter(id => !players[id].isOfflineMember);
-                const pool = onlineIds.length > 0 ? onlineIds : remainingIds;
-                const randomIndex = Math.floor(Math.random() * pool.length);
-                currentRoomData.leaderId = pool[randomIndex];
+            if (players[myPlayerId]) {
+                players[myPlayerId].isLeft = true;
             }
 
-            currentRoomData.players = players;
-            currentRoomData.propertyState = propState;
-            currentRoomData.mortgageRequests = (currentRoomData.mortgageRequests || []).filter(r => r.playerId !== myPlayerId);
+            // التحقق من اللاعبين المتصلين المتبقين في الغرفة (غير الأعضاء المحليين وغير الخارجين)
+            const activeOnlineRemainingIds = Object.keys(players).filter(
+                id => id !== myPlayerId && !players[id].isLeft && !players[id].isOfflineMember
+            );
 
             const leavingCode = activeRoomCode;
             if (roomUnsubscribe) {
@@ -2573,6 +2666,23 @@
             }
             activeRoomCode = null;
             impersonatedMemberId = null;
+
+            // إذا خرج الجميع بما فيهم القائد ولم يتبقَّ أي لاعب متصل في الغرفة: تُحذف الغرفة نهائياً
+            if (activeOnlineRemainingIds.length === 0) {
+                await deleteRoomFromDB(leavingCode);
+                currentRoomData = null;
+                switchMonopolyView('monoAuthView');
+                showMonoToast('تم حذف الغرفة بالكامل بعد خروج جميع اللاعبين والقائد');
+                return;
+            }
+
+            // إذا كان الخارج هو القائد وبقي لاعبون آخرون، يتم تعيين قائد بديل منهم
+            if (currentRoomData.leaderId === myPlayerId) {
+                const randomIndex = Math.floor(Math.random() * activeOnlineRemainingIds.length);
+                currentRoomData.leaderId = activeOnlineRemainingIds[randomIndex];
+            }
+
+            currentRoomData.players = players;
 
             if (window.__monoDB && window.__monoDB.db) {
                 try {
@@ -2583,7 +2693,7 @@
 
             currentRoomData = null;
             switchMonopolyView('monoAuthView');
-            showMonoToast('تم تسجيل الخروج من الغرفة');
+            showMonoToast('تم الخروج مع حفظ جميع معلوماتك وأراضيك في الغرفة');
         }
 
         // الدخول الكامل لواجهة عضو مضاف (تمتلئ الصفحة بواجهته بالكامل مع زر رجوع لصفحة القائد)
@@ -2976,10 +3086,25 @@
         // ==========================================
         // عرض وتحديث واجهة قائد الغرفة (Admin / Bank)
         // ==========================================
+        function switchAdminPropTab(tab) {
+            adminActiveTab = tab;
+            const ownedBtn = document.getElementById('adminTabOwnedBtn');
+            const mortBtn = document.getElementById('adminTabMortgagedBtn');
+
+            if (ownedBtn && mortBtn) {
+                if (tab === 'owned') {
+                    ownedBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-white text-[#121415] font-medium transition';
+                    mortBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition';
+                } else {
+                    mortBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-amber-400 text-[#121415] font-medium transition';
+                    ownedBtn.className = 'text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition';
+                }
+            }
+            renderAdminDashboard();
+        }
+
         function renderAdminDashboard() {
-            const players = currentRoomData.players || {};
-            const grid = document.getElementById('adminPlayersGrid');
-            grid.innerHTML = '';
+            if (!currentRoomData) return;
 
             // شارة طلبات الرهن وتبديل الأراضي المعلقة
             const pendingReqs = (currentRoomData.mortgageRequests || []);
@@ -2995,64 +3120,79 @@
                 reqBadge.classList.remove('flex');
             }
 
-            // ترتيب قائمة اللاعبين في صفحة القائد بحيث يكون القائد هو الأول دائماً في صفحته
-            const sortedPlayersForAdmin = Object.values(players).sort((a, b) => {
-                if (a.id === currentRoomData.leaderId) return -1;
-                if (b.id === currentRoomData.leaderId) return 1;
-                return (a.joinedAt || 0) - (b.joinedAt || 0);
-            });
+            // عرض أراضي القائد المملوكة والمرهونة في وسط الصفحة مثل المستخدمين العاديين
+            const summary = getPlayerPropertiesSummary(myPlayerId);
+            const ownedCountEl = document.getElementById('adminOwnedCount');
+            const mortCountEl = document.getElementById('adminMortgagedCount');
+            if (ownedCountEl) ownedCountEl.textContent = summary.owned.length;
+            if (mortCountEl) mortCountEl.textContent = summary.mortgaged.length;
 
-            sortedPlayersForAdmin.forEach((p, idx) => {
-                const summary = getPlayerPropertiesSummary(p.id);
-                const isMeLeader = p.id === currentRoomData.leaderId;
-                const safeAvatar = getSafeAvatarSrc(p.avatar, idx);
+            const container = document.getElementById('adminPropertiesContainer');
+            if (container) {
+                container.innerHTML = '';
+                const listToShow = adminActiveTab === 'owned' ? summary.owned : summary.mortgaged;
 
-                const card = document.createElement('div');
-                card.className = 'matte-card p-3 flex items-center justify-between cursor-pointer hover:border-[#95e6b8]/40 transition active:scale-99';
-                card.onclick = () => openPlayerDeedsModal(p.id, false);
-
-                // مصغرات ملونة للأراضي المملوكة
-                const colorDots = summary.owned.slice(0, 6).map(pr =>
-                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${(pr.isStation || pr.isUtility || pr.isSpecialCard) ? '#82b546' : pr.color}" title="${pr.arName}"></span>`
-                ).join('');
-
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="relative shrink-0">
-                            <img src="${safeAvatar}" class="w-12 h-12 rounded-2xl object-cover border border-white/15" />
-                            ${isMeLeader ? `<span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#95e6b8] text-[#121415] flex items-center justify-center shadow"><i class="ph-fill ph-crown text-xs"></i></span>` : ''}
+                if (listToShow.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-2 matte-card p-6 text-center my-auto">
+                            <i class="ph ph-cards text-2xl text-[#7c8288] mb-1"></i>
+                            <p class="text-xs text-white/80">${adminActiveTab === 'owned' ? 'لا تمتلك أراضي نشطة حالياً' : 'لا توجد لديك أراضي مرهونة'}</p>
+                            <p class="text-[10px] text-[#7c8288] mt-0.5">عند شرائك أرضاً أو محطة قطار من البنك ستظهر بطاقتها الحقيقية هنا</p>
                         </div>
-                        <div>
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="text-xs font-semibold text-white">${p.name}</span>
-                                ${p.id === myPlayerId ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/70">أنت</span>` : ''}
-                                ${p.isOfflineMember ? `<span class="text-[8.5px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/25">عضو محلي</span>` : ''}
-                            </div>
-                            <div class="flex items-center gap-2 mt-1 text-[10px]">
-                                <span class="text-[#95e6b8] font-medium">مملوكة: ${summary.owned.length}</span>
-                                <span class="text-amber-400/90">مرهونة: ${summary.mortgaged.length}</span>
-                            </div>
-                            <div class="flex items-center gap-1 mt-1">${colorDots || '<span class="text-[9px] text-[#7c8288]">لا توجد عقارات بعد</span>'}</div>
-                        </div>
-                    </div>
+                    `;
+                } else {
+                    listToShow.forEach(prop => {
+                        const st = currentRoomData.propertyState[prop.id];
+                        const fullGroup = ownsFullColorGroup(myPlayerId, prop.group);
+                        const canBuild = !prop.isStation && !prop.isUtility && !prop.isSpecialCard && fullGroup && !st.mortgaged && (st.houses || 0) < 5;
 
-                    <div class="text-left flex flex-col items-end gap-1" dir="ltr">
-                        <div class="num-font text-sm font-bold text-white">$${(p.balance || 0).toLocaleString()}</div>
-                        ${p.id !== myPlayerId ? `
-                            <button onclick="event.stopPropagation(); enterMemberFullPage('${p.id}')" class="px-2 py-0.5 rounded-lg bg-[#95e6b8]/15 hover:bg-[#95e6b8]/25 border border-[#95e6b8]/30 text-[#95e6b8] text-[9px] font-medium flex items-center gap-1 transition" dir="rtl">
-                                <i class="ph ph-arrows-out-simple"></i>
-                                <span>دخول صفحته</span>
+                        const footerHTML = `
+                            <div class="flex flex-col gap-1">
+                                ${prop.isStation ? `
+                                    <div class="text-[8px] text-center font-semibold text-black/75 py-0.5">
+                                        إيجار يتضاعف بعدد المحطات المملوكة
+                                    </div>
+                                ` : prop.isUtility ? `
+                                    <div class="text-[8px] text-center font-semibold text-black/75 py-0.5">
+                                        يتضاعف الإيجار بامتلاك الكهرباء والمياه
+                                    </div>
+                                ` : prop.isSpecialCard ? `
+                                    <div class="text-[8px] text-center font-semibold text-black/75 py-0.5">
+                                        بطاقة رسوم وضريبة السلع الفاخرة
+                                    </div>
+                                ` : canBuild ? `
+                                    <button onclick="buildHouseOrHotel('${prop.id}', '${myPlayerId}')" class="w-full py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-[8.5px] font-bold transition">
+                                        ${(st.houses || 0) === 4 ? `بناء فندق ($${prop.houseCost})` : `بناء منزل ($${prop.houseCost})`}
+                                    </button>
+                                ` : `
+                                    <div class="text-[8px] text-center text-black/55 py-0.5">
+                                        ${(st.houses || 0) >= 5 ? 'تم بناء الفندق الأقصى' : 'امتلك المجموعة كاملة للبناء'}
+                                    </div>
+                                `}
+                                <button onclick="openTradePropertyModal('${prop.id}', '${myPlayerId}')" class="w-full py-1 rounded bg-sky-700 hover:bg-sky-800 text-white text-[8.5px] font-bold transition">
+                                    تبديل مع لاعب آخر ⇄
+                                </button>
+                                <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${myPlayerId}')" class="w-full py-1 rounded bg-[#121415] hover:bg-black text-amber-300 text-[8.5px] font-bold transition">
+                                    رهن العقار (+$${prop.mortgage})
+                                </button>
+                            </div>
+                        `;
+
+                        const unmortgageBtn = `
+                            <button onclick="requestOrExecuteMortgage('${prop.id}', 'unmortgage', '${myPlayerId}')" class="w-full py-1.5 rounded-lg bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[9.5px] font-bold shadow transition">
+                                فك الرهن (-$${prop.mortgage})
                             </button>
-                        ` : `
-                            <span class="text-[9px] text-[#7c8288] flex items-center justify-end gap-0.5">
-                                <span>عرض البطاقات</span>
-                                <i class="ph ph-caret-left"></i>
-                            </span>
-                        `}
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                        `;
+
+                        const wrap = document.createElement('div');
+                        wrap.innerHTML = createAuthenticDeedCardHTML(prop, st, {
+                            footerActionHTML: footerHTML,
+                            unmortgageBtnHTML: unmortgageBtn
+                        });
+                        container.appendChild(wrap.firstElementChild);
+                    });
+                }
+            }
 
             updateAdminSmartVisaUI();
         }
@@ -3828,32 +3968,56 @@
 
             sortedPlayers.forEach((p, idx) => {
                 const isLeader = p.id === currentRoomData.leaderId;
+                const summary = getPlayerPropertiesSummary(p.id);
                 const safeAvatar = getSafeAvatarSrc(p.avatar, idx);
+                const colorDots = summary.owned.slice(0, 6).map(pr =>
+                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${(pr.isStation || pr.isUtility || pr.isSpecialCard) ? '#82b546' : pr.color}" title="${pr.arName}"></span>`
+                ).join('');
+
                 const row = document.createElement('div');
-                row.className = 'matte-card p-3 flex items-center justify-between gap-2';
+                row.className = 'matte-card p-3 flex flex-col gap-2 cursor-pointer hover:border-[#95e6b8]/40 transition';
+                row.onclick = () => openPlayerDeedsModal(p.id, false);
                 row.innerHTML = `
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <img src="${safeAvatar}" class="w-10 h-10 rounded-xl object-cover border border-white/10 shrink-0" />
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="text-xs font-semibold text-white truncate">${p.name}</span>
-                                ${p.isOfflineMember ? `<span class="text-[8.5px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300">محلي</span>` : ''}
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="relative shrink-0">
+                                <img src="${safeAvatar}" class="w-11 h-11 rounded-2xl object-cover border border-white/15" />
+                                ${isLeader ? `<span class="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-[#95e6b8] text-[#121415] flex items-center justify-center shadow"><i class="ph-fill ph-crown text-[10px]"></i></span>` : ''}
                             </div>
-                            <div class="text-[10px] text-[#7c8288] num-font">$${(p.balance || 0).toLocaleString()}</div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="text-xs font-semibold text-white truncate">${p.name}</span>
+                                    ${p.id === myPlayerId ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/70">أنت</span>` : ''}
+                                    ${p.isOfflineMember ? `<span class="text-[8.5px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/25">عضو محلي</span>` : ''}
+                                    ${p.isLeft ? `<span class="text-[8.5px] px-1.5 py-0.5 rounded bg-white/10 text-white/50">غادر مؤقتاً</span>` : ''}
+                                </div>
+                                <div class="flex items-center gap-2 mt-1 text-[10px]">
+                                    <span class="text-[#95e6b8] font-medium">مملوكة: ${summary.owned.length}</span>
+                                    <span class="text-amber-400/90">مرهونة: ${summary.mortgaged.length}</span>
+                                </div>
+                                <div class="flex items-center gap-1 mt-1">${colorDots || '<span class="text-[9px] text-[#7c8288]">لا توجد عقارات بعد</span>'}</div>
+                            </div>
+                        </div>
+                        <div class="text-left shrink-0 flex flex-col items-end gap-1" dir="ltr">
+                            <div class="num-font text-sm font-bold text-white">$${(p.balance || 0).toLocaleString()}</div>
+                            <span class="text-[9px] text-[#95e6b8] flex items-center gap-0.5" dir="rtl">
+                                <span>عرض السندات</span>
+                                <i class="ph ph-caret-left"></i>
+                            </span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+                    <div class="flex items-center justify-end gap-1.5 pt-1.5 border-t border-white/[0.06]" onclick="event.stopPropagation()">
                         ${isLeader ? `<span class="text-[10px] px-2.5 py-1 rounded-full bg-[#95e6b8]/20 text-[#95e6b8] font-medium">القائد (أنت)</span>` : `
                             <button onclick="enterMemberFullPage('${p.id}')" class="px-2.5 py-1.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[10px] font-bold transition flex items-center gap-1" title="دخول صفحته بالكامل">
                                 <i class="ph-bold ph-sign-in"></i>
                                 <span>دخول صفحته</span>
                             </button>
                             ${!p.isOfflineMember ? `
-                                <button onclick="promotePlayerToLeader('${p.id}')" class="px-2 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[10px] font-medium transition" title="ترقية لقائد">
-                                    ترقية
+                                <button onclick="promotePlayerToLeader('${p.id}')" class="px-2.5 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[10px] font-medium transition" title="ترقية لقائد">
+                                    ترقية لقائد
                                 </button>
                             ` : ''}
-                            <button onclick="kickPlayerFromRoom('${p.id}')" class="px-2 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-medium transition" title="طرد / حذف">
+                            <button onclick="kickPlayerFromRoom('${p.id}')" class="px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-medium transition" title="طرد / حذف">
                                 حذف
                             </button>
                         `}
