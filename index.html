@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DICE</title>
     <!-- إعدادات تطبيق الويب التقدمي (PWA) والأيقونة المصغرة لسطح المكتب للآيفون والأندرويد -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="MYDICE">
     <meta name="application-name" content="MYDICE">
     <meta name="theme-color" content="#121415">
@@ -18,7 +20,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- خطوط هندسية مطابقة لنمط الصورة (Plus Jakarta Sans للأرقام واللاتيني + Readex Pro للعربي) -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Readex+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Readex+Pro:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <!-- أيقونات خطية رفيعة Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -34,20 +38,36 @@
             --cube-half: 49px;
         }
 
-        html, body {
+        html,
+        body {
             font-family: 'Readex Pro', 'Plus Jakarta Sans', sans-serif;
-            background-color: #0b0c0d;
+            background-color: #121415;
             color: var(--text-main);
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
-            position: fixed;
-            inset: 0;
+            margin: 0;
+            padding: 0;
             width: 100%;
             height: 100%;
+            height: 100dvh;
             overflow: hidden;
             overscroll-behavior: none;
-            touch-action: none;
+            touch-action: manipulation;
+        }
+
+        /* ضبط حواف الأمان العلوية والسفلية عند فتح التطبيق من سطح المكتب (Standalone PWA) */
+        @media (max-width: 639px) {
+            #appShell {
+                padding-top: max(1.25rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
+                padding-bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem));
+                height: 100dvh;
+            }
+
+            #monopolyOverlay {
+                padding-top: max(1.25rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
+                padding-bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.5rem));
+            }
         }
 
         .num-font {
@@ -103,10 +123,21 @@
         }
 
         @keyframes softBounce {
-            0% { transform: translateY(0) scale(1); }
-            40% { transform: translateY(-38px) scale(1.1); }
-            75% { transform: translateY(-8px) scale(1.02); }
-            100% { transform: translateY(0) scale(1); }
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            40% {
+                transform: translateY(-38px) scale(1.1);
+            }
+
+            75% {
+                transform: translateY(-8px) scale(1.02);
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+            }
         }
 
         .cube {
@@ -134,12 +165,29 @@
             backface-visibility: hidden;
         }
 
-        .face-1 { transform: rotateY(0deg) translateZ(var(--cube-half)); }
-        .face-6 { transform: rotateY(180deg) translateZ(var(--cube-half)); }
-        .face-2 { transform: rotateY(-90deg) translateZ(var(--cube-half)); }
-        .face-5 { transform: rotateY(90deg) translateZ(var(--cube-half)); }
-        .face-3 { transform: rotateX(-90deg) translateZ(var(--cube-half)); }
-        .face-4 { transform: rotateX(90deg) translateZ(var(--cube-half)); }
+        .face-1 {
+            transform: rotateY(0deg) translateZ(var(--cube-half));
+        }
+
+        .face-6 {
+            transform: rotateY(180deg) translateZ(var(--cube-half));
+        }
+
+        .face-2 {
+            transform: rotateY(-90deg) translateZ(var(--cube-half));
+        }
+
+        .face-5 {
+            transform: rotateY(90deg) translateZ(var(--cube-half));
+        }
+
+        .face-3 {
+            transform: rotateX(-90deg) translateZ(var(--cube-half));
+        }
+
+        .face-4 {
+            transform: rotateX(90deg) translateZ(var(--cube-half));
+        }
 
         /* نقاط النرد (Pips) باللون الأبيض والنعناعي للرقم 1 */
         .pip {
@@ -159,6 +207,7 @@
         .arc-dot {
             transition: fill 0.35s ease, filter 0.35s ease;
         }
+
         .arc-dot.active {
             fill: var(--mint);
             filter: drop-shadow(0 0 4px rgba(149, 230, 184, 0.75));
@@ -167,9 +216,9 @@
         /* أنميشن إخفاء العناصر للتركيز */
         .collapsible-section {
             transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                        max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                        margin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+                transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                margin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
             max-height: 300px;
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -206,6 +255,7 @@
         .mono-view {
             transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
+
         .mono-view.hidden-view {
             opacity: 0;
             transform: translateY(18px) scale(0.98);
@@ -214,6 +264,7 @@
             inset: 0;
             z-index: -1;
         }
+
         .mono-view.active-view {
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -227,16 +278,18 @@
             color: #16181a;
             border-radius: 10px;
             padding: 7px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
             font-family: 'Plus Jakarta Sans', 'Readex Pro', sans-serif;
             position: relative;
             transition: transform 0.25s ease, box-shadow 0.25s ease;
             user-select: none;
         }
+
         .deed-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 14px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
         }
+
         .deed-inner {
             border: 1.5px solid #22252a;
             padding: 6px 8px;
@@ -245,12 +298,14 @@
             height: 100%;
             position: relative;
         }
+
         .deed-header {
             border: 1.5px solid #22252a;
             padding: 6px 4px;
             text-align: center;
             margin-bottom: 6px;
         }
+
         .deed-mortgaged-overlay {
             background: rgba(15, 17, 19, 0.82);
             backdrop-filter: blur(2px);
@@ -262,6 +317,7 @@
             border: 1px solid rgba(149, 230, 184, 0.28);
             box-shadow: 0 16px 35px rgba(0, 0, 0, 0.55);
         }
+
         .visa-card-personal {
             background: linear-gradient(135deg, #23272b 0%, #16181b 55%, #2b323c 100%);
             border: 1px solid rgba(255, 255, 255, 0.14);
@@ -273,19 +329,23 @@
             width: 4px;
             height: 4px;
         }
+
         .custom-scroll::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .custom-scroll::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.12);
             border-radius: 9999px;
         }
     </style>
 </head>
+
 <body class="h-full w-full flex items-center justify-center p-0 sm:p-6 overflow-hidden select-none">
 
     <!-- الواجهة الرئيسية (تأخذ شكل شاشة الموبايل في الصورة) -->
-    <main id="appShell" class="app-shell w-full max-w-[410px] h-full sm:h-[820px] sm:max-h-[92vh] sm:rounded-[48px] p-6 flex flex-col justify-between relative overflow-hidden">
+    <main id="appShell"
+        class="app-shell w-full max-w-[410px] h-full sm:h-[820px] sm:max-h-[92vh] sm:rounded-[48px] p-6 flex flex-col justify-between relative overflow-hidden">
 
         <!-- القسم العلوي: الهيدر + العنوان + أزرار اختيار (حجر / حجرين) -->
         <div id="topSection" class="collapsible-section">
@@ -298,18 +358,23 @@
 
                 <!-- زر نظام المونوبولي + زر تحميل اللعبة + زر الصوت الدائري -->
                 <div class="flex items-center gap-2">
-                    <button id="monopolyNavBtn" onclick="openMonopolySystem()" class="h-11 px-3.5 rounded-full bg-[#1d2022] border border-[#95e6b8]/25 flex items-center gap-2 text-white hover:bg-[#262a2d] active:scale-95 transition relative shadow-sm" title="نظام مونوبولي أونلاين">
+                    <button id="monopolyNavBtn" onclick="openMonopolySystem()"
+                        class="h-11 px-3.5 rounded-full bg-[#1d2022] border border-[#95e6b8]/25 flex items-center gap-2 text-white hover:bg-[#262a2d] active:scale-95 transition relative shadow-sm"
+                        title="نظام مونوبولي أونلاين">
                         <span class="w-2 h-2 rounded-full bg-[#95e6b8] animate-pulse"></span>
                         <i class="ph-fill ph-bank text-[#95e6b8] text-lg"></i>
                         <span class="text-[11px] font-medium text-white/90">مونوبولي</span>
                     </button>
 
                     <!-- زر تحميل اللعبة الدائري لتثبيتها على الشاشة الرئيسية -->
-                    <button id="installAppNavBtn" onclick="openInstallGuideModal()" class="w-11 h-11 rounded-full bg-[#1d2022] border border-white/10 hover:border-[#95e6b8]/40 flex items-center justify-center text-[#95e6b8] hover:text-white hover:bg-[#262a2d] active:scale-95 transition relative shadow-sm" title="تحميل وتثبيت اللعبة">
+                    <button id="installAppNavBtn" onclick="openInstallGuideModal()"
+                        class="w-11 h-11 rounded-full bg-[#1d2022] border border-white/10 hover:border-[#95e6b8]/40 flex items-center justify-center text-[#95e6b8] hover:text-white hover:bg-[#262a2d] active:scale-95 transition relative shadow-sm"
+                        title="تحميل وتثبيت اللعبة">
                         <i class="ph ph-download-simple text-lg"></i>
                     </button>
 
-                    <button id="soundBtn" onclick="toggleSound()" class="w-11 h-11 rounded-full bg-[#1d2022] border border-white/5 flex items-center justify-center text-white/80 hover:text-white transition relative">
+                    <button id="soundBtn" onclick="toggleSound()"
+                        class="w-11 h-11 rounded-full bg-[#1d2022] border border-white/5 flex items-center justify-center text-white/80 hover:text-white transition relative">
                         <span id="soundDot" class="w-2 h-2 rounded-full bg-[#95e6b8] absolute top-1.5 right-1.5"></span>
                         <i id="soundIcon" class="ph ph-bell-simple text-lg"></i>
                     </button>
@@ -318,7 +383,8 @@
 
             <!-- العنوان الرئيسي بخط رفيع وأنيق مثل ModuleOne™ في الصورة -->
             <div class="mb-5 text-right">
-                <h1 class="text-[28px] font-light tracking-tight text-white leading-tight flex items-center justify-between">
+                <h1
+                    class="text-[28px] font-light tracking-tight text-white leading-tight flex items-center justify-between">
                     <span class="num-font font-semibold tracking-wider">DICE</span>
                     <span class="num-font text-xs font-medium text-[#7c8288] tracking-widest uppercase">CubeOne™</span>
                 </h1>
@@ -327,10 +393,12 @@
 
             <!-- كبسولات الاختيار البيضاوية (مطابقة لأزرار Produced / Exported في الصورة) -->
             <div class="flex items-center gap-2.5">
-                <button id="pill1" onclick="setDiceCount(1)" class="flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-white text-[#121415] shadow-md">
+                <button id="pill1" onclick="setDiceCount(1)"
+                    class="flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-white text-[#121415] shadow-md">
                     حجر واحد
                 </button>
-                <button id="pill2" onclick="setDiceCount(2)" class="flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-[#1d2022] text-[#7c8288] hover:text-white border border-white/[0.03]">
+                <button id="pill2" onclick="setDiceCount(2)"
+                    class="flex-1 py-3.5 px-5 rounded-full text-xs font-medium transition-all duration-300 bg-[#1d2022] text-[#7c8288] hover:text-white border border-white/[0.03]">
                     حجرين معاً
                 </button>
             </div>
@@ -338,7 +406,7 @@
 
         <!-- القسم الأوسط: القوس المنقط + الدائرة المركزية + المكعبات -->
         <div class="center-stage my-4 flex flex-col items-center justify-center relative">
-            
+
             <!-- القوس المنقط والمؤشر الدائري (مثل 860 Wh في الصورة الوسطى) -->
             <div class="relative w-[220px] h-[155px] flex items-center justify-center">
                 <!-- القوس المنقط SVG -->
@@ -348,18 +416,20 @@
                     <circle id="gaugeRing" cx="110" cy="105" r="56" fill="none" stroke="#ffffff" stroke-width="2"
                         stroke-dasharray="240 360" stroke-dashoffset="60" stroke-linecap="round"
                         transform="rotate(135 110 105)" class="transition-all duration-500" />
-                    
+
                     <!-- مجموعة النقاط المضيئة حول القوس (يتم توليدها بالـ JS) -->
                     <g id="arcDotsGroup"></g>
 
                     <!-- أرقام الحد الأدنى والأقصى على جانبي القوس -->
                     <text x="20" y="115" fill="#7c8288" font-size="11" class="num-font" text-anchor="middle">0</text>
-                    <text id="maxGaugeLabel" x="200" y="115" fill="#7c8288" font-size="11" class="num-font" text-anchor="middle">6</text>
+                    <text id="maxGaugeLabel" x="200" y="115" fill="#7c8288" font-size="11" class="num-font"
+                        text-anchor="middle">6</text>
                 </svg>
 
                 <!-- الرقم الكبير في منتصف الدائرة -->
                 <div class="absolute top-[64px] flex flex-col items-center justify-center text-center">
-                    <span id="totalValue" class="num-font text-4xl font-light text-white tracking-tight leading-none">1</span>
+                    <span id="totalValue"
+                        class="num-font text-4xl font-light text-white tracking-tight leading-none">1</span>
                     <span id="statusLabel" class="text-[11px] text-[#7c8288] font-light mt-1">مجموع النرد</span>
                 </div>
             </div>
@@ -402,9 +472,11 @@
                 </div>
 
                 <!-- بطاقة الحجر الثاني -->
-                <div id="die2Card" class="matte-card p-4 flex flex-col justify-between h-[112px] opacity-45 transition-opacity duration-300">
+                <div id="die2Card"
+                    class="matte-card p-4 flex flex-col justify-between h-[112px] opacity-45 transition-opacity duration-300">
                     <div class="flex justify-between items-start">
-                        <span id="doubleBadge" class="hidden text-[10px] bg-[#95e6b8] text-[#121415] font-medium px-2 py-0.5 rounded-full">تطابق</span>
+                        <span id="doubleBadge"
+                            class="hidden text-[10px] bg-[#95e6b8] text-[#121415] font-medium px-2 py-0.5 rounded-full">تطابق</span>
                         <span id="die2Dot" class="w-2 h-2 rounded-full bg-white/20 mt-1"></span>
                         <div class="w-9 h-9 rounded-full bg-[#262a2d] flex items-center justify-center text-white/75">
                             <i class="ph ph-dice-two text-lg"></i>
@@ -422,20 +494,25 @@
 
             <!-- الشريط السفلي الخاص بالصفحات (مخصص لزر رمي النرد كما طلبت) -->
             <div class="floating-dock p-2 flex items-center justify-between mt-1">
-                
+
                 <!-- زر التبديل السريع لعدد الأحجار -->
-                <button onclick="toggleModeQuick()" class="w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition" title="تبديل حجر / حجرين">
+                <button onclick="toggleModeQuick()"
+                    class="w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition"
+                    title="تبديل حجر / حجرين">
                     <i id="quickModeIcon" class="ph ph-number-circle-one text-xl"></i>
                 </button>
 
                 <!-- زر رمي النرد الرئيسي في الشريط السفلي (الدائرة البيضاء البارزة مثل الصورة) -->
-                <button id="rollDockBtn" onclick="triggerRoll()" class="roll-trigger flex-1 mx-2 bg-white hover:bg-[#f2f4f5] text-[#121415] h-12 rounded-full flex items-center justify-center gap-2.5 shadow-lg transition-all duration-200">
+                <button id="rollDockBtn" onclick="triggerRoll()"
+                    class="roll-trigger flex-1 mx-2 bg-white hover:bg-[#f2f4f5] text-[#121415] h-12 rounded-full flex items-center justify-center gap-2.5 shadow-lg transition-all duration-200">
                     <i id="rollBtnIcon" class="ph-fill ph-dice-five text-xl"></i>
                     <span class="text-xs font-semibold tracking-wide">رمي النرد</span>
                 </button>
 
                 <!-- زر إخفاء/إظهار الواجهة للتركيز -->
-                <button id="focusBtn" onclick="toggleFocusMode()" class="w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition-all duration-300" title="وضع التركيز (إخفاء/إظهار العناصر)">
+                <button id="focusBtn" onclick="toggleFocusMode()"
+                    class="w-12 h-12 rounded-full bg-[#2b3034]/80 hover:bg-[#343a3f] text-white/70 hover:text-white flex items-center justify-center transition-all duration-300"
+                    title="وضع التركيز (إخفاء/إظهار العناصر)">
                     <i id="focusIcon" class="ph ph-eye-slash text-lg transition-transform duration-300"></i>
                 </button>
 
@@ -446,18 +523,22 @@
         <!-- ==========================================================
              نظام مونوبولي أونلاين (البنك الذكي وإدارة العقارات)
              ========================================================== -->
-        <div id="monopolyOverlay" class="fixed sm:absolute inset-0 bg-[#121415] z-40 flex flex-col justify-between p-5 overflow-hidden transition-all duration-500 opacity-0 pointer-events-none translate-y-6">
-            
+        <div id="monopolyOverlay"
+            class="fixed sm:absolute inset-0 bg-[#121415] z-40 flex flex-col justify-between p-5 overflow-hidden transition-all duration-500 opacity-0 pointer-events-none translate-y-6">
+
             <!-- شريط علوي مشترك لنظام المونوبولي -->
             <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] shrink-0">
                 <div class="flex items-center gap-2">
-                    <button onclick="closeMonopolySystem()" class="w-9 h-9 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition" title="العودة للنرد">
+                    <button onclick="closeMonopolySystem()"
+                        class="w-9 h-9 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition"
+                        title="العودة للنرد">
                         <i class="ph ph-dice-five text-lg text-[#95e6b8]"></i>
                     </button>
                     <div>
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-semibold text-white">مونوبولي باي</span>
-                            <span id="connBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-[#95e6b8]/15 text-[#95e6b8] num-font">متصل</span>
+                            <span id="connBadge"
+                                class="text-[9px] px-2 py-0.5 rounded-full bg-[#95e6b8]/15 text-[#95e6b8] num-font">متصل</span>
                         </div>
                         <p id="roomSubHeader" class="text-[10px] text-[#7c8288]">إدارة الأموال والعقارات الفورية</p>
                     </div>
@@ -465,18 +546,25 @@
 
                 <!-- شارة كود الغرفة + زر باركود اللعبة للأدمن + زر الخروج الدائري -->
                 <div class="flex items-center gap-1.5">
-                    <div id="roomCodePill" onclick="copyRoomCode()" class="hidden cursor-pointer items-center gap-1.5 bg-[#1d2022] hover:bg-[#262a2d] border border-[#95e6b8]/30 px-3 py-1.5 rounded-full transition active:scale-95" title="انسخ كود الغرفة">
+                    <div id="roomCodePill" onclick="copyRoomCode()"
+                        class="hidden cursor-pointer items-center gap-1.5 bg-[#1d2022] hover:bg-[#262a2d] border border-[#95e6b8]/30 px-3 py-1.5 rounded-full transition active:scale-95"
+                        title="انسخ كود الغرفة">
                         <span class="text-[10px] text-[#7c8288]">كود:</span>
-                        <span id="activeRoomCodeText" class="num-font text-xs font-bold text-[#95e6b8] tracking-widest">----</span>
+                        <span id="activeRoomCodeText"
+                            class="num-font text-xs font-bold text-[#95e6b8] tracking-widest">----</span>
                         <i class="ph ph-copy text-xs text-white/60"></i>
                     </div>
 
                     <!-- أيقونة دائرية بجانب زر نسخ الكود لصفحة الأدمن لإظهار باركود موقع اللعبة -->
-                    <button id="adminQrBtn" onclick="openModal('qrCodeModal')" class="hidden w-9 h-9 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-[#95e6b8]/35 items-center justify-center text-[#95e6b8] transition active:scale-95 shadow-sm" title="باركود موقع اللعبة">
+                    <button id="adminQrBtn" onclick="openModal('qrCodeModal')"
+                        class="hidden w-9 h-9 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-[#95e6b8]/35 items-center justify-center text-[#95e6b8] transition active:scale-95 shadow-sm"
+                        title="باركود موقع اللعبة">
                         <i class="ph ph-qr-code text-base"></i>
                     </button>
 
-                    <button id="headerLeaveRoomBtn" onclick="promptLeaveRoom()" class="hidden w-9 h-9 rounded-full bg-[#1d2022] hover:bg-red-500/15 border border-white/10 hover:border-red-500/30 items-center justify-center text-red-400 transition active:scale-95" title="مغادرة الغرفة">
+                    <button id="headerLeaveRoomBtn" onclick="promptLeaveRoom()"
+                        class="hidden w-9 h-9 rounded-full bg-[#1d2022] hover:bg-red-500/15 border border-white/10 hover:border-red-500/30 items-center justify-center text-red-400 transition active:scale-95"
+                        title="مغادرة الغرفة">
                         <i class="ph ph-sign-out text-base"></i>
                     </button>
                 </div>
@@ -486,10 +574,12 @@
             <div class="relative flex-1 overflow-hidden my-2">
 
                 <!-- 1. صفحة الدخول والتحقق (للجميع) -->
-                <div id="monoAuthView" class="mono-view active-view h-full flex flex-col justify-between overflow-y-auto custom-scroll pr-0.5">
+                <div id="monoAuthView"
+                    class="mono-view active-view h-full flex flex-col justify-between overflow-y-auto custom-scroll pr-0.5">
                     <div class="space-y-4 my-auto py-2">
                         <div class="text-center">
-                            <div class="w-14 h-14 rounded-3xl bg-[#1d2022] border border-[#95e6b8]/25 flex items-center justify-center mx-auto mb-2.5 shadow-lg">
+                            <div
+                                class="w-14 h-14 rounded-3xl bg-[#1d2022] border border-[#95e6b8]/25 flex items-center justify-center mx-auto mb-2.5 shadow-lg">
                                 <i class="ph-fill ph-bank text-2xl text-[#95e6b8]"></i>
                             </div>
                             <h2 class="text-lg font-medium text-white">بطاقة الهوية البنكية</h2>
@@ -499,15 +589,20 @@
                         <!-- اختيار الصورة الشخصية (أفاتار أو رفع من الجهاز) -->
                         <div class="matte-card p-4 space-y-3">
                             <div class="flex items-center gap-3.5">
-                                <div class="relative w-16 h-16 rounded-2xl bg-[#262a2d] border-2 border-[#95e6b8] overflow-hidden shrink-0 flex items-center justify-center shadow-md">
-                                    <img id="selectedAvatarPreview" src="" alt="Avatar" class="w-full h-full object-cover" />
+                                <div
+                                    class="relative w-16 h-16 rounded-2xl bg-[#262a2d] border-2 border-[#95e6b8] overflow-hidden shrink-0 flex items-center justify-center shadow-md">
+                                    <img id="selectedAvatarPreview" src="" alt="Avatar"
+                                        class="w-full h-full object-cover" />
                                 </div>
                                 <div class="flex-1">
-                                    <label class="text-[11px] text-[#7c8288] block mb-1.5">اختر أفاتار جاهز أو ارفع صورتك</label>
-                                    <label class="inline-flex items-center gap-1.5 text-[11px] bg-[#262a2d] hover:bg-[#303539] text-white px-3 py-1.5 rounded-full cursor-pointer transition border border-white/10">
+                                    <label class="text-[11px] text-[#7c8288] block mb-1.5">اختر أفاتار جاهز أو ارفع
+                                        صورتك</label>
+                                    <label
+                                        class="inline-flex items-center gap-1.5 text-[11px] bg-[#262a2d] hover:bg-[#303539] text-white px-3 py-1.5 rounded-full cursor-pointer transition border border-white/10">
                                         <i class="ph ph-upload-simple text-[#95e6b8]"></i>
                                         <span>رفع صورة من الجهاز</span>
-                                        <input type="file" id="avatarFileInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                                        <input type="file" id="avatarFileInput" accept="image/*" class="hidden"
+                                            onchange="handleAvatarUpload(event)">
                                     </label>
                                 </div>
                             </div>
@@ -518,38 +613,46 @@
                             <!-- إدخال اسم اللاعب -->
                             <div class="pt-1">
                                 <label class="text-[11px] text-[#7c8288] block mb-1">اسم اللاعب</label>
-                                <input id="playerNameInput" type="text" maxlength="18" placeholder="اكتب اسمك" class="w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-2xl px-3.5 py-2.5 text-xs text-white outline-none transition" />
+                                <input id="playerNameInput" type="text" maxlength="18" placeholder="اكتب اسمك"
+                                    class="w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-2xl px-3.5 py-2.5 text-xs text-white outline-none transition" />
                             </div>
                         </div>
 
                         <!-- خياران: إنشاء غرفة أو دخول غرفة -->
                         <div class="space-y-2.5">
                             <!-- لافتة الدعوة السريعة عند مسح الباركود (تظهر تلقائياً عند وجود كود غرفة في الرابط) -->
-                            <div id="qrDirectJoinBanner" class="hidden matte-card p-4 border-2 border-[#95e6b8] bg-[#95e6b8]/10 space-y-3 shadow-lg">
+                            <div id="qrDirectJoinBanner"
+                                class="hidden matte-card p-4 border-2 border-[#95e6b8] bg-[#95e6b8]/10 space-y-3 shadow-lg">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-9 h-9 rounded-xl bg-[#95e6b8] text-[#121415] flex items-center justify-center font-bold shadow">
+                                        <div
+                                            class="w-9 h-9 rounded-xl bg-[#95e6b8] text-[#121415] flex items-center justify-center font-bold shadow">
                                             <i class="ph-fill ph-qr-code text-lg"></i>
                                         </div>
                                         <div>
                                             <div class="text-xs font-bold text-white">تم مسح باركود الغرفة بنجاح!</div>
-                                            <div class="text-[10px] text-[#95e6b8]">أدخل اسمك واختر صورتك بالأعلى ثم اضغط دخول</div>
+                                            <div class="text-[10px] text-[#95e6b8]">أدخل اسمك واختر صورتك بالأعلى ثم
+                                                اضغط دخول</div>
                                         </div>
                                     </div>
-                                    <span id="qrBannerRoomCode" class="num-font text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#121415] text-[#95e6b8] border border-[#95e6b8]/30 tracking-widest">#----</span>
+                                    <span id="qrBannerRoomCode"
+                                        class="num-font text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#121415] text-[#95e6b8] border border-[#95e6b8]/30 tracking-widest">#----</span>
                                 </div>
-                                <button onclick="joinMonopolyRoom()" class="w-full py-3 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                                <button onclick="joinMonopolyRoom()"
+                                    class="w-full py-3 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
                                     <i class="ph-bold ph-sign-in text-base"></i>
                                     <span>ادخل للغرفة المباشرة الآن</span>
                                 </button>
                             </div>
 
-                            <button id="createRoomMainBtn" onclick="createMonopolyRoom()" class="w-full py-3.5 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-semibold text-xs flex items-center justify-between shadow-lg transition active:scale-98">
+                            <button id="createRoomMainBtn" onclick="createMonopolyRoom()"
+                                class="w-full py-3.5 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-semibold text-xs flex items-center justify-between shadow-lg transition active:scale-98">
                                 <div class="flex items-center gap-2.5">
                                     <i class="ph-fill ph-crown text-lg"></i>
                                     <div class="text-right">
                                         <div class="font-bold">إنشاء غرفة مونوبولي جديدة</div>
-                                        <div class="text-[10px] opacity-75 font-normal">تصبح أنت قائد الغرفة ومدير البنك</div>
+                                        <div class="text-[10px] opacity-75 font-normal">تصبح أنت قائد الغرفة ومدير البنك
+                                        </div>
                                     </div>
                                 </div>
                                 <i class="ph ph-arrow-left text-base"></i>
@@ -561,8 +664,11 @@
                                     <span>دخول غرفة مونوبولي بكود</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <input id="joinRoomCodeInput" type="text" inputmode="numeric" maxlength="4" placeholder="أدخل كود من 4 أرقام" class="num-font flex-1 bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3 py-2.5 text-center text-sm tracking-[0.25em] font-bold text-white outline-none transition" />
-                                    <button onclick="joinMonopolyRoom()" class="bg-white hover:bg-white/90 text-[#121415] font-semibold text-xs px-4 py-2.5 rounded-xl transition active:scale-95">
+                                    <input id="joinRoomCodeInput" type="text" inputmode="numeric" maxlength="4"
+                                        placeholder="أدخل كود من 4 أرقام"
+                                        class="num-font flex-1 bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3 py-2.5 text-center text-sm tracking-[0.25em] font-bold text-white outline-none transition" />
+                                    <button onclick="joinMonopolyRoom()"
+                                        class="bg-white hover:bg-white/90 text-[#121415] font-semibold text-xs px-4 py-2.5 rounded-xl transition active:scale-95">
                                         انضمام
                                     </button>
                                 </div>
@@ -573,33 +679,42 @@
 
                 <!-- 2. واجهة "قائد الغرفة" (الأدمن / البنك) -->
                 <div id="monoAdminView" class="mono-view hidden-view h-full flex flex-col justify-between gap-2.5">
-                    
+
                     <!-- الأزرار الدائرية العلوية (4 أزرار تحكم للقائد) -->
                     <div class="grid grid-cols-4 gap-2 shrink-0">
-                        <button onclick="promptLeaveRoom()" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-red-500/15 border border-white/5 hover:border-red-500/30 transition group">
-                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-red-500/20 flex items-center justify-center text-red-400 transition">
+                        <button onclick="promptLeaveRoom()"
+                            class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-red-500/15 border border-white/5 hover:border-red-500/30 transition group">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-red-500/20 flex items-center justify-center text-red-400 transition">
                                 <i class="ph ph-sign-out text-lg"></i>
                             </div>
                             <span class="text-[10px] text-[#7c8288] group-hover:text-white">خروج</span>
                         </button>
 
-                        <button onclick="openModal('propertiesModal')" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group">
-                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-[#95e6b8]/20 flex items-center justify-center text-[#95e6b8] transition">
+                        <button onclick="openModal('propertiesModal')"
+                            class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-[#95e6b8]/20 flex items-center justify-center text-[#95e6b8] transition">
                                 <i class="ph ph-buildings text-lg"></i>
                             </div>
                             <span class="text-[10px] text-[#7c8288] group-hover:text-white">إدارة الأراضي</span>
                         </button>
 
-                        <button onclick="openModal('requestsModal')" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group relative">
-                            <span id="requestsBadge" class="hidden absolute top-1.5 right-3 w-4 h-4 rounded-full bg-amber-400 text-[#121415] num-font text-[9px] font-bold items-center justify-center">0</span>
-                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition">
+                        <button onclick="openModal('requestsModal')"
+                            class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group relative">
+                            <span id="requestsBadge"
+                                class="hidden absolute top-1.5 right-3 w-4 h-4 rounded-full bg-amber-400 text-[#121415] num-font text-[9px] font-bold items-center justify-center">0</span>
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-amber-400/20 flex items-center justify-center text-amber-300 transition">
                                 <i class="ph ph-scales text-lg"></i>
                             </div>
-                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">طلبات الرهن</span>
+                            <span class="text-[10px] text-[#7c8288] group-hover:text-white">طلبات الرهن والتبديل</span>
                         </button>
 
-                        <button onclick="openModal('playersAdminModal')" class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group">
-                            <div class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-sky-400/20 flex items-center justify-center text-sky-300 transition">
+                        <button onclick="openModal('playersAdminModal')"
+                            class="flex flex-col items-center gap-1 p-2 rounded-2xl bg-[#1d2022] hover:bg-[#262a2d] border border-white/5 transition group">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#262a2d] group-hover:bg-sky-400/20 flex items-center justify-center text-sky-300 transition">
                                 <i class="ph ph-users-three text-lg"></i>
                             </div>
                             <span class="text-[10px] text-[#7c8288] group-hover:text-white">اللاعبين</span>
@@ -609,9 +724,11 @@
                     <!-- قسم إحصائيات المستخدمين (في المنتصف) -->
                     <div class="flex-1 flex flex-col min-h-0">
                         <div class="flex items-center justify-between mb-1.5 px-1">
-                            <span class="text-[11px] font-medium text-[#7c8288]">إحصائيات اللاعبين (انقر لعرض سندات الملكية)</span>
+                            <span class="text-[11px] font-medium text-[#7c8288]">إحصائيات اللاعبين (انقر لعرض سندات
+                                الملكية)</span>
                             <div class="flex items-center gap-2">
-                                <button onclick="openMyPropertiesAsAdmin()" class="text-[10px] text-[#95e6b8] hover:underline flex items-center gap-1">
+                                <button onclick="openMyPropertiesAsAdmin()"
+                                    class="text-[10px] text-[#95e6b8] hover:underline flex items-center gap-1">
                                     <i class="ph ph-cards"></i>
                                     <span>عقاراتي وتطويرها</span>
                                 </button>
@@ -632,48 +749,58 @@
                             </span>
                             <div class="flex items-center gap-1">
                                 <span id="dotBank" class="w-3.5 h-1.5 rounded-full bg-[#95e6b8] transition-all"></span>
-                                <span id="dotPersonal" class="w-1.5 h-1.5 rounded-full bg-white/25 transition-all"></span>
+                                <span id="dotPersonal"
+                                    class="w-1.5 h-1.5 rounded-full bg-white/25 transition-all"></span>
                             </div>
                         </div>
 
                         <!-- بطاقة الفيزا الذكية (تدعم السحب والنقر) -->
-                        <div id="adminSmartVisa" 
-                             ontouchstart="handleVisaTouchStart(event)" 
-                             ontouchend="handleVisaTouchEnd(event)"
-                             onmousedown="handleVisaMouseDown(event)"
-                             onmouseup="handleVisaMouseUp(event)"
-                             onclick="handleAdminVisaClick()"
-                             class="visa-card-bank rounded-[26px] p-4 cursor-pointer transition-all duration-300 relative overflow-hidden select-none">
-                            
+                        <div id="adminSmartVisa" ontouchstart="handleVisaTouchStart(event)"
+                            ontouchend="handleVisaTouchEnd(event)" onmousedown="handleVisaMouseDown(event)"
+                            onmouseup="handleVisaMouseUp(event)" onclick="handleAdminVisaClick()"
+                            class="visa-card-bank rounded-[26px] p-4 cursor-pointer transition-all duration-300 relative overflow-hidden select-none">
+
                             <!-- زخرفة خلفية للبطاقة -->
-                            <div class="absolute -left-8 -bottom-10 w-36 h-36 rounded-full bg-white/[0.03] pointer-events-none"></div>
+                            <div
+                                class="absolute -left-8 -bottom-10 w-36 h-36 rounded-full bg-white/[0.03] pointer-events-none">
+                            </div>
 
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center gap-2">
-                                    <div id="adminVisaAvatarWrap" class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/40 flex items-center justify-center overflow-hidden">
+                                    <div id="adminVisaAvatarWrap"
+                                        class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/40 flex items-center justify-center overflow-hidden">
                                         <i id="adminVisaBankIcon" class="ph-fill ph-bank text-lg text-[#95e6b8]"></i>
                                         <img id="adminVisaAvatarImg" src="" class="hidden w-full h-full object-cover" />
                                     </div>
                                     <div>
-                                        <div id="adminVisaTitle" class="text-xs font-semibold text-white">بنك مونوبولي المركزي</div>
-                                        <div id="adminVisaSub" class="text-[10px] text-[#95e6b8]">انقر لإرسال أموال أو فرض غرامة</div>
+                                        <div id="adminVisaTitle" class="text-xs font-semibold text-white">بنك مونوبولي
+                                            المركزي</div>
+                                        <div id="adminVisaSub" class="text-[10px] text-[#95e6b8]">انقر لإرسال أموال أو
+                                            فرض غرامة</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <button onclick="event.stopPropagation(); toggleAdminVisaCardMode();" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 text-xs transition" title="تبديل البطاقة">
+                                    <button onclick="event.stopPropagation(); toggleAdminVisaCardMode();"
+                                        class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 text-xs transition"
+                                        title="تبديل البطاقة">
                                         <i class="ph ph-arrows-left-right"></i>
                                     </button>
-                                    <span class="num-font text-xs font-bold italic tracking-wider text-white/90">VISA</span>
+                                    <span
+                                        class="num-font text-xs font-bold italic tracking-wider text-white/90">VISA</span>
                                 </div>
                             </div>
 
                             <div class="flex items-end justify-between">
                                 <div>
                                     <span class="text-[10px] text-white/60 block">الرصيد المتاح</span>
-                                    <div id="adminVisaBalance" class="num-font text-xl font-bold text-white tracking-tight" dir="ltr">∞ BANK</div>
+                                    <div id="adminVisaBalance"
+                                        class="num-font text-xl font-bold text-white tracking-tight" dir="ltr">∞ BANK
+                                    </div>
                                 </div>
                                 <div class="text-left" dir="ltr">
-                                    <span id="adminVisaNumber" class="num-font text-[10px] text-white/60 tracking-[0.2em]">4921 •••• •••• BANK</span>
+                                    <span id="adminVisaNumber"
+                                        class="num-font text-[10px] text-white/60 tracking-[0.2em]">4921 •••• ••••
+                                        BANK</span>
                                 </div>
                             </div>
                         </div>
@@ -683,30 +810,38 @@
 
                 <!-- 3. واجهة "اللاعب العادي" (User Interface) أو استعراض عضو محلي بالكامل -->
                 <div id="monoPlayerView" class="mono-view hidden-view h-full flex flex-col justify-between gap-3">
-                    
+
                     <!-- شريط العودة السريع لصفحة القائد/الأدمن عند فتح واجهة عضو محلي (بدون هاتف/وايفاي) -->
-                    <div id="impersonationReturnBar" class="hidden shrink-0 bg-[#95e6b8]/15 border border-[#95e6b8]/40 rounded-2xl p-2.5 items-center justify-between shadow-md">
+                    <div id="impersonationReturnBar"
+                        class="hidden shrink-0 bg-[#95e6b8]/15 border border-[#95e6b8]/40 rounded-2xl p-2.5 items-center justify-between shadow-md">
                         <div class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-[#95e6b8] animate-pulse"></span>
                             <div>
-                                <div class="text-[11px] font-bold text-white">وضع واجهة العضو: <span id="impersonatedMemberName" class="text-[#95e6b8]"></span></div>
+                                <div class="text-[11px] font-bold text-white">وضع واجهة العضو: <span
+                                        id="impersonatedMemberName" class="text-[#95e6b8]"></span></div>
                                 <div class="text-[9.5px] text-white/70">تتحكم الآن بكامل صفحة هذا العضو المحلي</div>
                             </div>
                         </div>
-                        <button onclick="exitMemberPageToAdmin()" class="px-3 py-1.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[10.5px] font-bold flex items-center gap-1 transition active:scale-95 shadow">
+                        <button onclick="exitMemberPageToAdmin()"
+                            class="px-3 py-1.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[10.5px] font-bold flex items-center gap-1 transition active:scale-95 shadow">
                             <i class="ph-bold ph-crown text-xs"></i>
                             <span>رجوع لصفحة القائد</span>
                         </button>
                     </div>
 
                     <!-- بطاقة الفيزا الرقمية الخاصة باللاعب (قابلة للنقر لتحويل مبلغ لشخص معين) -->
-                    <div onclick="handleUserVisaClick()" class="visa-card-personal rounded-[28px] p-4.5 relative overflow-hidden shrink-0 cursor-pointer hover:border-[#95e6b8]/45 active:scale-[0.99] transition-all duration-200 group">
-                        <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#95e6b8]/[0.05] pointer-events-none"></div>
+                    <div onclick="handleUserVisaClick()"
+                        class="visa-card-personal rounded-[28px] p-4.5 relative overflow-hidden shrink-0 cursor-pointer hover:border-[#95e6b8]/45 active:scale-[0.99] transition-all duration-200 group">
+                        <div
+                            class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#95e6b8]/[0.05] pointer-events-none">
+                        </div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2.5">
-                                <img id="playerVisaAvatar" src="" class="w-11 h-11 rounded-2xl object-cover border border-[#95e6b8]/50" />
+                                <img id="playerVisaAvatar" src=""
+                                    class="w-11 h-11 rounded-2xl object-cover border border-[#95e6b8]/50" />
                                 <div>
-                                    <span id="playerVisaStatusBadge" class="text-[10px] text-[#95e6b8] block">حساب لاعب نشط</span>
+                                    <span id="playerVisaStatusBadge" class="text-[10px] text-[#95e6b8] block">حساب لاعب
+                                        نشط</span>
                                     <h3 id="playerVisaName" class="text-sm font-semibold text-white">اسم اللاعب</h3>
                                     <span class="text-[9.5px] text-[#95e6b8]/90 flex items-center gap-1 mt-0.5">
                                         <i class="ph-fill ph-paper-plane-tilt text-[10px]"></i>
@@ -725,12 +860,16 @@
                                 <span class="text-[10px] text-white/60 block">الرصيد المالي الحالي</span>
                                 <div class="flex items-baseline gap-1" dir="ltr">
                                     <span class="num-font text-xs text-[#95e6b8]">$</span>
-                                    <span id="playerVisaBalance" class="num-font text-2xl font-bold text-white tracking-tight">1,500</span>
+                                    <span id="playerVisaBalance"
+                                        class="num-font text-2xl font-bold text-white tracking-tight">1,500</span>
                                 </div>
                             </div>
                             <div class="text-left flex flex-col items-end gap-1" dir="ltr">
-                                <span class="text-[9.5px] px-2.5 py-0.5 rounded-full bg-[#95e6b8]/15 text-[#95e6b8] border border-[#95e6b8]/30 font-medium group-hover:bg-[#95e6b8] group-hover:text-[#121415] transition" dir="rtl">دفع / تحويل مال</span>
-                                <span id="playerVisaCardCode" class="num-font text-[10px] text-white/50 tracking-widest">5211 •••• 2026</span>
+                                <span
+                                    class="text-[9.5px] px-2.5 py-0.5 rounded-full bg-[#95e6b8]/15 text-[#95e6b8] border border-[#95e6b8]/30 font-medium group-hover:bg-[#95e6b8] group-hover:text-[#121415] transition"
+                                    dir="rtl">دفع / تحويل مال</span>
+                                <span id="playerVisaCardCode"
+                                    class="num-font text-[10px] text-white/50 tracking-widest">5211 •••• 2026</span>
                             </div>
                         </div>
                     </div>
@@ -739,21 +878,25 @@
                     <div class="flex-1 flex flex-col min-h-0">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-1.5">
-                                <button id="tabOwnedBtn" onclick="switchPlayerPropTab('owned')" class="text-xs px-3 py-1.5 rounded-full bg-white text-[#121415] font-medium transition">
+                                <button id="tabOwnedBtn" onclick="switchPlayerPropTab('owned')"
+                                    class="text-xs px-3 py-1.5 rounded-full bg-white text-[#121415] font-medium transition">
                                     أراضي مملوكة (<span id="userOwnedCount">0</span>)
                                 </button>
-                                <button id="tabMortgagedBtn" onclick="switchPlayerPropTab('mortgaged')" class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition">
+                                <button id="tabMortgagedBtn" onclick="switchPlayerPropTab('mortgaged')"
+                                    class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] text-[#7c8288] hover:text-white transition">
                                     مرهونة (<span id="userMortgagedCount">0</span>)
                                 </button>
                             </div>
-                            <button onclick="openAllPlayersOverviewForUser()" class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-white/10 text-white/90 flex items-center gap-1.5 transition active:scale-95">
+                            <button onclick="openAllPlayersOverviewForUser()"
+                                class="text-xs px-3 py-1.5 rounded-full bg-[#1d2022] hover:bg-[#262a2d] border border-white/10 text-white/90 flex items-center gap-1.5 transition active:scale-95">
                                 <i class="ph ph-users text-sm text-[#95e6b8]"></i>
                                 <span>اللاعبين</span>
                             </button>
                         </div>
 
                         <!-- شبكة بطاقات أراضي اللاعب -->
-                        <div id="playerPropertiesContainer" class="flex-1 overflow-y-auto custom-scroll pr-0.5 grid grid-cols-2 gap-2.5 content-start pb-2">
+                        <div id="playerPropertiesContainer"
+                            class="flex-1 overflow-y-auto custom-scroll pr-0.5 grid grid-cols-2 gap-2.5 content-start pb-2">
                             <!-- تُرسم هنا بطاقات المونوبولي الحقيقية -->
                         </div>
                     </div>
@@ -766,12 +909,44 @@
                  النوافذ المنبثقة (Modals) داخل نظام المونوبولي
                  ========================================== -->
 
+            <!-- نافذة عروض شراء الأراضي المنبثقة في وسط الشاشة لمشتري الأرض (تظهر فيها بطاقة الأرض الحقيقية + زر الموافقة أو الرفض) -->
+            <div id="playerPurchaseOffersBox"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[90] p-4 flex items-center justify-center">
+                <div
+                    class="bg-[#181b1d] border-2 border-[#95e6b8]/50 rounded-[32px] p-5 w-full max-w-[335px] max-h-[88%] flex flex-col items-center shadow-2xl space-y-3.5 relative">
+                    <div class="w-full flex items-center justify-between border-b border-white/10 pb-2.5 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-8 h-8 rounded-full bg-[#95e6b8]/15 border border-[#95e6b8]/40 flex items-center justify-center text-[#95e6b8]">
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#95e6b8] animate-ping"></span>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-xs font-bold text-white">عرض شراء أرض بانتظار موافقتك</h3>
+                                <p class="text-[9.5px] text-[#95e6b8]">لن يُخصم المبلغ من رصيدك إلا بعد موافقتك</p>
+                            </div>
+                        </div>
+                        <span
+                            class="num-font text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#95e6b8]/20 text-[#95e6b8] border border-[#95e6b8]/30">
+                            <span id="playerPurchaseOffersCount">1</span> عروض
+                        </span>
+                    </div>
+
+                    <!-- حاوية بطاقة الأرض الحقيقية وزر الموافقة والرفض -->
+                    <div id="playerPurchaseOffersList"
+                        class="w-full flex-1 overflow-y-auto custom-scroll space-y-3 py-1 px-0.5 flex flex-col items-center">
+                    </div>
+                </div>
+            </div>
+
             <!-- نافذة باركود موقع اللعبة (تظهر عند النقر على الأيقونة الدائرية بجانب الكود في صفحة الأدمن) -->
-            <div id="qrCodeModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[85] p-4 flex items-center justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 w-full max-w-[330px] flex flex-col items-center text-center shadow-2xl space-y-3.5">
+            <div id="qrCodeModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[85] p-4 flex items-center justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 w-full max-w-[330px] flex flex-col items-center text-center shadow-2xl space-y-3.5">
                     <div class="w-full flex items-center justify-between border-b border-white/10 pb-2.5">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                            <div
+                                class="w-8 h-8 rounded-full bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
                                 <i class="ph ph-qr-code text-base"></i>
                             </div>
                             <div class="text-right">
@@ -779,87 +954,175 @@
                                 <p class="text-[9.5px] text-[#7c8288]">امسح الباركود للدخول السريع</p>
                             </div>
                         </div>
-                        <button onclick="closeModal('qrCodeModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('qrCodeModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
 
                     <!-- صورة الباركود لموقع https://3aasm.github.io/narde/ مع كود الغرفة التلقائي -->
                     <div class="bg-white p-3.5 rounded-3xl shadow-inner flex items-center justify-center">
-                        <img id="qrCodeDynamicImg" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=https%3A%2F%2F3aasm.github.io%2Fnarde%2F" 
-                             alt="QR Code https://3aasm.github.io/narde/" 
-                             class="w-44 h-44 object-contain rounded-xl" />
+                        <img id="qrCodeDynamicImg"
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=https%3A%2F%2F3aasm.github.io%2Fnarde%2F"
+                            alt="QR Code https://3aasm.github.io/narde/" class="w-44 h-44 object-contain rounded-xl" />
                     </div>
 
-                    <div class="w-full bg-[#121415] border border-white/10 rounded-2xl px-3 py-2 flex items-center justify-between gap-2" dir="ltr">
-                        <span id="qrInviteUrlText" class="num-font text-[10.5px] text-[#95e6b8] truncate">https://3aasm.github.io/narde/</span>
-                        <button onclick="copyGameUrl()" class="text-[10px] bg-[#262a2d] hover:bg-white/15 text-white px-2.5 py-1 rounded-lg transition shrink-0">
+                    <div class="w-full bg-[#121415] border border-white/10 rounded-2xl px-3 py-2 flex items-center justify-between gap-2"
+                        dir="ltr">
+                        <span id="qrInviteUrlText"
+                            class="num-font text-[10.5px] text-[#95e6b8] truncate">https://3aasm.github.io/narde/</span>
+                        <button onclick="copyGameUrl()"
+                            class="text-[10px] bg-[#262a2d] hover:bg-white/15 text-white px-2.5 py-1 rounded-lg transition shrink-0">
                             نسخ الرابط
                         </button>
                     </div>
 
-                    <p class="text-[10px] text-[#7c8288]">عند مسح الباركود سيكتب اللاعب اسمه وصورته ويدخل الغرفة <strong id="qrModalRoomCode" class="num-font text-white tracking-widest">----</strong> مباشرة</p>
+                    <p class="text-[10px] text-[#7c8288]">عند مسح الباركود سيكتب اللاعب اسمه وصورته ويدخل الغرفة <strong
+                            id="qrModalRoomCode" class="num-font text-white tracking-widest">----</strong> مباشرة</p>
                 </div>
             </div>
 
             <!-- نافذة إدارة وبيع الأراضي (للقائد) -->
-            <div id="propertiesModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
+            <div id="propertiesModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
                     <div class="flex items-center justify-between pb-3 border-b border-white/10">
                         <div>
                             <h3 class="text-sm font-semibold text-white">سجل عقارات وأراضي المونوبولي</h3>
-                            <p class="text-[10px] text-[#7c8288]">حدد الأرض أو محطة القطار واللاعب لبيعها أو نقل ملكيتها</p>
+                            <p class="text-[10px] text-[#7c8288]">حدد الأرض واللاعب لبيعها أو نقل ملكيتها</p>
                         </div>
-                        <button onclick="closeModal('propertiesModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('propertiesModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
 
-                    <!-- اختيار اللاعب المشتري + طريقة البيع -->
-                    <div class="grid grid-cols-2 gap-2 my-3 shrink-0">
-                        <div>
-                            <label class="text-[10px] text-[#7c8288] block mb-1">بيع/منح إلى اللاعب:</label>
-                            <select id="sellTargetPlayerSelect" class="w-full bg-[#121415] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white outline-none"></select>
+                    <!-- اختيار اللاعب المشتري + طريقة البيع + زر تفعيل/إيقاف موافقة المشتري -->
+                    <div class="space-y-2 my-3 shrink-0">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-[#7c8288] block mb-1">بيع/منح إلى اللاعب:</label>
+                                <select id="sellTargetPlayerSelect"
+                                    class="w-full bg-[#121415] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white outline-none"></select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-[#7c8288] block mb-1">خصم السعر تلقائياً؟</label>
+                                <div class="flex items-center gap-1.5">
+                                    <select id="sellDeductMode"
+                                        class="flex-1 min-w-0 bg-[#121415] border border-white/10 rounded-xl px-2 py-2 text-[11px] text-white outline-none">
+                                        <option value="yes">نعم، خصم السعر</option>
+                                        <option value="no">لا، منح مجاني</option>
+                                    </select>
+                                    <button id="toggleBuyerApprovalBtn" type="button"
+                                        onclick="toggleRequireBuyerApproval()"
+                                        class="shrink-0 px-2.5 py-2 rounded-xl border border-white/10 bg-[#262a2d] text-[10px] font-bold text-[#7c8288] flex items-center gap-1 transition active:scale-95"
+                                        title="تفعيل أو إيقاف شرط موافقة اللاعب قبل خصم السعر">
+                                        <i id="buyerApprovalIcon" class="ph-fill ph-toggle-left text-sm"></i>
+                                        <span id="buyerApprovalBtnLabel">إيقاف</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="text-[10px] text-[#7c8288] block mb-1">خصم السعر تلقائياً؟</label>
-                            <select id="sellDeductMode" class="w-full bg-[#121415] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white outline-none">
-                                <option value="yes">نعم، خصم سعر الأرض</option>
-                                <option value="no">لا، منح مجاني / تفاوض</option>
-                            </select>
+                        <div id="buyerApprovalHintBar"
+                            class="text-[10px] px-3 py-1.5 rounded-xl bg-[#121415] border border-white/5 text-[#7c8288] flex items-center justify-between">
+                            <span>وضع موافقة المشتري قبل الخصم:</span>
+                            <span id="buyerApprovalStatusBadge" class="text-white/80 font-semibold">متوقف (يخصم السعر
+                                تلقائياً فوراً)</span>
                         </div>
                     </div>
 
                     <!-- قائمة جميع الأراضي بتصميم البطاقات -->
-                    <div id="allPropertiesAdminList" class="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-2.5 pr-0.5 py-1"></div>
+                    <div id="allPropertiesAdminList"
+                        class="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-2.5 pr-0.5 py-1"></div>
                 </div>
             </div>
 
-            <!-- نافذة طلبات الرهن وفك الرهن (للقائد) -->
-            <div id="requestsModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[82%] flex flex-col shadow-2xl">
+            <!-- نافذة طلبات الرهن وفك الرهن وطلبات تبديل الأراضي (للقائد) -->
+            <div id="requestsModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[82%] flex flex-col shadow-2xl">
                     <div class="flex items-center justify-between pb-3 border-b border-white/10">
                         <div>
-                            <h3 class="text-sm font-semibold text-white">طلبات الرهن العقاري وفك الرهن</h3>
-                            <p class="text-[10px] text-[#7c8288]">وافق لتحويل قيمة الرهن تلقائياً أو ارفض الطلب</p>
+                            <h3 class="text-sm font-semibold text-white">طلبات الرهن العقاري وتبديل الأراضي</h3>
+                            <p class="text-[10px] text-[#7c8288]">وافق على الرهن أو تبديل الأراضي بين اللاعبين أو ارفض
+                                الطلب</p>
                         </div>
-                        <button onclick="closeModal('requestsModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('requestsModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
-                    <div id="mortgageRequestsList" class="flex-1 overflow-y-auto custom-scroll space-y-2 my-3 pr-0.5"></div>
+                    <div id="mortgageRequestsList" class="flex-1 overflow-y-auto custom-scroll space-y-2 my-3 pr-0.5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- نافذة تبديل أو إهداء الأرض مع لاعب آخر -->
+            <div id="tradePropertyModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[75] p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 flex flex-col shadow-2xl space-y-3.5">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-300">
+                                <i class="ph-fill ph-arrows-left-right text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">تبديل / نقل ملكية الأرض للاعب آخر</h3>
+                                <p id="tradeModalFromSub" class="text-[10px] text-[#7c8288]">يتم إرسال الطلب إلى قائد
+                                    الغرفة للموافقة والاعتماد</p>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('tradePropertyModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>
+
+                    <div class="matte-card p-3 flex items-center justify-between border border-white/10">
+                        <div>
+                            <span class="text-[10px] text-[#7c8288] block">عقارك المحدد للتبديل:</span>
+                            <span id="tradeSourcePropName" class="text-xs font-bold text-white">—</span>
+                        </div>
+                        <span id="tradeSourcePropColor" class="w-4 h-8 rounded-lg border border-white/20"></span>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] text-[#7c8288] block mb-1">اختر اللاعب الطرف الآخر:</label>
+                        <select id="tradeTargetPlayerSelect" onchange="populateTradeTargetProperties()"
+                            class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] text-[#7c8288] block mb-1">مقابل ماذا من أراضي اللاعب الآخر؟</label>
+                        <select id="tradeTargetPropertySelect"
+                            class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
+                    </div>
+
+                    <button onclick="submitPropertyTradeRequest()"
+                        class="w-full py-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                        <i class="ph-bold ph-paper-plane-tilt text-base"></i>
+                        <span>إرسال طلب التبديل لموافقة القائد</span>
+                    </button>
                 </div>
             </div>
 
             <!-- نافذة إدارة اللاعبين وصلاحيات الغرفة + إضافة أعضاء بدون هاتف/وايفاي (للقائد) -->
-            <div id="playersAdminModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[90%] flex flex-col shadow-2xl">
+            <div id="playersAdminModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[90%] flex flex-col shadow-2xl">
                     <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
                         <div>
                             <h3 class="text-sm font-semibold text-white">إدارة اللاعبين وإضافة الأعضاء</h3>
-                            <p class="text-[10px] text-[#7c8288]">إضافة عضو محلي (بدون هاتف)، دخول واجهته، أو إدارة الغرفة</p>
+                            <p class="text-[10px] text-[#7c8288]">إضافة عضو محلي (بدون هاتف)، دخول واجهته، أو إدارة
+                                الغرفة</p>
                         </div>
-                        <button onclick="closeModal('playersAdminModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('playersAdminModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
@@ -871,12 +1134,14 @@
                                 <div class="text-[11px] font-medium text-white">حالة الغرفة</div>
                                 <div id="roomLockStatusText" class="text-[9.5px] text-[#95e6b8]">مفتوحة للانضمام</div>
                             </div>
-                            <button id="toggleRoomLockBtn" onclick="toggleRoomLock()" class="px-2.5 py-1.5 rounded-xl bg-[#262a2d] hover:bg-[#32373b] text-[10px] font-medium text-white transition">
+                            <button id="toggleRoomLockBtn" onclick="toggleRoomLock()"
+                                class="px-2.5 py-1.5 rounded-xl bg-[#262a2d] hover:bg-[#32373b] text-[10px] font-medium text-white transition">
                                 إغلاق
                             </button>
                         </div>
 
-                        <button onclick="toggleAddOfflineMemberForm()" class="matte-card p-2.5 border border-[#95e6b8]/30 hover:bg-[#262a2d] flex items-center justify-center gap-2 text-[#95e6b8] transition active:scale-95">
+                        <button onclick="toggleAddOfflineMemberForm()"
+                            class="matte-card p-2.5 border border-[#95e6b8]/30 hover:bg-[#262a2d] flex items-center justify-center gap-2 text-[#95e6b8] transition active:scale-95">
                             <i class="ph-fill ph-user-plus text-lg"></i>
                             <div class="text-right">
                                 <div class="text-[11px] font-bold text-white">إضافة عضو محلي</div>
@@ -886,30 +1151,38 @@
                     </div>
 
                     <!-- نموذج إضافة عضو جديد (لغير المتصل بالوايفاي أو لا يملك هاتف) -->
-                    <div id="addOfflineMemberBox" class="hidden matte-card p-3.5 mb-2.5 border border-[#95e6b8]/35 space-y-2.5 shrink-0 bg-[#141719]">
+                    <div id="addOfflineMemberBox"
+                        class="hidden matte-card p-3.5 mb-2.5 border border-[#95e6b8]/35 space-y-2.5 shrink-0 bg-[#141719]">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-semibold text-[#95e6b8] flex items-center gap-1.5">
                                 <i class="ph-fill ph-user-circle-plus"></i>
                                 <span>بيانات العضو المضاف (بدون هاتف/إنترنت)</span>
                             </span>
-                            <button onclick="toggleAddOfflineMemberForm()" class="text-[10px] text-[#7c8288] hover:text-white">إخفاء</button>
+                            <button onclick="toggleAddOfflineMemberForm()"
+                                class="text-[10px] text-[#7c8288] hover:text-white">إخفاء</button>
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <div class="relative w-13 h-13 rounded-2xl bg-[#262a2d] border-2 border-[#95e6b8] overflow-hidden shrink-0 flex items-center justify-center">
+                            <div
+                                class="relative w-13 h-13 rounded-2xl bg-[#262a2d] border-2 border-[#95e6b8] overflow-hidden shrink-0 flex items-center justify-center">
                                 <img id="offlineMemberAvatarPreview" src="" class="w-12 h-12 object-cover" />
                             </div>
                             <div class="flex-1 space-y-1.5">
-                                <input id="offlineMemberNameInput" type="text" maxlength="18" placeholder="اسم العضو الجديد..." class="w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3 py-2 text-xs text-white outline-none" />
+                                <input id="offlineMemberNameInput" type="text" maxlength="18"
+                                    placeholder="اسم العضو الجديد..."
+                                    class="w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3 py-2 text-xs text-white outline-none" />
                                 <div class="flex items-center gap-1.5">
                                     <!-- اختيار صورة من الاستوديو -->
-                                    <label class="flex-1 text-center text-[10px] bg-[#262a2d] hover:bg-[#32373b] text-white py-1.5 px-2 rounded-lg cursor-pointer border border-white/10 transition flex items-center justify-center gap-1">
+                                    <label
+                                        class="flex-1 text-center text-[10px] bg-[#262a2d] hover:bg-[#32373b] text-white py-1.5 px-2 rounded-lg cursor-pointer border border-white/10 transition flex items-center justify-center gap-1">
                                         <i class="ph ph-image text-[#95e6b8]"></i>
                                         <span>من الاستوديو</span>
-                                        <input type="file" accept="image/*" class="hidden" onchange="handleOfflineMemberAvatarUpload(event)" />
+                                        <input type="file" accept="image/*" class="hidden"
+                                            onchange="handleOfflineMemberAvatarUpload(event)" />
                                     </label>
                                     <!-- اختيار صورة عشوائية -->
-                                    <button type="button" onclick="pickRandomOfflineMemberAvatar()" class="flex-1 text-[10px] bg-[#262a2d] hover:bg-[#32373b] text-white py-1.5 px-2 rounded-lg border border-white/10 transition flex items-center justify-center gap-1">
+                                    <button type="button" onclick="pickRandomOfflineMemberAvatar()"
+                                        class="flex-1 text-[10px] bg-[#262a2d] hover:bg-[#32373b] text-white py-1.5 px-2 rounded-lg border border-white/10 transition flex items-center justify-center gap-1">
                                         <i class="ph ph-shuffle text-amber-300"></i>
                                         <span>صورة عشوائية</span>
                                     </button>
@@ -917,56 +1190,72 @@
                             </div>
                         </div>
 
-                        <button onclick="addOfflineMemberToRoom()" class="w-full py-2.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-98">
+                        <button onclick="addOfflineMemberToRoom()"
+                            class="w-full py-2.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-98">
                             <i class="ph-bold ph-check-circle text-sm"></i>
                             <span>إضافة العضو للغرفة الآن</span>
                         </button>
                     </div>
 
                     <!-- قائمة اللاعبين مع أزرار (دخول واجهته، ترقية، طرد) -->
-                    <div id="adminManagePlayersList" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-0.5"></div>
+                    <div id="adminManagePlayersList" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-0.5">
+                    </div>
                 </div>
             </div>
 
             <!-- نافذة التحويل البنكي / الغرامات (عند النقر على فيزا البنك) -->
-            <div id="bankTransferModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 flex flex-col shadow-2xl space-y-3.5">
+            <div id="bankTransferModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 flex flex-col shadow-2xl space-y-3.5">
                     <div class="flex items-center justify-between border-b border-white/10 pb-3">
                         <div class="flex items-center gap-2">
                             <i class="ph-fill ph-bank text-xl text-[#95e6b8]"></i>
                             <div>
-                                <h3 id="transferModalTitle" class="text-sm font-semibold text-white">عمليات بنك المونوبولي</h3>
-                                <p id="transferModalSub" class="text-[10px] text-[#7c8288]">إرسال مكافأة/راتب أو فرض غرامة على لاعب</p>
+                                <h3 id="transferModalTitle" class="text-sm font-semibold text-white">عمليات بنك
+                                    المونوبولي</h3>
+                                <p id="transferModalSub" class="text-[10px] text-[#7c8288]">إرسال مكافأة/راتب أو فرض
+                                    غرامة على لاعب</p>
                             </div>
                         </div>
-                        <button onclick="closeModal('bankTransferModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('bankTransferModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
 
                     <div>
                         <label class="text-[11px] text-[#7c8288] block mb-1">اختر اللاعب المستهدف</label>
-                        <select id="bankTargetPlayer" class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
+                        <select id="bankTargetPlayer"
+                            class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
                     </div>
 
                     <div>
                         <label class="text-[11px] text-[#7c8288] block mb-1">المبلغ المالي ($)</label>
-                        <input id="bankAmountInput" type="number" min="1" value="200" class="num-font w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3.5 py-2.5 text-base font-bold text-white outline-none" />
+                        <input id="bankAmountInput" type="number" min="1" value="200"
+                            class="num-font w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3.5 py-2.5 text-base font-bold text-white outline-none" />
                         <!-- أزرار مبالغ سريعة -->
                         <div class="flex items-center gap-1.5 mt-2">
-                            <button onclick="setQuickAmount(50)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$50</button>
-                            <button onclick="setQuickAmount(100)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$100</button>
-                            <button onclick="setQuickAmount(200)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-[#95e6b8] font-semibold">$200 (GO)</button>
-                            <button onclick="setQuickAmount(500)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$500</button>
+                            <button onclick="setQuickAmount(50)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$50</button>
+                            <button onclick="setQuickAmount(100)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$100</button>
+                            <button onclick="setQuickAmount(200)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-[#95e6b8] font-semibold">$200
+                                (GO)</button>
+                            <button onclick="setQuickAmount(500)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$500</button>
                         </div>
                     </div>
 
                     <div id="bankActionButtonsWrap" class="grid grid-cols-2 gap-2.5 pt-1">
-                        <button onclick="executeBankTransaction('give')" class="py-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
+                        <button onclick="executeBankTransaction('give')"
+                            class="py-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
                             <i class="ph-bold ph-plus-circle text-base"></i>
                             <span>إيداع أموال للاعب</span>
                         </button>
-                        <button onclick="executeBankTransaction('fine')" class="py-3 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5">
+                        <button onclick="executeBankTransaction('fine')"
+                            class="py-3 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-bold text-xs flex items-center justify-center gap-1.5">
                             <i class="ph-bold ph-minus-circle text-base"></i>
                             <span>فرض غرامة / سحب</span>
                         </button>
@@ -975,41 +1264,53 @@
             </div>
 
             <!-- نافذة دفع وتحويل مبلغ من فيزا المستخدم العادي إلى لاعب آخر -->
-            <div id="userPayModal" class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 flex flex-col shadow-2xl space-y-3.5">
+            <div id="userPayModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/80 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 flex flex-col shadow-2xl space-y-3.5">
                     <div class="flex items-center justify-between border-b border-white/10 pb-3">
                         <div class="flex items-center gap-2">
-                            <div class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
                                 <i class="ph-fill ph-credit-card text-xl"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-white">دفع وتحويل من بطاقة الفيزا</h3>
-                                <p id="userPayFromLabel" class="text-[10px] text-[#7c8288]">تحويل مباشر من رصيدك إلى لاعب آخر في الغرفة</p>
+                                <p id="userPayFromLabel" class="text-[10px] text-[#7c8288]">تحويل مباشر من رصيدك إلى
+                                    لاعب آخر في الغرفة</p>
                             </div>
                         </div>
-                        <button onclick="closeModal('userPayModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('userPayModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
 
                     <div>
                         <label class="text-[11px] text-[#7c8288] block mb-1">اختر الشخص المستلم</label>
-                        <select id="userPayTargetSelect" class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
+                        <select id="userPayTargetSelect"
+                            class="w-full bg-[#121415] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none"></select>
                     </div>
 
                     <div>
                         <label class="text-[11px] text-[#7c8288] block mb-1">المبلغ المراد دفعه ($)</label>
-                        <input id="userPayAmountInput" type="number" min="1" value="50" class="num-font w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3.5 py-2.5 text-base font-bold text-white outline-none" />
+                        <input id="userPayAmountInput" type="number" min="1" value="50"
+                            class="num-font w-full bg-[#121415] border border-white/10 focus:border-[#95e6b8] rounded-xl px-3.5 py-2.5 text-base font-bold text-white outline-none" />
                         <!-- أزرار مبالغ سريعة للدفع -->
                         <div class="flex items-center gap-1.5 mt-2">
-                            <button onclick="setUserQuickPayAmount(25)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$25</button>
-                            <button onclick="setUserQuickPayAmount(50)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$50</button>
-                            <button onclick="setUserQuickPayAmount(100)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-[#95e6b8] font-semibold">$100</button>
-                            <button onclick="setUserQuickPayAmount(200)" class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$200</button>
+                            <button onclick="setUserQuickPayAmount(25)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$25</button>
+                            <button onclick="setUserQuickPayAmount(50)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$50</button>
+                            <button onclick="setUserQuickPayAmount(100)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-[#95e6b8] font-semibold">$100</button>
+                            <button onclick="setUserQuickPayAmount(200)"
+                                class="num-font text-[11px] flex-1 py-1.5 rounded-lg bg-[#262a2d] hover:bg-white/15 text-white">$200</button>
                         </div>
                     </div>
 
-                    <button onclick="executeUserVisaPayment()" class="w-full py-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                    <button onclick="executeUserVisaPayment()"
+                        class="w-full py-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
                         <i class="ph-bold ph-paper-plane-tilt text-base"></i>
                         <span>تأكيد دفع المبلغ الآن</span>
                     </button>
@@ -1017,100 +1318,126 @@
             </div>
 
             <!-- نافذة عرض بطاقات أراضي لاعب محدد (عند النقر على مستطيل اللاعب) -->
-            <div id="playerDeedsModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[70] p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
+            <div id="playerDeedsModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[70] p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
                     <div class="flex items-center justify-between pb-3 border-b border-white/10">
                         <div class="flex items-center gap-2.5">
-                            <img id="inspectedPlayerAvatar" src="" class="w-9 h-9 rounded-xl object-cover border border-[#95e6b8]/40" />
+                            <img id="inspectedPlayerAvatar" src=""
+                                class="w-9 h-9 rounded-xl object-cover border border-[#95e6b8]/40" />
                             <div>
                                 <h3 id="inspectedPlayerName" class="text-sm font-semibold text-white">أراضي اللاعب</h3>
-                                <p id="inspectedPlayerSub" class="text-[10px] text-[#95e6b8]">سندات الملكية والمنازل المشيدة</p>
+                                <p id="inspectedPlayerSub" class="text-[10px] text-[#95e6b8]">سندات الملكية والمنازل
+                                    المشيدة</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5">
                             <!-- زر فتح واجهة اللاعب بالكامل إذا كان القائد يتصفح لاعباً آخر -->
-                            <button id="enterFullMemberPageFromDeedsBtn" class="hidden px-2.5 py-1.5 rounded-xl bg-[#95e6b8] text-[#121415] text-[10px] font-bold items-center gap-1 shadow">
+                            <button id="enterFullMemberPageFromDeedsBtn"
+                                class="hidden px-2.5 py-1.5 rounded-xl bg-[#95e6b8] text-[#121415] text-[10px] font-bold items-center gap-1 shadow">
                                 <i class="ph-bold ph-arrows-out-simple"></i>
                                 <span>دخول صفحته</span>
                             </button>
-                            <button onclick="closeModal('playerDeedsModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                            <button onclick="closeModal('playerDeedsModal')"
+                                class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                                 <i class="ph ph-x"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div id="inspectedPlayerDeedsGrid" class="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-2.5 py-3 pr-0.5"></div>
+                    <div id="inspectedPlayerDeedsGrid"
+                        class="flex-1 overflow-y-auto custom-scroll grid grid-cols-2 gap-2.5 py-3 pr-0.5"></div>
                 </div>
             </div>
 
             <!-- نافذة تفاصيل اللاعب الموسعة (للمشاهدة فقط عند النقر على لاعب من لوحة اللاعبين) -->
-            <div id="userReadOnlyProfileModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[60] p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
+            <div id="userReadOnlyProfileModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[60] p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[88%] flex flex-col shadow-2xl">
                     <!-- رأس النافذة -->
                     <div class="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
                         <div class="flex items-center gap-2">
-                            <button onclick="backToPlayersOverviewFromProfile()" class="w-8 h-8 rounded-full bg-[#262a2d] hover:bg-white/15 flex items-center justify-center text-white/80 transition" title="رجوع لقائمة اللاعبين">
+                            <button onclick="backToPlayersOverviewFromProfile()"
+                                class="w-8 h-8 rounded-full bg-[#262a2d] hover:bg-white/15 flex items-center justify-center text-white/80 transition"
+                                title="رجوع لقائمة اللاعبين">
                                 <i class="ph ph-arrow-right"></i>
                             </button>
                             <div>
                                 <div class="flex items-center gap-1.5">
                                     <h3 class="text-sm font-semibold text-white">ملف اللاعب العقاري والمالي</h3>
-                                    <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/75">للمشاهدة فقط</span>
+                                    <span class="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/75">للمشاهدة
+                                        فقط</span>
                                 </div>
                                 <p class="text-[10px] text-[#7c8288]">عرض تفصيلي للثروة والأراضي المملوكة والمرهونة</p>
                             </div>
                         </div>
-                        <button onclick="closeModal('userReadOnlyProfileModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('userReadOnlyProfileModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
 
                     <!-- محتوى ملف اللاعب والقوائم -->
-                    <div id="userReadOnlyProfileContent" class="flex-1 overflow-y-auto custom-scroll space-y-3 my-3 pr-0.5">
+                    <div id="userReadOnlyProfileContent"
+                        class="flex-1 overflow-y-auto custom-scroll space-y-3 my-3 pr-0.5">
                         <!-- يُعبأ ديناميكياً عند النقر على اللاعب -->
                     </div>
                 </div>
             </div>
 
             <!-- نافذة لوحة اللاعبين للمستخدم العادي (للمشاهدة فقط بدون أي صلاحية تعديل) -->
-            <div id="userPlayersOverviewModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[86%] flex flex-col shadow-2xl">
+            <div id="userPlayersOverviewModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-4 max-h-[86%] flex flex-col shadow-2xl">
                     <div class="flex items-center justify-between pb-3 border-b border-white/10">
                         <div class="flex items-center gap-2">
-                            <div class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
                                 <i class="ph-fill ph-users-three text-lg"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold text-white">شوف شلة الشرقية</h3>
-                                <p class="text-[10px] text-[#7c8288]">وضع المشاهدة فقط — انقر على أي لاعب لعرض بطاقات أراضيه</p>
+                                <p class="text-[10px] text-[#7c8288]">وضع المشاهدة فقط — انقر على أي لاعب لعرض بطاقات
+                                    أراضيه</p>
                             </div>
                         </div>
-                        <button onclick="closeModal('userPlayersOverviewModal')" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
+                        <button onclick="closeModal('userPlayersOverviewModal')"
+                            class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white">
                             <i class="ph ph-x"></i>
                         </button>
                     </div>
 
-                    <div id="userOverviewPlayersList" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 my-3 pr-0.5">
+                    <div id="userOverviewPlayersList"
+                        class="flex-1 overflow-y-auto custom-scroll space-y-2.5 my-3 pr-0.5">
                         <!-- مستطيلات اللاعبين للمشاهدة فقط -->
                     </div>
                 </div>
             </div>
 
             <!-- نافذة تأكيد مغادرة الغرفة -->
-            <div id="leaveConfirmModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[80] p-4 flex items-center justify-center">
-                <div class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 w-full max-w-[320px] flex flex-col items-center text-center shadow-2xl space-y-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
+            <div id="leaveConfirmModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[80] p-4 flex items-center justify-center">
+                <div
+                    class="bg-[#181b1d] border border-white/10 rounded-[32px] p-5 w-full max-w-[320px] flex flex-col items-center text-center shadow-2xl space-y-3.5">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
                         <i class="ph-fill ph-warning-circle text-2xl"></i>
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-white">تأكيد مغادرة الغرفة</h3>
-                        <p class="text-[11px] text-[#7c8288] mt-1 leading-relaxed">هل أنت متأكد من رغبتك في الخروج من الغرفة؟ ستعود أراضيك الحالية إلى البنك المركزي.</p>
+                        <p class="text-[11px] text-[#7c8288] mt-1 leading-relaxed">هل أنت متأكد من رغبتك في الخروج من
+                            الغرفة؟ ستعود أراضيك الحالية إلى البنك المركزي.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5 w-full pt-1">
-                        <button onclick="confirmLeaveRoomAction()" class="py-2.5 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition active:scale-95">
+                        <button onclick="confirmLeaveRoomAction()"
+                            class="py-2.5 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition active:scale-95">
                             تأكيد الخروج
                         </button>
-                        <button onclick="closeModal('leaveConfirmModal')" class="py-2.5 rounded-2xl bg-[#262a2d] hover:bg-[#32373b] text-white/85 font-medium text-xs transition active:scale-95">
+                        <button onclick="closeModal('leaveConfirmModal')"
+                            class="py-2.5 rounded-2xl bg-[#262a2d] hover:bg-[#32373b] text-white/85 font-medium text-xs transition active:scale-95">
                             إلغاء
                         </button>
                     </div>
@@ -1118,7 +1445,8 @@
             </div>
 
             <!-- رسالة تنبيه داخلية أنيقة (Toast) بديلة عن alert -->
-            <div id="monoToast" class="pointer-events-none fixed sm:absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-[#262a2d] border border-[#95e6b8]/40 text-white px-4 py-2.5 rounded-full shadow-2xl text-xs flex items-center gap-2 opacity-0 -translate-y-3 transition-all duration-300">
+            <div id="monoToast"
+                class="pointer-events-none fixed sm:absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-[#262a2d] border border-[#95e6b8]/40 text-white px-4 py-2.5 rounded-full shadow-2xl text-xs flex items-center gap-2 opacity-0 -translate-y-3 transition-all duration-300">
                 <i class="ph-fill ph-info text-[#95e6b8] text-base"></i>
                 <span id="monoToastText">تمت العملية بنجاح</span>
             </div>
@@ -1128,31 +1456,38 @@
         <!-- ==========================================================
              نافذة شرح تحميل وتثبيت اللعبة على سطح المكتب (آيفون & أندرويد)
              ========================================================== -->
-        <div id="installGuideModal" class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
-            <div class="bg-[#181b1d] border border-white/10 rounded-[34px] p-5 max-h-[90%] flex flex-col shadow-2xl space-y-4 overflow-hidden">
+        <div id="installGuideModal"
+            class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-50 p-4 flex flex-col justify-end sm:justify-center">
+            <div
+                class="bg-[#181b1d] border border-white/10 rounded-[34px] p-5 max-h-[90%] flex flex-col shadow-2xl space-y-4 overflow-hidden">
                 <!-- الهيدر -->
                 <div class="flex items-center justify-between border-b border-white/10 pb-3 shrink-0">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-10 h-10 rounded-2xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
+                        <div
+                            class="w-10 h-10 rounded-2xl bg-[#95e6b8]/15 border border-[#95e6b8]/30 flex items-center justify-center text-[#95e6b8]">
                             <i class="ph-fill ph-device-mobile-speaker text-xl"></i>
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-white">تثبيت اللعبة على شاشة الهاتف</h3>
-                            <p id="detectedDeviceHint" class="text-[10px] text-[#95e6b8]">اختر نظام هاتفك لعرض خطوات الإضافة لسطح المكتب</p>
+                            <p id="detectedDeviceHint" class="text-[10px] text-[#95e6b8]">اختر نظام هاتفك لعرض خطوات
+                                الإضافة لسطح المكتب</p>
                         </div>
                     </div>
-                    <button onclick="closeInstallGuideModal()" class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white transition">
+                    <button onclick="closeInstallGuideModal()"
+                        class="w-8 h-8 rounded-full bg-[#262a2d] flex items-center justify-center text-white/70 hover:text-white transition">
                         <i class="ph ph-x"></i>
                     </button>
                 </div>
 
                 <!-- زرا اختيار النظام (آيفون / أندرويد) -->
                 <div class="grid grid-cols-2 gap-2.5 shrink-0">
-                    <button id="tabIosGuideBtn" onclick="switchInstallGuidePlatform('ios')" class="py-3 px-3 rounded-2xl border transition-all flex items-center justify-center gap-2 text-xs font-semibold">
+                    <button id="tabIosGuideBtn" onclick="switchInstallGuidePlatform('ios')"
+                        class="py-3 px-3 rounded-2xl border transition-all flex items-center justify-center gap-2 text-xs font-semibold">
                         <i class="ph-fill ph-apple-logo text-lg"></i>
                         <span>آيفون (iPhone)</span>
                     </button>
-                    <button id="tabAndroidGuideBtn" onclick="switchInstallGuidePlatform('android')" class="py-3 px-3 rounded-2xl border transition-all flex items-center justify-center gap-2 text-xs font-semibold">
+                    <button id="tabAndroidGuideBtn" onclick="switchInstallGuidePlatform('android')"
+                        class="py-3 px-3 rounded-2xl border transition-all flex items-center justify-center gap-2 text-xs font-semibold">
                         <i class="ph-fill ph-android-logo text-lg"></i>
                         <span>أندرويد (Android)</span>
                     </button>
@@ -1162,48 +1497,61 @@
                 <div id="iosInstallSteps" class="flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-0.5">
                     <div class="bg-[#95e6b8]/10 border border-[#95e6b8]/25 rounded-2xl p-3 flex items-center gap-2.5">
                         <i class="ph-fill ph-compass text-xl text-[#95e6b8] shrink-0"></i>
-                        <p class="text-[11px] text-white/90 leading-relaxed">لأفضل تجربة على الآيفون، افتح اللعبة من متصفح <strong class="text-[#95e6b8]">Safari</strong> ثم اتبع الخطوات التالية:</p>
+                        <p class="text-[11px] text-white/90 leading-relaxed">لأفضل تجربة على الآيفون، افتح اللعبة من
+                            متصفح <strong class="text-[#95e6b8]">Safari</strong> ثم اتبع الخطوات التالية:</p>
                     </div>
 
                     <!-- الخطوة 1 آيفون -->
                     <div class="matte-card p-3.5 flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#38bdf8] shrink-0 shadow-inner">
+                        <div
+                            class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#38bdf8] shrink-0 shadow-inner">
                             <i class="ph ph-export text-2xl"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-1.5">
-                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">1</span>
+                                <span
+                                    class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">1</span>
                                 <h4 class="text-xs font-semibold text-white">اضغط على زر المشاركة (Share)</h4>
                             </div>
-                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">ستجده في الشريط السفلي لمتصفح سفاري على شكل مربع يخرج منه سهم للأعلى <i class="ph ph-export text-white inline-block align-middle"></i>.</p>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">ستجده في الشريط السفلي لمتصفح
+                                سفاري على شكل مربع يخرج منه سهم للأعلى <i
+                                    class="ph ph-export text-white inline-block align-middle"></i>.</p>
                         </div>
                     </div>
 
                     <!-- الخطوة 2 آيفون -->
                     <div class="matte-card p-3.5 flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#95e6b8] shrink-0 shadow-inner">
+                        <div
+                            class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#95e6b8] shrink-0 shadow-inner">
                             <i class="ph ph-plus-square text-2xl"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-1.5">
-                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">2</span>
+                                <span
+                                    class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">2</span>
                                 <h4 class="text-xs font-semibold text-white">اختر "إضافة إلى الشاشة الرئيسية"</h4>
                             </div>
-                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اسحب قائمة المشاركة للأعلى واختر <strong class="text-white">إضافة إلى الشاشة الرئيسية (Add to Home Screen)</strong> بجانب أيقونة <i class="ph ph-plus-square text-white inline-block align-middle"></i>.</p>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اسحب قائمة المشاركة للأعلى
+                                واختر <strong class="text-white">إضافة إلى الشاشة الرئيسية (Add to Home Screen)</strong>
+                                بجانب أيقونة <i class="ph ph-plus-square text-white inline-block align-middle"></i>.</p>
                         </div>
                     </div>
 
                     <!-- الخطوة 3 آيفون -->
                     <div class="matte-card p-3.5 flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
+                        <div
+                            class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
                             <i class="ph-fill ph-check-circle text-2xl"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-1.5">
-                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">3</span>
+                                <span
+                                    class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">3</span>
                                 <h4 class="text-xs font-semibold text-white">اضغط على "إضافة" (Add)</h4>
                             </div>
-                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">في أعلى الزاوية اضغط على <strong class="text-white">إضافة</strong>، وستظهر أيقونة اللعبة فوراً على سطح مكتب الآيفون كتطبيق كامل.</p>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">في أعلى الزاوية اضغط على
+                                <strong class="text-white">إضافة</strong>، وستظهر أيقونة اللعبة فوراً على سطح مكتب
+                                الآيفون كتطبيق كامل.</p>
                         </div>
                     </div>
                 </div>
@@ -1211,61 +1559,77 @@
                 <!-- قسم خطوات الأندرويد (Android Chrome) -->
                 <div id="androidInstallSteps" class="hidden flex-1 overflow-y-auto custom-scroll space-y-2.5 pr-0.5">
                     <!-- زر التثبيت المباشر للأندرويد إن كان متاحاً من المتصفح -->
-                    <button id="directAndroidInstallBtn" onclick="triggerNativePwaInstall()" class="hidden w-full py-3 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs items-center justify-center gap-2 shadow-lg transition active:scale-95">
+                    <button id="directAndroidInstallBtn" onclick="triggerNativePwaInstall()"
+                        class="hidden w-full py-3 px-4 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs items-center justify-center gap-2 shadow-lg transition active:scale-95">
                         <i class="ph-bold ph-download-simple text-base"></i>
                         <span>تثبيت اللعبة بضغطة واحدة الآن</span>
                     </button>
 
                     <div class="bg-[#95e6b8]/10 border border-[#95e6b8]/25 rounded-2xl p-3 flex items-center gap-2.5">
                         <i class="ph-fill ph-google-chrome-logo text-xl text-[#95e6b8] shrink-0"></i>
-                        <p class="text-[11px] text-white/90 leading-relaxed">لتثبيت اللعبة على سطح مكتب الأندرويد عبر متصفح <strong class="text-[#95e6b8]">Chrome</strong> اتبع الخطوات التالية:</p>
+                        <p class="text-[11px] text-white/90 leading-relaxed">لتثبيت اللعبة على سطح مكتب الأندرويد عبر
+                            متصفح <strong class="text-[#95e6b8]">Chrome</strong> اتبع الخطوات التالية:</p>
                     </div>
 
                     <!-- الخطوة 1 أندرويد -->
                     <div class="matte-card p-3.5 flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#38bdf8] shrink-0 shadow-inner">
+                        <div
+                            class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#38bdf8] shrink-0 shadow-inner">
                             <i class="ph-bold ph-dots-three-vertical text-2xl"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-1.5">
-                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">1</span>
+                                <span
+                                    class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">1</span>
                                 <h4 class="text-xs font-semibold text-white">افتح قائمة المتصفح أو المشاركة</h4>
                             </div>
-                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اضغط على أيقونة النقاط الثلاث <i class="ph-bold ph-dots-three-vertical text-white inline-block align-middle"></i> في أعلى المتصفح أو زر المشاركة <i class="ph ph-share-network text-white inline-block align-middle"></i>.</p>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اضغط على أيقونة النقاط الثلاث
+                                <i class="ph-bold ph-dots-three-vertical text-white inline-block align-middle"></i> في
+                                أعلى المتصفح أو زر المشاركة <i
+                                    class="ph ph-share-network text-white inline-block align-middle"></i>.</p>
                         </div>
                     </div>
 
                     <!-- الخطوة 2 أندرويد -->
                     <div class="matte-card p-3.5 flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#95e6b8] shrink-0 shadow-inner">
+                        <div
+                            class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-[#95e6b8] shrink-0 shadow-inner">
                             <i class="ph ph-device-mobile-camera text-2xl"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-1.5">
-                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">2</span>
+                                <span
+                                    class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">2</span>
                                 <h4 class="text-xs font-semibold text-white">اختر "الإضافة إلى الشاشة الرئيسية"</h4>
                             </div>
-                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">من القائمة المنسدلة اختر <strong class="text-white">تثبيت التطبيق (Install App)</strong> أو <strong class="text-white">الإضافة إلى الشاشة الرئيسية (Add to Home screen)</strong>.</p>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">من القائمة المنسدلة اختر
+                                <strong class="text-white">تثبيت التطبيق (Install App)</strong> أو <strong
+                                    class="text-white">الإضافة إلى الشاشة الرئيسية (Add to Home screen)</strong>.</p>
                         </div>
                     </div>
 
                     <!-- الخطوة 3 أندرويد -->
                     <div class="matte-card p-3.5 flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
+                        <div
+                            class="w-11 h-11 rounded-2xl bg-[#262a2d] border border-white/10 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
                             <i class="ph-fill ph-check-circle text-2xl"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-1.5">
-                                <span class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">3</span>
+                                <span
+                                    class="num-font text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-[#95e6b8]">3</span>
                                 <h4 class="text-xs font-semibold text-white">أكد الضغط على "تثبيت / إضافة"</h4>
                             </div>
-                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اضغط على <strong class="text-white">تثبيت (Install)</strong> في النافذة المنبثقة لتظهر أيقونة اللعبة على سطح مكتب هاتفك فوراً.</p>
+                            <p class="text-[10.5px] text-[#7c8288] mt-1 leading-relaxed">اضغط على <strong
+                                    class="text-white">تثبيت (Install)</strong> في النافذة المنبثقة لتظهر أيقونة اللعبة
+                                على سطح مكتب هاتفك فوراً.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- زر إغلاق سفلي -->
-                <button onclick="closeInstallGuideModal()" class="w-full py-3 rounded-2xl bg-[#262a2d] hover:bg-[#32373b] text-white text-xs font-semibold transition shrink-0">
+                <button onclick="closeInstallGuideModal()"
+                    class="w-full py-3 rounded-2xl bg-[#262a2d] hover:bg-[#32373b] text-white text-xs font-semibold transition shrink-0">
                     فهمت الخطوات، إغلاق
                 </button>
             </div>
@@ -1278,13 +1642,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyB3IDkykHcq7eOZ_psgqP1-Edgqgb7_2wY", 
-            authDomain: "monjez-5fef8.firebaseapp.com", 
-            projectId: "monjez-5fef8", 
-            storageBucket: "monjez-5fef8.firebasestorage.app", 
-            messagingSenderId: "389640182212", 
-            appId: "1:389640182212:web:3b67460cd41949c97aac91" 
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3IDkykHcq7eOZ_psgqP1-Edgqgb7_2wY",
+            authDomain: "monjez-5fef8.firebaseapp.com",
+            projectId: "monjez-5fef8",
+            storageBucket: "monjez-5fef8.firebasestorage.app",
+            messagingSenderId: "389640182212",
+            appId: "1:389640182212:web:3b67460cd41949c97aac91"
         };
 
         let db = null;
@@ -1318,11 +1682,11 @@
 
         // زوايا الدوران لكل رقم
         const faceRotations = {
-            1: { x: 0,   y: 0 },
-            6: { x: 0,   y: 180 },
-            2: { x: 0,   y: 90 },
-            5: { x: 0,   y: -90 },
-            3: { x: 90,  y: 0 },
+            1: { x: 0, y: 0 },
+            6: { x: 0, y: 180 },
+            2: { x: 0, y: 90 },
+            5: { x: 0, y: -90 },
+            3: { x: 90, y: 0 },
             4: { x: -90, y: 0 }
         };
 
@@ -1465,7 +1829,7 @@
                     osc.start(now);
                     osc.stop(now + 0.18);
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         // اختيار عدد الأحجار (1 أو 2)
@@ -1490,7 +1854,7 @@
                 document.getElementById('die2Dot').classList.remove('hidden');
                 maxGaugeLabel.textContent = '6';
                 quickModeIcon.className = 'ph ph-number-circle-one text-xl';
-                
+
                 const current1 = parseInt(document.getElementById('die1Stat').textContent) || 1;
                 document.getElementById('totalValue').textContent = current1;
                 updateArcGauge(current1, 6);
@@ -1728,7 +2092,11 @@
             { id: 'station_montparnasse', name: 'PARK MONTPARNASSE', arName: 'محطة قطار مونبارناس', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-01' },
             { id: 'station_lyon', name: 'PARK OF LYON', arName: 'محطة قطار ليون', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-02' },
             { id: 'station_north', name: 'PARK NORTH', arName: 'محطة قطار الشمال', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-03' },
-            { id: 'station_saintlazare', name: 'PARK SAINFLAZARE', arName: 'محطة قطار سان لازار', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-04' }
+            { id: 'station_saintlazare', name: 'PARK SAINFLAZARE', arName: 'محطة قطار سان لازار', group: 'station', isStation: true, color: '#27272a', price: 200, rent: [25, 50, 100, 200], mortgage: 100, houseCost: 0, code: 'RAIL-04' },
+            // المرافق والضرائب الخاصة المرفقة في الصور (الكهرباء + المياه + ضريبة السلع الفاخرة)
+            { id: 'utility_electricity', name: 'COMPANY OF DISTRIBUTION OF ELECTRICITY', arName: 'شركة توزيع الكهرباء', group: 'utility', isUtility: true, utilityType: 'electricity', color: '#eab308', price: 150, rent: [15, 30], mortgage: 75, houseCost: 0, code: 'UTIL-01' },
+            { id: 'utility_water', name: 'WATER WORKS', arName: 'مصلحة المياه', group: 'utility', isUtility: true, utilityType: 'water', color: '#38bdf8', price: 150, rent: [15, 30], mortgage: 75, houseCost: 0, code: 'UTIL-02' },
+            { id: 'luxury_tax_goods', name: 'TAX ON LUXURY GOODS', arName: 'ضريبة السلع الفاخرة', group: 'special_tax', isSpecialCard: true, color: '#f59e0b', price: 100, rent: [100], mortgage: 50, houseCost: 0, code: 'LUX-100' }
         ];
 
         // دالة لتوليد أفاتار SVG مشفر بـ Base64 بالكامل (يمنع كسر كود الـ HTML أو ظهور نص طويل)
@@ -1776,6 +2144,11 @@
         // متغيرات ميزة الأعضاء المحليين (لغير المتصلين بالوايفاي أو بدون هاتف) وتبديل واجهة القائد لصفحتهم
         let impersonatedMemberId = null;
         let offlineMemberAvatarDraft = PRESET_AVATARS[Math.floor(Math.random() * PRESET_AVATARS.length)];
+
+        // متغيرات ميزة موافقة المشتري قبل خصم سعر الأرض وميزة تبديل الأراضي بين اللاعبين
+        let requireBuyerApprovalOnSell = false;
+        let activeTradeSourcePropId = null;
+        let activeTradeSourceOwnerId = null;
 
         // إرجاع المعرف الفعال حالياً في واجهة اللاعب (إما اللاعب نفسه أو العضو الذي دخل القائد لصفحته)
         function getEffectiveUserViewPlayerId() {
@@ -1832,9 +2205,9 @@
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const size = 120;
                     canvas.width = size;
@@ -2205,7 +2578,7 @@
                 try {
                     const { db, doc, setDoc } = window.__monoDB;
                     await setDoc(doc(db, 'monopoly_rooms', leavingCode), currentRoomData);
-                } catch (e) {}
+                } catch (e) { }
             }
 
             currentRoomData = null;
@@ -2260,14 +2633,17 @@
                 document.getElementById('roomSubHeader').textContent = `واجهة العضو: ${impPlayer.name}`;
                 switchMonopolyView('monoPlayerView');
                 renderPlayerDashboard();
+                renderPendingPurchaseOffersModal(impersonatedMemberId);
             } else if (isLeader) {
                 document.getElementById('roomSubHeader').textContent = 'أنت قائد الغرفة ومدير البنك المركزي';
                 switchMonopolyView('monoAdminView');
                 renderAdminDashboard();
+                renderPendingPurchaseOffersModal(myPlayerId);
             } else {
                 document.getElementById('roomSubHeader').textContent = `غرفة #${activeRoomCode} — لاعب نشط`;
                 switchMonopolyView('monoPlayerView');
                 renderPlayerDashboard();
+                renderPendingPurchaseOffersModal(myPlayerId);
             }
 
             // تحديث النوافذ المنبثقة المفتوحة تلقائياً
@@ -2309,9 +2685,16 @@
             return MONOPOLY_PROPERTIES.filter(p => p.isStation && propState[p.id] && propState[p.id].ownerId === playerId && !propState[p.id].mortgaged).length;
         }
 
-        // التحقق مما إذا كان اللاعب يمتلك المجموعة اللونية كاملة (لبناء المنازل والفنادق — لا ينطبق على محطات القطار)
+        // حساب عدد شركات المرافق (الكهرباء والمياه) النشطة المملوكة لنفس اللاعب
+        function getOwnedUtilitiesCount(playerId) {
+            if (!playerId || !currentRoomData || !currentRoomData.propertyState) return 0;
+            const propState = currentRoomData.propertyState;
+            return MONOPOLY_PROPERTIES.filter(p => p.isUtility && propState[p.id] && propState[p.id].ownerId === playerId && !propState[p.id].mortgaged).length;
+        }
+
+        // التحقق مما إذا كان اللاعب يمتلك المجموعة اللونية كاملة (لبناء المنازل والفنادق — لا ينطبق على المحطات والمرافق)
         function ownsFullColorGroup(playerId, groupName) {
-            if (groupName === 'station') return false;
+            if (groupName === 'station' || groupName === 'utility' || groupName === 'special_tax') return false;
             const propState = (currentRoomData && currentRoomData.propertyState) || {};
             const groupProps = MONOPOLY_PROPERTIES.filter(p => p.group === groupName);
             return groupProps.every(p => {
@@ -2320,10 +2703,128 @@
             });
         }
 
-        // رسم بطاقة سند ملكية حقيقية (للأراضي العادية ولمحطات القطار الـ 4 المرفقة في الصورة)
+        // رسم بطاقة سند ملكية حقيقية (للأراضي العادية ومحطات القطار والمرافق والسلع الفاخرة)
         function createAuthenticDeedCardHTML(prop, state, options = {}) {
             const houses = (state && state.houses) || 0;
             const isMortgaged = !!(state && state.mortgaged);
+
+            // في حال كانت البطاقة من المرافق (شركة الكهرباء / مصلحة المياه) أو بطاقة ضريبة السلع الفاخرة المرفقة بالصورة
+            if (prop.isUtility || prop.isSpecialCard) {
+                const ownerId = state && state.ownerId;
+                const ownedUtils = ownerId ? getOwnedUtilitiesCount(ownerId) : 0;
+
+                let iconSVG = '';
+                if (prop.utilityType === 'electricity') {
+                    // رسم المصباح الأصفر المشع مطابق للصورة
+                    iconSVG = `
+                        <svg viewBox="0 0 80 80" class="w-11 h-11">
+                            <g stroke="#111315" stroke-width="2.5" stroke-linecap="round">
+                                <line x1="14" y1="30" x2="22" y2="33" />
+                                <line x1="10" y1="42" x2="19" y2="42" />
+                                <line x1="14" y1="54" x2="22" y2="51" />
+                                <line x1="66" y1="30" x2="58" y2="33" />
+                                <line x1="70" y1="42" x2="61" y2="42" />
+                                <line x1="66" y1="54" x2="58" y2="51" />
+                            </g>
+                            <path d="M33 20 H47 L44 12 H36 Z" fill="#111315"/>
+                            <rect x="34" y="20" width="12" height="6" fill="#111315"/>
+                            <path d="M27 48 C27 34 33 26 40 26 C47 26 53 34 53 48 C53 57 47 63 40 63 C33 63 27 57 27 48 Z" fill="#facc15" stroke="#111315" stroke-width="2.8"/>
+                            <path d="M36 28 C35 38 35 46 38 52 M44 28 C45 38 45 46 42 52" fill="none" stroke="#111315" stroke-width="2"/>
+                        </svg>
+                    `;
+                } else if (prop.utilityType === 'water') {
+                    // رسم صنبور المياه الأبيض مطابق للصورة
+                    iconSVG = `
+                        <svg viewBox="0 0 80 80" class="w-11 h-11">
+                            <ellipse cx="44" cy="64" rx="13" ry="5" fill="#e5e7eb" stroke="#111315" stroke-width="2.5"/>
+                            <path d="M39 63 V30 C39 20 45 16 55 16 H64 V24 H55 C50 24 48 26 48 31 V63 Z" fill="#f3f4f6" stroke="#111315" stroke-width="2.5"/>
+                            <rect x="33" y="38" width="6" height="10" fill="#d1d5db" stroke="#111315" stroke-width="2.2"/>
+                            <line x1="26" y1="33" x2="26" y2="53" stroke="#111315" stroke-width="2.8" stroke-linecap="round"/>
+                            <line x1="21" y1="43" x2="33" y2="43" stroke="#111315" stroke-width="2.8" stroke-linecap="round"/>
+                            <circle cx="26" cy="32" r="3" fill="#ffffff" stroke="#111315" stroke-width="2"/>
+                            <circle cx="26" cy="54" r="3" fill="#ffffff" stroke="#111315" stroke-width="2"/>
+                        </svg>
+                    `;
+                } else {
+                    // رسم الخاتم الذهبي الماسي لضريبة السلع الفاخرة مطابق للصورة
+                    iconSVG = `
+                        <svg viewBox="0 0 80 80" class="w-11 h-11">
+                            <g stroke="#111315" stroke-width="2" stroke-linecap="round">
+                                <line x1="40" y1="10" x2="40" y2="17" />
+                                <line x1="29" y1="13" x2="33" y2="19" />
+                                <line x1="51" y1="13" x2="47" y2="19" />
+                                <line x1="22" y1="20" x2="28" y2="23" />
+                                <line x1="58" y1="20" x2="52" y2="23" />
+                            </g>
+                            <ellipse cx="40" cy="46" rx="24" ry="14" fill="none" stroke="#111315" stroke-width="6"/>
+                            <ellipse cx="40" cy="46" rx="24" ry="14" fill="none" stroke="#facc15" stroke-width="3.5"/>
+                            <rect x="33" y="24" width="14" height="12" rx="2" fill="#e5e7eb" stroke="#111315" stroke-width="2.5"/>
+                            <path d="M35 26 L45 34 M45 26 L35 34" stroke="#111315" stroke-width="1.5"/>
+                        </svg>
+                    `;
+                }
+
+                return `
+                    <div class="deed-card flex flex-col justify-between" style="background-color: #93c456;" onclick="${options.onClick || ''}">
+                        <div class="deed-inner" style="border-color: #16181a;">
+                            <div class="deed-header" style="background-color: #82b546; color: #111315; border-color: #16181a;">
+                                <div class="text-[7.5px] font-bold tracking-[0.12em] uppercase opacity-80">${prop.isUtility ? 'PUBLIC UTILITY' : 'LUXURY GOODS'}</div>
+                                <div class="text-[9.5px] font-extrabold leading-tight mt-0.5 uppercase">${prop.name}</div>
+                                <div class="text-[8.5px] font-bold opacity-90">${prop.arName}</div>
+                            </div>
+
+                            <div class="flex items-center justify-center my-1 py-0.5 bg-black/10 rounded">
+                                ${iconSVG}
+                            </div>
+
+                            <div class="text-[8.5px] space-y-0.5 flex-1 text-[#111315] font-medium" dir="ltr">
+                                ${prop.isUtility ? `
+                                    <div class="flex justify-between ${ownedUtils === 1 ? 'font-extrabold underline' : ''}">
+                                        <span>1 Utility Owned</span>
+                                        <span>4x Dice ($15)</span>
+                                    </div>
+                                    <div class="flex justify-between ${ownedUtils >= 2 ? 'font-extrabold underline' : ''}">
+                                        <span>2 Utilities Owned</span>
+                                        <span>10x Dice ($30)</span>
+                                    </div>
+                                ` : `
+                                    <div class="flex justify-between font-extrabold">
+                                        <span>Luxury Tax / Fee</span>
+                                        <span>$ ${prop.rent[0]}</span>
+                                    </div>
+                                    <div class="text-[8px] opacity-80 leading-snug">
+                                        رسوم وضريبة السلع الفاخرة والمجوهرات
+                                    </div>
+                                `}
+
+                                <div class="border-t border-black/25 pt-1 mt-1 space-y-0.5 text-[8.5px]">
+                                    <div class="flex justify-between">
+                                        <span>Mortgage Value</span>
+                                        <span class="font-bold">$ ${prop.mortgage}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-1.5 pt-1 border-t border-black/25 flex items-center justify-between text-[8px] text-black/80" dir="ltr">
+                            <span class="font-semibold">${prop.code}</span>
+                            <span class="px-1.5 py-0.5 rounded bg-black text-[#93c456] text-[8px] font-bold">${prop.isUtility ? 'UTILITY ⚡' : 'LUXURY 💍'}</span>
+                            <span class="font-extrabold text-black text-[9.5px]">$ ${prop.price}</span>
+                        </div>
+
+                        ${options.footerActionHTML ? `<div class="mt-1.5" onclick="event.stopPropagation()">${options.footerActionHTML}</div>` : ''}
+
+                        ${isMortgaged ? `
+                            <div class="deed-mortgaged-overlay absolute inset-0 rounded-[8px] flex flex-col items-center justify-center p-2 text-center text-white">
+                                <i class="ph-fill ph-lock-key text-2xl text-amber-400 mb-1"></i>
+                                <span class="text-[11px] font-bold text-amber-300">عقار مرهون ومحجوب</span>
+                                <span class="text-[9px] text-white/75 mt-0.5">فك الرهن: $${prop.mortgage}</span>
+                                ${options.unmortgageBtnHTML ? `<div class="mt-2 w-full" onclick="event.stopPropagation()">${options.unmortgageBtnHTML}</div>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            }
 
             // في حال كانت البطاقة محطة قطار (مطابقة للصورة المرفقة باللون الأخضر الفاتح ورمز القاطرة السوداء)
             if (prop.isStation) {
@@ -2480,11 +2981,13 @@
             const grid = document.getElementById('adminPlayersGrid');
             grid.innerHTML = '';
 
-            // شارة طلبات الرهن المعلقة
+            // شارة طلبات الرهن وتبديل الأراضي المعلقة
             const pendingReqs = (currentRoomData.mortgageRequests || []);
+            const pendingTrades = (currentRoomData.tradeRequests || []);
+            const totalPendingCount = pendingReqs.length + pendingTrades.length;
             const reqBadge = document.getElementById('requestsBadge');
-            if (pendingReqs.length > 0) {
-                reqBadge.textContent = pendingReqs.length;
+            if (totalPendingCount > 0) {
+                reqBadge.textContent = totalPendingCount;
                 reqBadge.classList.remove('hidden');
                 reqBadge.classList.add('flex');
             } else {
@@ -2510,7 +3013,7 @@
 
                 // مصغرات ملونة للأراضي المملوكة
                 const colorDots = summary.owned.slice(0, 6).map(pr =>
-                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${pr.isStation ? '#82b546' : pr.color}" title="${pr.arName}"></span>`
+                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${(pr.isStation || pr.isUtility || pr.isSpecialCard) ? '#82b546' : pr.color}" title="${pr.arName}"></span>`
                 ).join('');
 
                 card.innerHTML = `
@@ -2774,11 +3277,13 @@
             if (id === 'propertiesModal') renderAdminPropertiesModal();
             if (id === 'requestsModal') renderAdminRequestsModal();
             if (id === 'playersAdminModal') renderAdminPlayersModal();
-            document.getElementById(id).classList.remove('hidden');
+            const modalEl = document.getElementById(id);
+            if (modalEl) modalEl.classList.remove('hidden');
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
+            const modalEl = document.getElementById(id);
+            if (modalEl) modalEl.classList.add('hidden');
             if (id === 'playerDeedsModal') inspectedPlayerId = null;
             if (id === 'userReadOnlyProfileModal') readOnlyProfilePlayerId = null;
         }
@@ -2817,9 +3322,9 @@
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const size = 120;
                     canvas.width = size;
@@ -2878,9 +3383,42 @@
             openAllPlayersOverviewForUser();
         }
 
+        // زر تفعيل/إيقاف شرط موافقة اللاعب المشتري على الأرض من صفحته قبل خصم المبلغ
+        function toggleRequireBuyerApproval() {
+            requireBuyerApprovalOnSell = !requireBuyerApprovalOnSell;
+            updateBuyerApprovalToggleUI();
+            renderAdminPropertiesModal();
+            showMonoToast(requireBuyerApprovalOnSell
+                ? 'تم التفعيل: لن يُخصم مبلغ الأرض حتى يوافق اللاعب من صفحته'
+                : 'تم الإيقاف: سيُخصم سعر الأرض تلقائياً فور البيع');
+        }
+
+        function updateBuyerApprovalToggleUI() {
+            const btn = document.getElementById('toggleBuyerApprovalBtn');
+            const icon = document.getElementById('buyerApprovalIcon');
+            const label = document.getElementById('buyerApprovalBtnLabel');
+            const badge = document.getElementById('buyerApprovalStatusBadge');
+            if (!btn || !icon || !label || !badge) return;
+
+            if (requireBuyerApprovalOnSell) {
+                btn.className = 'shrink-0 px-2.5 py-2 rounded-xl border border-[#95e6b8] bg-[#95e6b8]/15 text-[10px] font-bold text-[#95e6b8] flex items-center gap-1 transition active:scale-95 shadow-sm';
+                icon.className = 'ph-fill ph-toggle-right text-base text-[#95e6b8]';
+                label.textContent = 'تفعيل';
+                badge.textContent = 'مفعّل (ينتظر موافقة المشتري من صفحته قبل الخصم)';
+                badge.className = 'text-[#95e6b8] font-bold';
+            } else {
+                btn.className = 'shrink-0 px-2.5 py-2 rounded-xl border border-white/10 bg-[#262a2d] text-[10px] font-bold text-[#7c8288] flex items-center gap-1 transition active:scale-95';
+                icon.className = 'ph-fill ph-toggle-left text-base';
+                label.textContent = 'إيقاف';
+                badge.textContent = 'متوقف (يخصم السعر تلقائياً فوراً)';
+                badge.className = 'text-white/80 font-semibold';
+            }
+        }
+
         // نافذة إدارة الأراضي وبيعها للاعبين
         function renderAdminPropertiesModal() {
             if (!currentRoomData) return;
+            updateBuyerApprovalToggleUI();
             const select = document.getElementById('sellTargetPlayerSelect');
             const prevVal = select.value;
             select.innerHTML = '';
@@ -2897,19 +3435,30 @@
             const container = document.getElementById('allPropertiesAdminList');
             container.innerHTML = '';
             const propState = currentRoomData.propertyState || {};
+            const pendingOffers = currentRoomData.pendingPurchaseOffers || [];
 
             MONOPOLY_PROPERTIES.forEach(prop => {
                 const st = propState[prop.id];
                 const owner = st && st.ownerId ? players[st.ownerId] : null;
+                const pendingOffer = pendingOffers.find(o => o.propId === prop.id);
+                const pendingBuyer = pendingOffer ? players[pendingOffer.buyerId] : null;
 
-                const footerHTML = owner
-                    ? `<div class="flex items-center justify-between gap-1 bg-black/15 rounded px-1.5 py-1">
+                let footerHTML = '';
+                if (owner) {
+                    footerHTML = `<div class="flex items-center justify-between gap-1 bg-black/15 rounded px-1.5 py-1">
                          <span class="text-[9px] font-bold truncate text-emerald-950">المالك: ${owner.name}</span>
                          <button onclick="reclaimPropertyToBank('${prop.id}')" class="text-[8.5px] bg-red-600 text-white px-1.5 py-0.5 rounded font-bold">استرداد</button>
-                       </div>`
-                    : `<button onclick="sellPropertyToSelectedPlayer('${prop.id}')" class="w-full py-1.5 rounded bg-[#121415] hover:bg-black text-[#95e6b8] text-[9.5px] font-bold transition">
-                         ${prop.isStation ? `بيع المحطة ($${prop.price})` : `بيع الأرض ($${prop.price})`}
+                       </div>`;
+                } else if (pendingOffer && pendingBuyer) {
+                    footerHTML = `<div class="flex items-center justify-between gap-1 bg-amber-500/25 border border-amber-700/40 rounded px-1.5 py-1">
+                         <span class="text-[8.5px] font-bold truncate text-amber-950">بانتظار موافقة: ${pendingBuyer.name}</span>
+                         <button onclick="cancelPendingPurchaseOffer('${pendingOffer.id}')" class="text-[8px] bg-red-600 text-white px-1.5 py-0.5 rounded font-bold">إلغاء</button>
+                       </div>`;
+                } else {
+                    footerHTML = `<button onclick="sellPropertyToSelectedPlayer('${prop.id}')" class="w-full py-1.5 rounded bg-[#121415] hover:bg-black text-[#95e6b8] text-[9.5px] font-bold transition">
+                         ${requireBuyerApprovalOnSell ? `إرسال عرض شراء ($${prop.price})` : (prop.isStation ? `بيع المحطة ($${prop.price})` : `بيع الأرض ($${prop.price})`)}
                        </button>`;
+                }
 
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = createAuthenticDeedCardHTML(prop, st, { footerActionHTML: footerHTML });
@@ -2917,7 +3466,7 @@
             });
         }
 
-        // بيع أرض للاعب المحدد
+        // بيع أرض للاعب المحدد (أو إرسالها كعرض بانتظار موافقته إذا كان زر التفعيل نشطاً)
         async function sellPropertyToSelectedPlayer(propId) {
             if (!currentRoomData) return;
             const targetId = document.getElementById('sellTargetPlayerSelect').value;
@@ -2926,6 +3475,27 @@
             const player = (currentRoomData.players || {})[targetId];
 
             if (!prop || !player) return;
+
+            // في حال كان زر موافقة المشتري مفعلاً: لا يخصم المبلغ ولا تنقل الملكية حتى يوافق اللاعب من صفحته
+            if (requireBuyerApprovalOnSell) {
+                currentRoomData.pendingPurchaseOffers = currentRoomData.pendingPurchaseOffers || [];
+                const alreadyOffered = currentRoomData.pendingPurchaseOffers.some(o => o.propId === propId);
+                if (alreadyOffered) {
+                    showMonoToast('يوجد عرض شراء معلق بالفعل لهذه الأرض');
+                    return;
+                }
+                const offerCost = deductMode === 'yes' ? prop.price : 0;
+                currentRoomData.pendingPurchaseOffers.push({
+                    id: 'offer_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                    propId: propId,
+                    buyerId: targetId,
+                    price: offerCost,
+                    createdAt: Date.now()
+                });
+                await saveRoomData(activeRoomCode, currentRoomData);
+                showMonoToast(`تم إرسال عرض أرض "${prop.arName}" إلى ${player.name} للموافقة من صفحته`);
+                return;
+            }
 
             if (deductMode === 'yes') {
                 if ((player.balance || 0) < prop.price) {
@@ -2946,6 +3516,46 @@
             showMonoToast(`تم بيع ${prop.arName} إلى ${player.name}`);
         }
 
+        // إلغاء عرض شراء معلق من قِبل القائد
+        async function cancelPendingPurchaseOffer(offerId) {
+            if (!currentRoomData || !currentRoomData.pendingPurchaseOffers) return;
+            currentRoomData.pendingPurchaseOffers = currentRoomData.pendingPurchaseOffers.filter(o => o.id !== offerId);
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast('تم إلغاء عرض الشراء المعلق');
+        }
+
+        // قبول أو رفض اللاعب لعرض شراء الأرض من صفحته
+        async function respondToPurchaseOffer(offerId, accepted) {
+            if (!currentRoomData || !currentRoomData.pendingPurchaseOffers) return;
+            const offer = currentRoomData.pendingPurchaseOffers.find(o => o.id === offerId);
+            if (!offer) return;
+
+            const buyer = (currentRoomData.players || {})[offer.buyerId];
+            const prop = MONOPOLY_PROPERTIES.find(p => p.id === offer.propId);
+            if (!buyer || !prop) return;
+
+            if (accepted) {
+                const cost = offer.price || 0;
+                if ((buyer.balance || 0) < cost) {
+                    showMonoToast(`رصيدك غير كافٍ لشراء ${prop.arName} ($${cost})`);
+                    return;
+                }
+                buyer.balance -= cost;
+                currentRoomData.propertyState = currentRoomData.propertyState || {};
+                currentRoomData.propertyState[offer.propId] = {
+                    ownerId: buyer.id,
+                    mortgaged: false,
+                    houses: 0
+                };
+                showMonoToast(`تمت الموافقة وشراء ${prop.arName} مقابل $${cost}`);
+            } else {
+                showMonoToast(`تم رفض شراء أرض ${prop.arName}`);
+            }
+
+            currentRoomData.pendingPurchaseOffers = currentRoomData.pendingPurchaseOffers.filter(o => o.id !== offerId);
+            await saveRoomData(activeRoomCode, currentRoomData);
+        }
+
         // استرداد أرض إلى البنك
         async function reclaimPropertyToBank(propId) {
             if (!currentRoomData || !currentRoomData.propertyState) return;
@@ -2954,18 +3564,52 @@
             showMonoToast('تمت إعادة العقار إلى البنك المركزي');
         }
 
-        // نافذة طلبات الرهن وفك الرهن المرسلة من اللاعبين
+        // نافذة طلبات الرهن وفك الرهن وطلبات تبديل الأراضي المرسلة من اللاعبين
         function renderAdminRequestsModal() {
             const list = document.getElementById('mortgageRequestsList');
             list.innerHTML = '';
             const reqs = (currentRoomData && currentRoomData.mortgageRequests) || [];
+            const tradeReqs = (currentRoomData && currentRoomData.tradeRequests) || [];
             const players = (currentRoomData && currentRoomData.players) || {};
 
-            if (reqs.length === 0) {
-                list.innerHTML = `<div class="text-center py-8 text-xs text-[#7c8288]">لا توجد طلبات رهن أو فك رهن معلقة حالياً</div>`;
+            if (reqs.length === 0 && tradeReqs.length === 0) {
+                list.innerHTML = `<div class="text-center py-8 text-xs text-[#7c8288]">لا توجد طلبات رهن أو تبديل أراضي معلقة حالياً</div>`;
                 return;
             }
 
+            // عرض طلبات تبديل/نقل الأراضي بين اللاعبين
+            tradeReqs.forEach(tr => {
+                const fromPlayer = players[tr.fromPlayerId];
+                const toPlayer = players[tr.toPlayerId];
+                const fromProp = MONOPOLY_PROPERTIES.find(p => p.id === tr.fromPropId);
+                const toProp = tr.toPropId ? MONOPOLY_PROPERTIES.find(p => p.id === tr.toPropId) : null;
+                if (!fromPlayer || !toPlayer || !fromProp) return;
+
+                const item = document.createElement('div');
+                item.className = 'matte-card p-3 flex items-center justify-between gap-2 border border-sky-500/30';
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-300 shrink-0">
+                            <i class="ph-fill ph-arrows-left-right text-base"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-semibold text-white">طلب تبديل أراضي: ${fromPlayer.name} ⇄ ${toPlayer.name}</div>
+                            <div class="text-[10px] text-sky-300 mt-0.5">
+                                ${toProp
+                        ? `مبادلة <strong>${fromProp.arName}</strong> مقابل <strong>${toProp.arName}</strong>`
+                        : `نقل ملكية <strong>${fromProp.arName}</strong> إلى <strong>${toPlayer.name}</strong> (بدون مقابل)`}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="resolveTradeRequest('${tr.id}', true)" class="px-3 py-1.5 rounded-xl bg-[#95e6b8] text-[#121415] text-[10px] font-bold">موافقة</button>
+                        <button onclick="resolveTradeRequest('${tr.id}', false)" class="px-2.5 py-1.5 rounded-xl bg-red-500/20 text-red-300 text-[10px]">رفض</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+
+            // عرض طلبات الرهن وفك الرهن
             reqs.forEach(req => {
                 const player = players[req.playerId];
                 const prop = MONOPOLY_PROPERTIES.find(p => p.id === req.propId);
@@ -2992,6 +3636,133 @@
                 `;
                 list.appendChild(item);
             });
+        }
+
+        // موافقة أو رفض القائد لطلب تبديل الأراضي بين اللاعبين
+        async function resolveTradeRequest(tradeId, approved) {
+            if (!currentRoomData) return;
+            const tradeReqs = currentRoomData.tradeRequests || [];
+            const tr = tradeReqs.find(t => t.id === tradeId);
+            if (!tr) return;
+
+            const players = currentRoomData.players || {};
+            const fromPlayer = players[tr.fromPlayerId];
+            const toPlayer = players[tr.toPlayerId];
+            const propState = currentRoomData.propertyState || {};
+            const fromSt = propState[tr.fromPropId];
+            const fromProp = MONOPOLY_PROPERTIES.find(p => p.id === tr.fromPropId);
+            const toProp = tr.toPropId ? MONOPOLY_PROPERTIES.find(p => p.id === tr.toPropId) : null;
+
+            if (approved) {
+                if (!fromPlayer || !toPlayer || !fromSt || fromSt.ownerId !== tr.fromPlayerId) {
+                    showMonoToast('تعذر إتمام التبديل لتغير ملكية الأرض الأصلية');
+                } else if (tr.toPropId) {
+                    const toSt = propState[tr.toPropId];
+                    if (!toSt || toSt.ownerId !== tr.toPlayerId) {
+                        showMonoToast('تعذر إتمام التبديل لتغير ملكية أرض الطرف الآخر');
+                    } else {
+                        fromSt.ownerId = tr.toPlayerId;
+                        toSt.ownerId = tr.fromPlayerId;
+                        showMonoToast(`تمت الموافقة وتبديل "${fromProp.arName}" مع "${toProp.arName}"`);
+                    }
+                } else {
+                    fromSt.ownerId = tr.toPlayerId;
+                    showMonoToast(`تمت الموافقة ونقل ملكية "${fromProp.arName}" إلى ${toPlayer.name}`);
+                }
+            } else {
+                showMonoToast('تم رفض طلب تبديل الأراضي');
+            }
+
+            currentRoomData.tradeRequests = tradeReqs.filter(t => t.id !== tradeId);
+            await saveRoomData(activeRoomCode, currentRoomData);
+        }
+
+        // فتح نافذة تبديل أو نقل ملكية أرض للاعب آخر
+        function openTradePropertyModal(propId, ownerId = null) {
+            if (!currentRoomData) return;
+            const actingOwnerId = ownerId || getEffectiveUserViewPlayerId();
+            const players = currentRoomData.players || {};
+            const otherPlayers = Object.values(players).filter(p => p.id !== actingOwnerId);
+
+            if (otherPlayers.length === 0) {
+                showMonoToast('لا يوجد لاعبون آخرون في الغرفة لتبديل الأراضي معهم');
+                return;
+            }
+
+            const prop = MONOPOLY_PROPERTIES.find(p => p.id === propId);
+            if (!prop) return;
+
+            activeTradeSourcePropId = propId;
+            activeTradeSourceOwnerId = actingOwnerId;
+
+            document.getElementById('tradeSourcePropName').textContent = `${prop.arName} (${prop.name})`;
+            document.getElementById('tradeSourcePropColor').style.background = (prop.isStation || prop.isUtility || prop.isSpecialCard) ? '#82b546' : prop.color;
+
+            const playerSelect = document.getElementById('tradeTargetPlayerSelect');
+            playerSelect.innerHTML = '';
+            otherPlayers.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name;
+                playerSelect.appendChild(opt);
+            });
+
+            populateTradeTargetProperties();
+            openModal('tradePropertyModal');
+        }
+
+        function populateTradeTargetProperties() {
+            if (!currentRoomData) return;
+            const targetPlayerId = document.getElementById('tradeTargetPlayerSelect').value;
+            const propSelect = document.getElementById('tradeTargetPropertySelect');
+            propSelect.innerHTML = '';
+
+            const giftOpt = document.createElement('option');
+            giftOpt.value = '';
+            giftOpt.textContent = 'بدون مقابل (نقل ملكية الأرض مجاناً لهذا اللاعب)';
+            propSelect.appendChild(giftOpt);
+
+            if (targetPlayerId) {
+                const targetSummary = getPlayerPropertiesSummary(targetPlayerId);
+                targetSummary.all.forEach(pr => {
+                    const opt = document.createElement('option');
+                    opt.value = pr.id;
+                    opt.textContent = `مبادلة بـ: ${pr.arName} ($${pr.price})`;
+                    propSelect.appendChild(opt);
+                });
+            }
+        }
+
+        // إرسال طلب تبديل الأراضي إلى قائمة طلبات الرهن والتبديل لدى قائد الغرفة
+        async function submitPropertyTradeRequest() {
+            if (!currentRoomData || !activeTradeSourcePropId || !activeTradeSourceOwnerId) return;
+            const toPlayerId = document.getElementById('tradeTargetPlayerSelect').value;
+            const toPropId = document.getElementById('tradeTargetPropertySelect').value || null;
+
+            if (!toPlayerId) {
+                showMonoToast('يرجى اختيار اللاعب الطرف الآخر');
+                return;
+            }
+
+            currentRoomData.tradeRequests = currentRoomData.tradeRequests || [];
+            const alreadyPending = currentRoomData.tradeRequests.some(t => t.fromPropId === activeTradeSourcePropId);
+            if (alreadyPending) {
+                showMonoToast('يوجد طلب تبديل معلق بالفعل لهذه الأرض بانتظار القائد');
+                return;
+            }
+
+            currentRoomData.tradeRequests.push({
+                id: 'trade_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                fromPlayerId: activeTradeSourceOwnerId,
+                toPlayerId: toPlayerId,
+                fromPropId: activeTradeSourcePropId,
+                toPropId: toPropId,
+                createdAt: Date.now()
+            });
+
+            closeModal('tradePropertyModal');
+            await saveRoomData(activeRoomCode, currentRoomData);
+            showMonoToast('تم إرسال طلب تبديل الأرض إلى قائد الغرفة للموافقة');
         }
 
         // موافقة أو رفض القائد لطلب الرهن / فك الرهن
@@ -3167,10 +3938,11 @@
                     let unmortgageBtn = '';
 
                     if (isOwnDeeds) {
-                        const canBuild = !prop.isStation && ownsFullColorGroup(playerId, prop.group) && !st.mortgaged && (st.houses || 0) < 5;
+                        const canBuild = !prop.isStation && !prop.isUtility && !prop.isSpecialCard && ownsFullColorGroup(playerId, prop.group) && !st.mortgaged && (st.houses || 0) < 5;
                         footerHTML = `
                             <div class="flex flex-col gap-1">
                                 ${canBuild ? `<button onclick="buildHouseOrHotel('${prop.id}', '${playerId}')" class="w-full py-1 rounded bg-emerald-700 text-white text-[8.5px] font-bold">بناء منزل/فندق ($${prop.houseCost})</button>` : ''}
+                                <button onclick="openTradePropertyModal('${prop.id}', '${playerId}')" class="w-full py-1 rounded bg-sky-600 hover:bg-sky-700 text-white text-[8.5px] font-bold">تبديل مع لاعب ⇄</button>
                                 <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${playerId}')" class="w-full py-1 rounded bg-amber-500/20 text-amber-950 border border-amber-700/40 text-[8.5px] font-bold">رهن العقار (+$${prop.mortgage})</button>
                             </div>
                         `;
@@ -3213,7 +3985,7 @@
 
                 const ownedPills = summary.owned.map(pr =>
                     `<span class="inline-flex items-center gap-1 text-[9.5px] px-2 py-0.5 rounded-md bg-white/[0.06] text-white/90 border border-white/10">
-                        <span class="w-2 h-2 rounded-full" style="background:${pr.isStation ? '#82b546' : pr.color}"></span>
+                        <span class="w-2 h-2 rounded-full" style="background:${(pr.isStation || pr.isUtility || pr.isSpecialCard) ? '#82b546' : pr.color}"></span>
                         <span>${pr.arName}</span>
                     </span>`
                 ).join('');
@@ -3289,26 +4061,35 @@
 
             const totalRealEstateValue = summary.all.reduce((acc, pr) => acc + (pr.price || 0), 0);
             const ownedStationsCount = getOwnedStationsCount(playerId);
+            const ownedUtilitiesCount = getOwnedUtilitiesCount(playerId);
 
             const ownedListHTML = summary.owned.length > 0
                 ? summary.owned.map(prop => {
                     const houses = prop.houses || 0;
                     const currentRent = prop.isStation
                         ? prop.rent[Math.max(0, Math.min(ownedStationsCount - 1, 3))]
-                        : (prop.rent ? prop.rent[Math.min(houses, 5)] : 0);
+                        : prop.isUtility
+                            ? prop.rent[Math.max(0, Math.min(ownedUtilitiesCount - 1, 1))]
+                            : prop.isSpecialCard
+                                ? prop.rent[0]
+                                : (prop.rent ? prop.rent[Math.min(houses, 5)] : 0);
 
                     const buildTag = prop.isStation
                         ? `<span class="px-2 py-0.5 rounded-md bg-lime-500/20 text-lime-300 border border-lime-500/30 text-[9.5px] font-semibold">محطة قطار 🚂 (${ownedStationsCount}/4)</span>`
-                        : houses === 5
-                            ? `<span class="px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 border border-red-500/30 text-[9.5px] font-semibold">فندق 🏨</span>`
-                            : houses > 0
-                                ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9.5px] font-semibold">${houses} منازل 🏠</span>`
-                                : `<span class="px-2 py-0.5 rounded-md bg-white/5 text-[#7c8288] text-[9.5px]">بدون مباني</span>`;
+                        : prop.isUtility
+                            ? `<span class="px-2 py-0.5 rounded-md bg-lime-500/20 text-lime-300 border border-lime-500/30 text-[9.5px] font-semibold">مرفق عام ⚡ (${ownedUtilitiesCount}/2)</span>`
+                            : prop.isSpecialCard
+                                ? `<span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9.5px] font-semibold">سلع فاخرة 💍</span>`
+                                : houses === 5
+                                    ? `<span class="px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 border border-red-500/30 text-[9.5px] font-semibold">فندق 🏨</span>`
+                                    : houses > 0
+                                        ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9.5px] font-semibold">${houses} منازل 🏠</span>`
+                                        : `<span class="px-2 py-0.5 rounded-md bg-white/5 text-[#7c8288] text-[9.5px]">بدون مباني</span>`;
 
                     return `
                         <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-[#121415] border border-white/[0.06] hover:border-white/20 flex items-center justify-between gap-2 cursor-pointer transition">
                             <div class="flex items-center gap-3">
-                                <span class="w-3.5 h-10 rounded-lg shrink-0 shadow-sm border border-white/20" style="background:${prop.isStation ? '#82b546' : prop.color}"></span>
+                                <span class="w-3.5 h-10 rounded-lg shrink-0 shadow-sm border border-white/20" style="background:${(prop.isStation || prop.isUtility || prop.isSpecialCard) ? '#82b546' : prop.color}"></span>
                                 <div>
                                     <div class="text-xs font-semibold text-white">${prop.arName}</div>
                                     <div class="text-[10px] text-[#7c8288] num-font">${prop.name}</div>
@@ -3331,7 +4112,7 @@
                 ? summary.mortgaged.map(prop => `
                     <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-amber-500/[0.06] border border-amber-500/25 flex items-center justify-between gap-2 cursor-pointer transition">
                         <div class="flex items-center gap-3">
-                            <span class="w-3.5 h-10 rounded-lg shrink-0 opacity-60 border border-white/20" style="background:${prop.isStation ? '#82b546' : prop.color}"></span>
+                            <span class="w-3.5 h-10 rounded-lg shrink-0 opacity-60 border border-white/20" style="background:${(prop.isStation || prop.isUtility || prop.isSpecialCard) ? '#82b546' : prop.color}"></span>
                             <div>
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-xs font-semibold text-amber-200">${prop.arName}</span>
@@ -3441,6 +4222,54 @@
             renderPlayerDashboard();
         }
 
+        // عرض نافذة منبثقة في وسط الشاشة لمشتري الأرض تحتوي على بطاقة الأرض الحقيقية وزر الموافقة أو الرفض
+        function renderPendingPurchaseOffersModal(targetPlayerId) {
+            const offersBox = document.getElementById('playerPurchaseOffersBox');
+            const offersList = document.getElementById('playerPurchaseOffersList');
+            const offersCountEl = document.getElementById('playerPurchaseOffersCount');
+            if (!offersBox || !offersList || !currentRoomData) return;
+
+            const myOffers = ((currentRoomData.pendingPurchaseOffers) || []).filter(o => o.buyerId === targetPlayerId);
+
+            if (myOffers.length > 0) {
+                offersBox.classList.remove('hidden');
+                if (offersCountEl) offersCountEl.textContent = myOffers.length;
+                offersList.innerHTML = '';
+                myOffers.forEach(offer => {
+                    const prop = MONOPOLY_PROPERTIES.find(p => p.id === offer.propId);
+                    if (!prop) return;
+                    const cardDeedHTML = createAuthenticDeedCardHTML(prop, { ownerId: null, mortgaged: false, houses: 0 });
+                    const row = document.createElement('div');
+                    row.className = 'w-full bg-[#121415] border border-white/10 rounded-3xl p-3.5 flex flex-col items-center gap-3 shadow-xl';
+                    row.innerHTML = `
+                        <div class="w-full flex items-center justify-between px-1">
+                            <span class="text-[11px] font-bold text-white">${prop.arName}</span>
+                            <span class="text-[10.5px] font-extrabold px-2.5 py-0.5 rounded-full bg-[#95e6b8]/15 text-[#95e6b8] border border-[#95e6b8]/30 num-font">
+                                ${offer.price > 0 ? `السعر المطلوب: $${offer.price}` : 'منحة مجانية ($0)'}
+                            </span>
+                        </div>
+                        <div class="w-[185px] mx-auto pointer-events-none">
+                            ${cardDeedHTML}
+                        </div>
+                        <div class="w-full grid grid-cols-2 gap-2 pt-1">
+                            <button onclick="respondToPurchaseOffer('${offer.id}', true)" class="py-2.5 px-3 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition active:scale-95">
+                                <i class="ph-bold ph-check-circle text-sm"></i>
+                                <span>موافقة وشراء</span>
+                            </button>
+                            <button onclick="respondToPurchaseOffer('${offer.id}', false)" class="py-2.5 px-3 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/35 text-red-300 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
+                                <i class="ph-bold ph-x-circle text-sm"></i>
+                                <span>رفض الأرض</span>
+                            </button>
+                        </div>
+                    `;
+                    offersList.appendChild(row);
+                });
+            } else {
+                offersBox.classList.add('hidden');
+                offersList.innerHTML = '';
+            }
+        }
+
         function renderPlayerDashboard() {
             if (!currentRoomData) return;
             const targetPlayerId = getEffectiveUserViewPlayerId();
@@ -3466,6 +4295,8 @@
             document.getElementById('playerVisaBalance').textContent = (me.balance || 0).toLocaleString();
             document.getElementById('playerVisaCardCode').textContent = `5211 •••• ${activeRoomCode || '2026'}`;
 
+            renderPendingPurchaseOffersModal(targetPlayerId);
+
             const summary = getPlayerPropertiesSummary(targetPlayerId);
             document.getElementById('userOwnedCount').textContent = summary.owned.length;
             document.getElementById('userMortgagedCount').textContent = summary.mortgaged.length;
@@ -3489,13 +4320,21 @@
             listToShow.forEach(prop => {
                 const st = currentRoomData.propertyState[prop.id];
                 const fullGroup = ownsFullColorGroup(targetPlayerId, prop.group);
-                const canBuild = !prop.isStation && fullGroup && !st.mortgaged && (st.houses || 0) < 5;
+                const canBuild = !prop.isStation && !prop.isUtility && !prop.isSpecialCard && fullGroup && !st.mortgaged && (st.houses || 0) < 5;
 
                 const footerHTML = `
                     <div class="flex flex-col gap-1">
                         ${prop.isStation ? `
                             <div class="text-[8px] text-center font-semibold text-black/75 py-0.5">
                                 إيجار يتضاعف بعدد المحطات المملوكة
+                            </div>
+                        ` : prop.isUtility ? `
+                            <div class="text-[8px] text-center font-semibold text-black/75 py-0.5">
+                                يتضاعف الإيجار بامتلاك الكهرباء والمياه
+                            </div>
+                        ` : prop.isSpecialCard ? `
+                            <div class="text-[8px] text-center font-semibold text-black/75 py-0.5">
+                                بطاقة رسوم وضريبة السلع الفاخرة
                             </div>
                         ` : canBuild ? `
                             <button onclick="buildHouseOrHotel('${prop.id}', '${targetPlayerId}')" class="w-full py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-[8.5px] font-bold transition">
@@ -3506,6 +4345,9 @@
                                 ${(st.houses || 0) >= 5 ? 'تم بناء الفندق الأقصى' : 'امتلك المجموعة كاملة للبناء'}
                             </div>
                         `}
+                        <button onclick="openTradePropertyModal('${prop.id}', '${targetPlayerId}')" class="w-full py-1 rounded bg-sky-700 hover:bg-sky-800 text-white text-[8.5px] font-bold transition">
+                            تبديل مع لاعب آخر ⇄
+                        </button>
                         <button onclick="requestOrExecuteMortgage('${prop.id}', 'mortgage', '${targetPlayerId}')" class="w-full py-1 rounded bg-[#121415] hover:bg-black text-amber-300 text-[8.5px] font-bold transition">
                             طلب رهن العقار (+$${prop.mortgage})
                         </button>
@@ -3584,7 +4426,7 @@
             const prop = MONOPOLY_PROPERTIES.find(p => p.id === propId);
             const st = (currentRoomData.propertyState || {})[propId];
             const actor = (currentRoomData.players || {})[actingPlayerId];
-            if (!prop || !st || !actor || prop.isStation) return;
+            if (!prop || !st || !actor || prop.isStation || prop.isUtility || prop.isSpecialCard) return;
 
             if (!ownsFullColorGroup(actingPlayerId, prop.group)) {
                 showMonoToast('يجب امتلاك جميع أراضي المجموعة اللونية أولاً للبناء');
@@ -3610,23 +4452,30 @@
             showMonoToast(st.houses === 5 ? `مبارك! تم تشييد فندق في ${prop.arName}` : `تم بناء منزل (${st.houses}) في ${prop.arName}`);
         }
 
-        // منع سحب الشاشة أو ارتدادها في المتصفح (iOS / Android) خارج القوائم القابلة للتمرير
+        // منع سحب الشاشة أو ارتدادها في المتصفح (iOS / Android) خارج القوائم القابلة للتمرير بدون تعليق الأزرار
         function lockNativeAppViewport() {
             document.addEventListener('touchmove', function (e) {
-                // السماح بالسحب على بطاقة الفيزا الذكية لتبديلها
-                if (e.target.closest('#adminSmartVisa')) return;
+                // السماح بالسحب على بطاقة الفيزا الذكية وعناصر الإدخال
+                if (e.target.closest('#adminSmartVisa') || e.target.closest('input, select, textarea, button')) return;
 
-                // السماح بالتمرير فقط داخل الحاويات المهمة التي تحمل كلاس custom-scroll وبها محتوى أطول من مساحتها
+                // السماح بالتمرير داخل الحاويات التي تحمل كلاس custom-scroll
                 const scrollable = e.target.closest('.custom-scroll');
-                if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
+                if (scrollable) {
                     return;
                 }
 
-                // منع أي تحريك عشوائي للشاشة في باقي أجزاء التطبيق
+                // منع ارتداد الشاشة فقط عند محاولة سحب الخلفية
                 if (e.cancelable) {
                     e.preventDefault();
                 }
             }, { passive: false });
+
+            // إعادة ضبط موضع الصفحة عند إغلاق الكيبورد في وضع سطح المكتب (Standalone) لمنع بقاء الشاشة مرتفعة
+            window.addEventListener('focusout', function () {
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 60);
+            });
 
             // منع التكبير باللمس المزدوج أو القرص (Pinch Zoom) ليبقى كتطبيق حقيقي
             document.addEventListener('gesturestart', function (e) {
@@ -3762,4 +4611,5 @@
         };
     </script>
 </body>
+
 </html>
