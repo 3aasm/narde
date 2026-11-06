@@ -580,11 +580,27 @@
         /* ==========================================================
            ثيم وتصميم غرفة "اللعب جيم كامل" المتناسق مع لوحة المونوبولي الوسطى
            ========================================================== */
+        #appShell.board-mode-shell {
+            max-width: 560px !important;
+        }
+
+        @media (min-width: 640px) {
+            #appShell.board-mode-shell {
+                height: 94vh !important;
+                max-height: 94vh !important;
+            }
+        }
+
         #monopolyOverlay.board-mode-theme {
             background: radial-gradient(circle at 50% 48%, #6da334 0%, #466e1d 58%, #243b0e 100%) !important;
-            border: 3.5px solid #b91c1c;
+            border: 3px solid #b91c1c;
             box-shadow: inset 0 0 0 2px #141618;
-            padding: 10px !important;
+            padding: 4px !important;
+        }
+
+        #monopolyOverlay.board-mode-theme > div.relative.flex-1 {
+            margin-top: 2px !important;
+            margin-bottom: 2px !important;
         }
 
         /* إلغاء الشريط العلوي القديم بالكامل عند تفعيل وضع الجيم الكامل */
@@ -704,15 +720,16 @@
            ========================================================== */
         .mono-real-board {
             display: grid;
-            grid-template-columns: 1.35fr repeat(9, 1fr) 1.35fr;
-            grid-template-rows: 1.35fr repeat(9, 1fr) 1.35fr;
+            grid-template-columns: 1.32fr repeat(9, 1fr) 1.32fr;
+            grid-template-rows: 1.32fr repeat(9, 1fr) 1.32fr;
             aspect-ratio: 1 / 1;
             width: 100%;
-            max-width: 100%;
+            max-width: min(100%, 72vh);
+            max-height: 100%;
             margin: 0 auto;
             background-color: #93c456;
-            border: 4px solid #b91c1c;
-            box-shadow: 0 6px 0 #141618, 0 14px 32px rgba(0, 0, 0, 0.65), inset 0 0 0 1.5px #111315;
+            border: 3.5px solid #b91c1c;
+            box-shadow: 0 5px 0 #141618, 0 12px 28px rgba(0, 0, 0, 0.65), inset 0 0 0 1.5px #111315;
             border-radius: 10px;
             position: relative;
             overflow: hidden;
@@ -1543,48 +1560,48 @@
                 </div>
 
                 <!-- 4. واجهة "اللعب جيم كامل" (بتصميم متناسق بالكامل مع لوحة مونوبولي الوسطى) -->
-                <div id="monoBoardGameView" class="mono-view hidden-view h-full flex flex-col justify-between gap-1.5 relative overflow-hidden">
+                <div id="monoBoardGameView" class="mono-view hidden-view h-full flex flex-col justify-between gap-1 relative overflow-hidden">
 
                     <!-- الشريط العلوي: يميناً بطاقة اللاعب (صورته واسمه والمال الذي لديه)، وبجانبه يساراً زر الإعدادات المربع -->
                     <div class="shrink-0 relative z-30">
-                        <div class="flex items-stretch justify-between gap-2">
+                        <div class="flex items-stretch justify-between gap-1.5">
                             <!-- جهة اليمين: مستطيل بطاقة اللاعب (صورته + اسمه + المال الذي لديه فقط) -->
                             <div id="boardTopRightMyCard"
-                                class="flex-1 min-w-0 mono-board-ui-card px-3 py-2 flex items-center justify-between gap-2.5">
-                                <div class="flex items-center gap-2.5 min-w-0">
+                                class="flex-1 min-w-0 mono-board-ui-card px-2.5 py-1.5 flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2 min-w-0">
                                     <div class="relative shrink-0">
-                                        <img id="boardMyAvatar" src="" class="w-11 h-11 rounded-xl object-cover border-2 border-[#141618] shadow" />
-                                        <span id="boardMyTurnDot" class="hidden absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#dc2626] border border-[#141618] text-white items-center justify-center shadow">
-                                            <i class="ph-fill ph-dice-five text-[9px]"></i>
+                                        <img id="boardMyAvatar" src="" class="w-9 h-9 rounded-xl object-cover border-2 border-[#141618] shadow" />
+                                        <span id="boardMyTurnDot" class="hidden absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#dc2626] border border-[#141618] text-white items-center justify-center shadow">
+                                            <i class="ph-fill ph-dice-five text-[8px]"></i>
                                         </span>
                                     </div>
                                     <span id="boardMyName" class="text-xs font-black text-[#111315] truncate">اللاعب</span>
                                 </div>
-                                <span id="boardMyBalance" class="num-font text-xs font-black px-2.5 py-1 rounded-lg bg-[#fef08a] border-2 border-[#141618] text-[#111315] shadow-[0_2px_0_#141618] shrink-0" dir="ltr">$1,500</span>
+                                <span id="boardMyBalance" class="num-font text-xs font-black px-2 py-0.5 rounded-lg bg-[#fef08a] border-2 border-[#141618] text-[#111315] shadow-[0_2px_0_#141618] shrink-0" dir="ltr">$1,500</span>
                             </div>
 
                             <!-- جهة اليسار بجانب مستطيل معلومات المستخدم: زر الإعدادات المربع (يظهر كود الغرفة والباركود وزر الخروج) -->
                             <button id="boardSettingsSquareBtn" onclick="openBoardSettingsModal()"
-                                class="shrink-0 w-14 mono-board-ui-card flex flex-col items-center justify-center gap-0.5 cursor-pointer select-none hover:brightness-105"
+                                class="shrink-0 w-12 mono-board-ui-card flex flex-col items-center justify-center gap-0.5 cursor-pointer select-none hover:brightness-105"
                                 title="الإعدادات (كود الغرفة والباركود والخروج)">
-                                <i class="ph-fill ph-gear-six text-xl text-[#111315]"></i>
-                                <span class="text-[8.5px] font-black text-[#111315]">الإعدادات</span>
+                                <i class="ph-fill ph-gear-six text-lg text-[#111315]"></i>
+                                <span class="text-[8px] font-black text-[#111315]">الإعدادات</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- كلمة الدور في أعلى اللعبة مباشرة فوق لوحة المونوبولي + عداد الـ 15 ثانية -->
                     <div id="boardTurnTopBanner"
-                        class="shrink-0 bg-[#fef08a] border-2 border-[#141618] shadow-[0_3px_0_#141618] rounded-xl px-3 py-1.5 flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 min-w-0">
+                        class="shrink-0 bg-[#fef08a] border-2 border-[#141618] shadow-[0_2px_0_#141618] rounded-xl px-2.5 py-1 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 min-w-0">
                             <img id="boardTopTurnAvatar" src="" class="center-turn-avatar shrink-0" />
-                            <span class="text-xs font-black text-[#111315] truncate">
+                            <span class="text-[11px] font-black text-[#111315] truncate">
                                 الدور: <strong id="boardTopTurnName" class="text-[#b91c1c]">...</strong>
                             </span>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <span id="boardFreeParkingBadge" class="hidden text-[9px] px-2 py-0.5 rounded-full bg-[#dc2626] text-white font-black num-font">الموقف: $0</span>
-                            <span id="boardTurnCountdownBadge" class="hidden text-[10px] px-2.5 py-0.5 rounded-full bg-[#141618] text-[#fef08a] font-black num-font items-center gap-1">
+                            <span id="boardFreeParkingBadge" class="hidden text-[8.5px] px-2 py-0.5 rounded-full bg-[#dc2626] text-white font-black num-font">الموقف: $0</span>
+                            <span id="boardTurnCountdownBadge" class="hidden text-[9.5px] px-2 py-0.5 rounded-full bg-[#141618] text-[#fef08a] font-black num-font items-center gap-1">
                                 <i class="ph-fill ph-timer text-xs text-[#95e6b8]"></i>
                                 <span id="boardTurnCountdownSec">15s</span>
                             </span>
@@ -1600,7 +1617,7 @@
 
                     <!-- أسفل لعبة المونوبولي: مستطيل أبيض بداخله زر رمي النرد (مع أزرار الشراء عند الوقوف على أرض) -->
                     <div id="boardBottomRollWhiteBox"
-                        class="shrink-0 bg-white border-2 border-[#141618] rounded-2xl p-2 shadow-[0_4px_0_#141618] flex items-center justify-center gap-2">
+                        class="shrink-0 bg-white border-2 border-[#141618] rounded-2xl p-1.5 shadow-[0_3px_0_#141618] flex items-center justify-center gap-2">
                         <!-- يتم تحديث زر رمي النرد هنا تلقائياً بالـ JS -->
                     </div>
 
@@ -3183,8 +3200,12 @@
         // التبديل السلس بين الصفحات الأربع (Auth / Admin / Player / BoardGame)
         function switchMonopolyView(viewId) {
             const overlay = document.getElementById('monopolyOverlay');
+            const appShellEl = document.getElementById('appShell');
             if (overlay) {
                 overlay.classList.toggle('board-mode-theme', viewId === 'monoBoardGameView');
+            }
+            if (appShellEl) {
+                appShellEl.classList.toggle('board-mode-shell', viewId === 'monoBoardGameView');
             }
             ['monoAuthView', 'monoAdminView', 'monoPlayerView', 'monoBoardGameView'].forEach(id => {
                 const el = document.getElementById(id);
@@ -3507,7 +3528,7 @@
                     turnPlayerId: myPlayerId,
                     phase: 'roll',
                     lastDice: [1],
-                    turnEndsAt: null,
+                    turnEndsAt: Date.now() + 15000,
                     lastEventText: 'بدأت اللعبة! ارمِ النرد للتحرك من خانة الانطلاق GO',
                     freeParkingPot: 0,
                     pendingBuyPropId: null,
@@ -5741,7 +5762,7 @@
                     turnPlayerId: activePlayers[0] ? activePlayers[0].id : myPlayerId,
                     phase: 'roll',
                     lastDice: [1],
-                    turnEndsAt: null,
+                    turnEndsAt: Date.now() + 15000,
                     lastEventText: 'بدأت اللعبة! ارمِ النرد للتحرك من خانة الانطلاق GO',
                     freeParkingPot: 0,
                     pendingBuyPropId: null,
@@ -5753,8 +5774,11 @@
             if (activePlayers.length > 0 && !activePlayers.some(p => p.id === bState.turnPlayerId)) {
                 bState.turnPlayerId = activePlayers[0].id;
                 bState.phase = 'roll';
-                bState.turnEndsAt = null;
+                bState.turnEndsAt = Date.now() + 15000;
                 bState.pendingBuyPropId = null;
+            }
+            if (!bState.turnEndsAt) {
+                bState.turnEndsAt = Date.now() + 15000;
             }
             return bState;
         }
@@ -5819,7 +5843,7 @@
             `;
         }
 
-        // تشغيل/تحديث مؤقت الـ 15 ثانية لنقل الدور تلقائياً بعد المشي للخانة
+        // تشغيل/تحديث مؤقت الـ 15 ثانية الذي يبدأ فور بدء دور الشخص وقبل رمي النرد الخاص به
         function ensureBoardTurnCountdownLoop() {
             if (boardTurnTimerInterval) return;
             boardTurnTimerInterval = setInterval(async () => {
@@ -5829,11 +5853,7 @@
                 const secEl = document.getElementById('boardTurnCountdownSec');
                 const bottomTimerEl = document.getElementById('boardBottomCountdownText');
 
-                if (!bState.turnEndsAt || bState.phase === 'roll' || isBoardDiceAnimating) {
-                    if (badgeEl) {
-                        badgeEl.classList.add('hidden');
-                        badgeEl.classList.remove('flex');
-                    }
+                if (!bState.turnEndsAt || isBoardDiceAnimating) {
                     return;
                 }
 
@@ -5849,7 +5869,7 @@
                     bottomTimerEl.textContent = `${remSec} ثانية`;
                 }
 
-                // بمجرد انتهاء 15 ثانية ينتقل الدور تلقائياً للاعب التالي
+                // بمجرد انتهاء 15 ثانية ينتقل الدور تلقائياً للاعب التالي ويبدأ مؤقت الـ 15 ثانية الجديد له
                 if (remMs <= 0 && !isAutoEndingBoardTurn) {
                     const players = currentRoomData.players || {};
                     const turnPlayer = players[bState.turnPlayerId];
@@ -6096,12 +6116,8 @@
                     </div>
                 </div>
 
-                <!-- محتوى وسط اللوحة: شعار MONOPOLY + النرد الواحد 3D + الرسالة في وسط لعبة المونوبولي -->
+                <!-- محتوى وسط اللوحة: النرد الواحد 3D + الرسالة في وسط لعبة المونوبولي (بدون نص MONOPOLY) -->
                 <div class="flex flex-col items-center justify-center gap-3 z-10 my-auto w-full px-2">
-                    <div class="center-monopoly-banner">
-                        <span class="num-font text-xs font-black tracking-[0.18em] text-white drop-shadow">MONOPOLY</span>
-                    </div>
-
                     <!-- النرد الواحد الثلاثي الأبعاد (يسقط 3D عند الرمي) -->
                     ${buildBoard3dSingleDieHTML(d1, boardIsDropping3dDie, isMyTurn && bState.phase === 'roll')}
 
@@ -6124,7 +6140,7 @@
                             bottomWhiteBox.innerHTML = `
                                 <button onclick="rollBoardGameDice()" class="mono-board-btn-3d flex-1 py-2.5 px-3 bg-[#dc2626] hover:bg-[#ef4444] text-white text-xs flex items-center justify-center gap-1.5">
                                     <i class="ph-fill ph-dice-five text-base text-amber-200"></i>
-                                    <span>ارمِ النرد (الرقم 6 يخرجك)</span>
+                                    <span>ارمِ النرد (<span id="boardBottomCountdownText">${remSec} ثانية</span>)</span>
                                 </button>
                                 <button onclick="payBailAndLeaveJail()" class="mono-board-btn-3d py-2.5 px-3 bg-[#fef08a] hover:bg-[#fde047] text-[#111315] text-xs">
                                     دفع $50 والخروج
@@ -6132,9 +6148,9 @@
                             `;
                         } else {
                             bottomWhiteBox.innerHTML = `
-                                <button onclick="rollBoardGameDice()" class="mono-board-btn-3d w-full py-3 px-4 bg-[#dc2626] hover:bg-[#ef4444] text-white text-xs flex items-center justify-center gap-2">
+                                <button onclick="rollBoardGameDice()" class="mono-board-btn-3d w-full py-2.5 px-4 bg-[#dc2626] hover:bg-[#ef4444] text-white text-xs flex items-center justify-center gap-2">
                                     <i class="ph-fill ph-dice-five text-lg text-amber-200"></i>
-                                    <span>رمي النرد (${turnPlayer ? turnPlayer.name : ''})</span>
+                                    <span>رمي النرد (${turnPlayer ? turnPlayer.name : ''}) — <strong id="boardBottomCountdownText" class="text-amber-200 num-font">${remSec} ثانية</strong></span>
                                 </button>
                             `;
                         }
@@ -6149,17 +6165,16 @@
                         `;
                     } else {
                         bottomWhiteBox.innerHTML = `
-                            <div class="w-full py-2.5 px-3 rounded-xl bg-[#fef08a] border-2 border-[#141618] text-[#111315] text-xs font-black flex items-center justify-center gap-2">
-                                <i class="ph-fill ph-timer text-base text-[#b91c1c]"></i>
-                                <span>ينتقل الدور تلقائياً بعد: <strong id="boardBottomCountdownText" class="text-[#b91c1c] num-font">${remSec} ثانية</strong></span>
-                            </div>
+                            <button onclick="endBoardPlayerTurn()" class="mono-board-btn-3d w-full py-2.5 px-3 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-black flex items-center justify-center gap-2">
+                                <span>إنهاء الدور الآن ⏭</span>
+                            </button>
                         `;
                     }
                 } else {
                     bottomWhiteBox.innerHTML = `
                         <button disabled class="mono-board-btn-3d w-full py-2.5 px-4 bg-[#e2e8f0] text-[#475569] text-xs flex items-center justify-center gap-2 opacity-80 cursor-not-allowed">
                             <i class="ph-fill ph-dice-five text-base"></i>
-                            <span>رمي النرد — بانتظار دور: ${turnPlayer ? turnPlayer.name : '...'} ${bState.phase !== 'roll' ? `(<span id="boardBottomCountdownText">${remSec} ثانية</span>)` : ''}</span>
+                            <span>رمي النرد — بانتظار دور: ${turnPlayer ? turnPlayer.name : '...'} (<span id="boardBottomCountdownText">${remSec} ثانية</span>)</span>
                         </button>
                     `;
                 }
@@ -6175,7 +6190,29 @@
             }
         }
 
-        // رمي النرد الواحد (3D) والتحرك بسرعة أبطأ قليلاً على لوحة المونوبولي ثم بدء مؤقت 15 ثانية لنقل الدور
+        // دالة مساعدة لنقل الدور مباشرة للاعب التالي وبدء عداد الـ 15 ثانية الجديد له فوراً قبل رمي النرد
+        function advanceBoardTurnImmediately(customEventNote = null) {
+            if (!currentRoomData || !currentRoomData.boardGameState) return;
+            const bState = currentRoomData.boardGameState;
+            const ordered = getOrderedBoardPlayers();
+            if (ordered.length === 0) return;
+
+            const currentIdx = ordered.findIndex(p => p.id === bState.turnPlayerId);
+            const nextPlayer = ordered[(currentIdx + 1) % ordered.length];
+
+            bState.turnPlayerId = nextPlayer.id;
+            bState.phase = 'roll';
+            bState.turnEndsAt = Date.now() + 15000;
+            bState.pendingBuyPropId = null;
+            bState.pendingCard = null;
+            if (customEventNote) {
+                bState.lastEventText = `${customEventNote} — الدور الآن عند ${nextPlayer.name} 🎲`;
+            } else {
+                bState.lastEventText = `انتقل الدور إلى ${nextPlayer.name} — ارمِ النرد 🎲`;
+            }
+        }
+
+        // رمي النرد الواحد (3D) والتحرك بسرعة أبطأ قليلاً على لوحة المونوبولي
         async function rollBoardGameDice() {
             if (!currentRoomData || isBoardDiceAnimating) return;
             const bState = ensureValidBoardGameState();
@@ -6193,6 +6230,7 @@
             if (bState.phase !== 'roll') return;
 
             isBoardDiceAnimating = true;
+            const animStartedAt = Date.now();
             playMinimalSound('roll');
 
             // نرد واحد فقط (من 1 إلى 6)
@@ -6224,9 +6262,8 @@
                         bState.freeParkingPot = (bState.freeParkingPot || 0) + 50;
                         showMonoToast(`دفع ${turnPlayer.name} كفالة $50 بعد 3 محاولات وخرج من السجن`);
                     } else {
-                        bState.lastEventText = `رمى ${turnPlayer.name} (${d1}) ولم يحصل على 6 — يبقى في السجن (محاولة ${turnPlayer.jailTurns}/3)`;
-                        bState.phase = 'wait15';
-                        bState.turnEndsAt = Date.now() + 15000;
+                        const jailNote = `رمى ${turnPlayer.name} (${d1}) ولم يحصل على 6 — يبقى في السجن (محاولة ${turnPlayer.jailTurns}/3)`;
+                        advanceBoardTurnImmediately(jailNote);
                         isBoardDiceAnimating = false;
                         await saveRoomData(activeRoomCode, currentRoomData);
                         return;
@@ -6251,9 +6288,18 @@
                 eventNotes.push(`مرّ بخانة GO واستلم +$200`);
             }
 
-            // تطبيق تأثير الخانة التي وقف عليها اللاعب وبدء عداد الـ 15 ثانية لنقل الدور
+            // تطبيق تأثير الخانة التي وقف عليها اللاعب
             await resolveLandingOnBoardSquare(turnPlayer, newPos, total, eventNotes);
-            bState.turnEndsAt = Date.now() + 15000;
+
+            // إذا كان هناك خيار شراء أرض متاحة نعوض وقت أنميشن المشي حتى يكمل وقته لاتخاذ القرار (أو ينتقل فوراً عند الضغط على شراء/عدم الشراء)
+            // أما إذا لم يكن هناك شراء وانتهت لعبته الخاصة به فينتقل الدور مباشرة للاعب التالي ويبدأ عداد الـ 15 ثانية الجديد له!
+            if (bState.phase === 'action' && bState.pendingBuyPropId) {
+                const animDuration = Date.now() - animStartedAt;
+                bState.turnEndsAt = Math.max(Date.now() + 8000, (bState.turnEndsAt || Date.now()) + animDuration);
+            } else {
+                advanceBoardTurnImmediately(bState.lastEventText);
+            }
+
             isBoardDiceAnimating = false;
             playMinimalSound('done');
             await saveRoomData(activeRoomCode, currentRoomData);
@@ -6273,13 +6319,13 @@
             eventNotes.push(`وصل إلى ${space.arName}`);
 
             if (space.type === 'go') {
-                bState.phase = 'wait15';
+                bState.phase = 'done';
             } else if (space.type === 'gotojail') {
                 player.pos = 10;
                 player.inJail = true;
                 player.doublesCount = 0;
                 eventNotes.push('تم إرساله إلى السجن 👮⛓️');
-                bState.phase = 'wait15';
+                bState.phase = 'done';
             } else if (space.type === 'parking') {
                 if ((bState.freeParkingPot || 0) > 0) {
                     const pot = bState.freeParkingPot;
@@ -6287,13 +6333,13 @@
                     bState.freeParkingPot = 0;
                     eventNotes.push(`حصل على خزينة الموقف المجاني +$${pot}!`);
                 }
-                bState.phase = 'wait15';
+                bState.phase = 'done';
             } else if (space.type === 'tax') {
                 const tax = space.amount || 200;
                 player.balance = Math.max(0, (player.balance || 0) - tax);
                 bState.freeParkingPot = (bState.freeParkingPot || 0) + tax;
                 eventNotes.push(`دفع ضريبة الدخل -$${tax}`);
-                bState.phase = 'wait15';
+                bState.phase = 'done';
             } else if (space.type === 'chance' || space.type === 'chest') {
                 const deck = space.type === 'chance' ? BOARD_CHANCE_CARDS : BOARD_CHEST_CARDS;
                 const card = deck[Math.floor(Math.random() * deck.length)];
@@ -6327,7 +6373,7 @@
                     });
                 }
                 showMonoToast(`${card.title}: ${card.text}`);
-                bState.phase = 'wait15';
+                bState.phase = 'done';
             } else if (space.type === 'prop' && space.propId) {
                 const prop = MONOPOLY_PROPERTIES.find(p => p.id === space.propId);
                 const st = propState[space.propId];
@@ -6340,14 +6386,14 @@
                         eventNotes.push(`متاحة للشراء مقابل $${prop.price}`);
                     } else {
                         eventNotes.push(`رصيده لا يكفي لشرائها ($${prop.price})`);
-                        bState.phase = 'wait15';
+                        bState.phase = 'done';
                     }
                 } else if (owner.id === player.id) {
                     eventNotes.push('أرضه الخاصة');
-                    bState.phase = 'wait15';
+                    bState.phase = 'done';
                 } else if (st.mortgaged) {
                     eventNotes.push(`ملك ${owner.name} (مرهونة — لا إيجار)`);
-                    bState.phase = 'wait15';
+                    bState.phase = 'done';
                 } else {
                     const rent = calculateBoardPropertyRent(prop, st, diceSum);
                     const paid = Math.min(player.balance || 0, rent);
@@ -6355,16 +6401,16 @@
                     owner.balance = (owner.balance || 0) + paid;
                     eventNotes.push(`دفع إيجار $${paid} إلى ${owner.name}`);
                     showMonoToast(`دفع ${player.name} إيجار $${paid} إلى ${owner.name} (${prop.arName})`);
-                    bState.phase = 'wait15';
+                    bState.phase = 'done';
                 }
             } else {
-                bState.phase = 'wait15';
+                bState.phase = 'done';
             }
 
             bState.lastEventText = eventNotes.join(' — ');
         }
 
-        // شراء الأرض التي وقف عليها اللاعب في الجيم الكامل (وينتقل الدور تلقائياً بمجرد انتهاء الـ 15 ثانية)
+        // شراء الأرض التي وقف عليها اللاعب في الجيم الكامل (وينتقل الدور فوراً للاعب التالي دون انتظار 15 ثانية)
         async function buyBoardPropertyNow() {
             if (!currentRoomData || !currentRoomData.boardGameState) return;
             const bState = currentRoomData.boardGameState;
@@ -6388,28 +6434,22 @@
                 houses: 0
             };
 
-            bState.pendingBuyPropId = null;
-            bState.phase = 'wait15';
-            if (!bState.turnEndsAt || bState.turnEndsAt < Date.now()) {
-                bState.turnEndsAt = Date.now() + 15000;
-            }
-            bState.lastEventText = `اشترى ${player.name} عقار "${prop.arName}" بـ $${prop.price} وأصبحت الخانة بصورته!`;
+            const buyNote = `اشترى ${player.name} عقار "${prop.arName}" بـ $${prop.price} وأصبحت الخانة بصورته!`;
+            advanceBoardTurnImmediately(buyNote);
 
             closeModal('boardSquareActionModal');
             await saveRoomData(activeRoomCode, currentRoomData);
             showMonoToast(`مبارك! اشترى ${player.name} "${prop.arName}"`);
         }
 
+        // عدم شراء العقار: ينتقل الدور فوراً للاعب التالي دون انتظار بقية الـ 15 ثانية
         async function skipBoardPropertyBuy() {
             if (!currentRoomData || !currentRoomData.boardGameState) return;
             const bState = currentRoomData.boardGameState;
             const player = (currentRoomData.players || {})[bState.turnPlayerId];
-            bState.pendingBuyPropId = null;
-            bState.phase = 'wait15';
-            if (!bState.turnEndsAt || bState.turnEndsAt < Date.now()) {
-                bState.turnEndsAt = Date.now() + 15000;
-            }
-            bState.lastEventText = `لم يشترِ ${player ? player.name : 'اللاعب'} العقار — ينتقل الدور عند انتهاء الـ 15 ثانية`;
+            const skipNote = `لم يشترِ ${player ? player.name : 'اللاعب'} العقار`;
+            advanceBoardTurnImmediately(skipNote);
+
             closeModal('boardSquareActionModal');
             await saveRoomData(activeRoomCode, currentRoomData);
         }
@@ -6434,20 +6474,7 @@
 
         async function endBoardPlayerTurn() {
             if (!currentRoomData || !currentRoomData.boardGameState) return;
-            const bState = currentRoomData.boardGameState;
-            const ordered = getOrderedBoardPlayers();
-            if (ordered.length === 0) return;
-
-            const currentIdx = ordered.findIndex(p => p.id === bState.turnPlayerId);
-            const nextPlayer = ordered[(currentIdx + 1) % ordered.length];
-
-            bState.turnPlayerId = nextPlayer.id;
-            bState.phase = 'roll';
-            bState.turnEndsAt = null;
-            bState.pendingBuyPropId = null;
-            bState.pendingCard = null;
-            bState.lastEventText = `انتقل الدور إلى ${nextPlayer.name} — ارمِ النرد 🎲`;
-
+            advanceBoardTurnImmediately();
             closeModal('boardSquareActionModal');
             await saveRoomData(activeRoomCode, currentRoomData);
         }
