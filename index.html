@@ -424,6 +424,88 @@
             z-index: 5;
         }
 
+        /* ==========================================
+           أنميشن احترافي عند النقر على أي زر في الموقع
+           ========================================== */
+        @keyframes btnSpringPress {
+            0% {
+                transform: scale(1);
+            }
+            35% {
+                transform: scale(0.91);
+            }
+            75% {
+                transform: scale(1.035);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes btnIconPop {
+            0% {
+                transform: scale(1) rotate(0deg);
+            }
+            45% {
+                transform: scale(1.26) rotate(-8deg);
+            }
+            80% {
+                transform: scale(0.95) rotate(4deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes btnRippleExpand {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.55;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3.2);
+                opacity: 0;
+            }
+        }
+
+        button,
+        [role="button"],
+        label.cursor-pointer {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.22s ease,
+                        background-color 0.2s ease,
+                        border-color 0.2s ease;
+            will-change: transform;
+        }
+
+        button:active,
+        [role="button"]:active,
+        label.cursor-pointer:active {
+            transform: scale(0.93) !important;
+        }
+
+        .btn-click-anim {
+            animation: btnSpringPress 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .btn-click-anim i,
+        .btn-click-anim svg {
+            animation: btnIconPop 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .btn-ripple-wave {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(149, 230, 184, 0.55) 0%, rgba(255, 255, 255, 0.25) 60%, transparent 100%);
+            pointer-events: none;
+            width: 64px;
+            height: 64px;
+            animation: btnRippleExpand 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            z-index: 2;
+        }
+
         .deed-mortgaged-overlay {
             background: rgba(15, 17, 19, 0.82);
             backdrop-filter: blur(2px);
@@ -1083,6 +1165,67 @@
             <!-- ==========================================
                  النوافذ المنبثقة (Modals) داخل نظام المونوبولي
                  ========================================== -->
+
+            <!-- نافذة الدخول السريع في وسط الشاشة عند مسح باركود الغرفة (يدخل الغرفة مباشرة ويظهر له مربع الاسم والصورة في الوسط) -->
+            <div id="qrRoomDirectJoinModal"
+                class="hidden fixed sm:absolute inset-0 bg-black/85 backdrop-blur-md z-[95] p-4 flex items-center justify-center">
+                <div
+                    class="bg-[#181b1d] border-2 border-[#95e6b8]/60 rounded-[32px] p-5 w-full max-w-[340px] flex flex-col items-center text-center shadow-2xl space-y-4 relative">
+                    <div class="w-full flex items-center justify-between border-b border-white/10 pb-3">
+                        <div class="flex items-center gap-2.5 text-right">
+                            <div
+                                class="w-10 h-10 rounded-2xl bg-[#95e6b8] text-[#121415] flex items-center justify-center shadow-md shrink-0">
+                                <i class="ph-fill ph-qr-code text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white">مرحباً بك في غرفة المونوبولي</h3>
+                                <p class="text-[10px] text-[#95e6b8]">أدخل اسمك واختر صورتك للدخول مباشرة</p>
+                            </div>
+                        </div>
+                        <span id="qrDirectModalCodeBadge"
+                            class="num-font text-xs font-extrabold px-2.5 py-1 rounded-xl bg-[#121415] text-[#95e6b8] border border-[#95e6b8]/35 tracking-widest">#----</span>
+                    </div>
+
+                    <!-- اختيار الصورة الشخصية من نافذة الباركود -->
+                    <div class="w-full matte-card p-3.5 space-y-3 text-right">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="relative w-15 h-15 rounded-2xl bg-[#262a2d] border-2 border-[#95e6b8] overflow-hidden shrink-0 flex items-center justify-center shadow-md">
+                                <img id="qrModalAvatarPreview" src="" alt="Avatar"
+                                    class="w-14 h-14 object-cover" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="text-[10.5px] text-[#7c8288] block mb-1.5">اختر أفاتار أو ارفع صورتك</label>
+                                <label
+                                    class="inline-flex items-center gap-1.5 text-[10.5px] bg-[#262a2d] hover:bg-[#303539] text-white px-3 py-1.5 rounded-full cursor-pointer transition border border-white/10">
+                                    <i class="ph ph-upload-simple text-[#95e6b8]"></i>
+                                    <span>رفع صورة من الجهاز</span>
+                                    <input type="file" accept="image/*" class="hidden"
+                                        onchange="handleAvatarUpload(event)">
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- صف الأفاتارات السريعة داخل نافذة الباركود -->
+                        <div id="qrModalPresetAvatarsRow" class="flex items-center justify-between gap-1.5 pt-1"></div>
+
+                        <!-- إدخال اسم اللاعب -->
+                        <div class="pt-1">
+                            <label class="text-[11px] text-[#7c8288] block mb-1">اسمك في الغرفة</label>
+                            <input id="qrModalPlayerNameInput" type="text" maxlength="18"
+                                placeholder="اكتب اسمك هنا..."
+                                onkeydown="if(event.key==='Enter') confirmQrDirectRoomEntry()"
+                                class="w-full bg-[#121415] border border-white/15 focus:border-[#95e6b8] rounded-2xl px-3.5 py-2.5 text-xs text-white outline-none transition" />
+                        </div>
+                    </div>
+
+                    <button onclick="confirmQrDirectRoomEntry()"
+                        class="w-full py-3.5 rounded-2xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+                        <i class="ph-bold ph-sign-in text-base"></i>
+                        <span>دخول مباشر للغرفة الآن</span>
+                    </button>
+                </div>
+            </div>
 
             <!-- نافذة عروض شراء الأراضي المنبثقة في وسط الشاشة لمشتري الأرض (تظهر فيها بطاقة الأرض الحقيقية + زر الموافقة أو الرفض) -->
             <div id="playerPurchaseOffersBox"
@@ -2299,8 +2442,9 @@
             return avatarStr;
         }
 
-        // حالة اللاعب والغرفة الحالية
+        // حالة اللاعب والغرفة الحالية (مع معرف جلسة فريد لكل جهاز لمنع الدخول مرتين بنفس الاسم)
         let myPlayerId = 'p_' + Math.random().toString(36).substring(2, 10);
+        const myDeviceSessionToken = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
         let myProfile = {
             name: '',
             avatar: PRESET_AVATARS[Math.floor(Math.random() * PRESET_AVATARS.length)]
@@ -2353,30 +2497,50 @@
             });
         }
 
-        // تهيئة الأفاتارات في شاشة الدخول
+        let isQrPendingDirectJoin = false;
+
+        // تهيئة الأفاتارات في شاشة الدخول ونافذة الباركود السريعة
         function initMonopolyAuthUI() {
             const row = document.getElementById('presetAvatarsRow');
+            const qrRow = document.getElementById('qrModalPresetAvatarsRow');
             const preview = document.getElementById('selectedAvatarPreview');
-            preview.src = getSafeAvatarSrc(myProfile.avatar);
-            row.innerHTML = '';
+            const qrPreview = document.getElementById('qrModalAvatarPreview');
+            const safeSrc = getSafeAvatarSrc(myProfile.avatar);
+            if (preview) preview.src = safeSrc;
+            if (qrPreview) qrPreview.src = safeSrc;
+            if (row) row.innerHTML = '';
+            if (qrRow) qrRow.innerHTML = '';
+
+            const syncAvatarSelectionUI = (selectedSrc) => {
+                myProfile.avatar = selectedSrc;
+                if (preview) preview.src = selectedSrc;
+                if (qrPreview) qrPreview.src = selectedSrc;
+                [row, qrRow].forEach(container => {
+                    if (!container) return;
+                    Array.from(container.children).forEach(c => {
+                        const isMatch = c.dataset.avatarSrc === selectedSrc;
+                        c.className = isMatch
+                            ? 'w-10 h-10 rounded-xl overflow-hidden border-2 border-[#95e6b8] scale-105 transition'
+                            : 'w-10 h-10 rounded-xl overflow-hidden border-2 border-white/10 opacity-70 hover:opacity-100 transition';
+                    });
+                });
+            };
 
             PRESET_AVATARS.forEach((src) => {
                 const isSelected = myProfile.avatar === src;
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = `w-11 h-11 rounded-xl overflow-hidden border-2 transition ${isSelected ? 'border-[#95e6b8] scale-105' : 'border-white/10 opacity-70 hover:opacity-100'}`;
-                const imgEl = document.createElement('img');
-                imgEl.src = src;
-                imgEl.className = 'w-full h-full object-cover';
-                btn.appendChild(imgEl);
-
-                btn.onclick = () => {
-                    myProfile.avatar = src;
-                    preview.src = src;
-                    Array.from(row.children).forEach(c => c.className = 'w-11 h-11 rounded-xl overflow-hidden border-2 border-white/10 opacity-70 hover:opacity-100 transition');
-                    btn.className = 'w-11 h-11 rounded-xl overflow-hidden border-2 border-[#95e6b8] scale-105 transition';
-                };
-                row.appendChild(btn);
+                [row, qrRow].forEach(container => {
+                    if (!container) return;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.dataset.avatarSrc = src;
+                    btn.className = `w-10 h-10 rounded-xl overflow-hidden border-2 transition ${isSelected ? 'border-[#95e6b8] scale-105' : 'border-white/10 opacity-70 hover:opacity-100'}`;
+                    const imgEl = document.createElement('img');
+                    imgEl.src = src;
+                    imgEl.className = 'w-full h-full object-cover';
+                    btn.appendChild(imgEl);
+                    btn.onclick = () => syncAvatarSelectionUI(src);
+                    container.appendChild(btn);
+                });
             });
 
             // تهيئة الصورة الافتراضية لنموذج إضافة عضو محلي
@@ -2400,7 +2564,10 @@
                     ctx.drawImage(img, 0, 0, size, size);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     myProfile.avatar = dataUrl;
-                    document.getElementById('selectedAvatarPreview').src = dataUrl;
+                    const p1 = document.getElementById('selectedAvatarPreview');
+                    const p2 = document.getElementById('qrModalAvatarPreview');
+                    if (p1) p1.src = dataUrl;
+                    if (p2) p2.src = dataUrl;
                     showMonoToast('تم اختيار صورتك الشخصية بنجاح');
                 };
                 img.src = e.target.result;
@@ -2529,35 +2696,111 @@
             showMonoToast('تم نسخ رابط الدعوة المباشر للغرفة');
         }
 
-        // التحقق التلقائي عند فتح الرابط من الباركود (?room=XXXX) لفتح شاشة الاسم والصورة وتعبئة الكود مباشرة
+        // التحقق التلقائي عند فتح الرابط من الباركود (?room=XXXX): يدخله الغرفة فوراً ويظهر له نافذة في وسط الشاشة لإدخال اسمه وصورته والدخول المباشر
         function checkUrlForDirectRoomJoin() {
             try {
                 const params = new URLSearchParams(window.location.search);
                 const roomParam = (params.get('room') || '').trim();
                 if (roomParam && /^\d{4}$/.test(roomParam)) {
-                    // فتح نظام المونوبولي مباشرة
+                    activeRoomCode = roomParam;
+                    isQrPendingDirectJoin = true;
+
+                    // فتح نظام المونوبولي والدخول المباشر لواجهة الغرفة في الخلفية
                     openMonopolySystem();
-                    // تعبئة خانة الكود تلقائياً
+                    switchMonopolyView('monoPlayerView');
+                    document.getElementById('roomSubHeader').textContent = `غرفة #${roomParam} — بانتظار إدخال اسمك`;
+                    document.getElementById('playerVisaName').textContent = 'لاعب جديد';
+                    document.getElementById('playerVisaAvatar').src = getSafeAvatarSrc(myProfile.avatar);
+
+                    // تعبئة الكود في الخلفية أيضاً
                     const joinInput = document.getElementById('joinRoomCodeInput');
                     if (joinInput) joinInput.value = roomParam;
 
-                    // إظهار لافتة الانضمام المباشر للغرفة الممسوحة
-                    const qrBanner = document.getElementById('qrDirectJoinBanner');
-                    const qrBannerCode = document.getElementById('qrBannerRoomCode');
-                    if (qrBanner && qrBannerCode) {
-                        qrBannerCode.textContent = `#${roomParam}`;
-                        qrBanner.classList.remove('hidden');
-                    }
+                    // إظهار النافذة في وسط الشاشة لإدخال الاسم والصورة والدخول المباشر
+                    const qrModal = document.getElementById('qrRoomDirectJoinModal');
+                    const codeBadge = document.getElementById('qrDirectModalCodeBadge');
+                    if (codeBadge) codeBadge.textContent = `#${roomParam}`;
+                    if (qrModal) qrModal.classList.remove('hidden');
 
-                    // تركيز المؤشر في حقل اسم اللاعب ليسهل عليه كتابة اسمه فوراً
                     setTimeout(() => {
-                        const nameInput = document.getElementById('playerNameInput');
-                        if (nameInput) nameInput.focus();
-                        showMonoToast(`مرحباً! اكتب اسمك واختر صورتك للدخول للغرفة #${roomParam}`);
-                    }, 350);
+                        const qrNameInput = document.getElementById('qrModalPlayerNameInput');
+                        if (qrNameInput) qrNameInput.focus();
+                    }, 300);
                 }
             } catch (e) {
                 console.warn("URL room param check error:", e);
+            }
+        }
+
+        // تأكيد الاسم والصورة من النافذة الوسطى بعد مسح الباركود والدخول المباشر للغرفة
+        async function confirmQrDirectRoomEntry() {
+            const qrNameInput = document.getElementById('qrModalPlayerNameInput');
+            const nameVal = (qrNameInput ? qrNameInput.value : '').trim();
+            if (!nameVal) {
+                showMonoToast('يرجى كتابة اسمك أولاً للدخول المباشر');
+                if (qrNameInput) qrNameInput.focus();
+                return;
+            }
+
+            // مزامنة الاسم مع الحقل الرئيسي ثم محاولة الدخول المباشر للغرفة
+            const mainNameInput = document.getElementById('playerNameInput');
+            if (mainNameInput) mainNameInput.value = nameVal;
+            myProfile.name = nameVal;
+
+            if (activeRoomCode) {
+                const joinInput = document.getElementById('joinRoomCodeInput');
+                if (joinInput) joinInput.value = activeRoomCode;
+            }
+
+            const joinedSuccessfully = await joinMonopolyRoom();
+            const qrModal = document.getElementById('qrRoomDirectJoinModal');
+            if (joinedSuccessfully) {
+                isQrPendingDirectJoin = false;
+                if (qrModal) qrModal.classList.add('hidden');
+            } else {
+                // إذا رُفض الدخول بسبب تكرار الاسم داخل الغرفة تبقى النافذة مفتوحة ليختار اسماً آخر
+                if (isQrPendingDirectJoin && qrNameInput) {
+                    qrNameInput.focus();
+                    qrNameInput.select();
+                } else if (qrModal) {
+                    qrModal.classList.add('hidden');
+                }
+            }
+        }
+
+        // تأكيد الاسم والصورة من النافذة الوسطى بعد مسح الباركود والدخول المباشر للغرفة
+        async function confirmQrDirectRoomEntry() {
+            const qrNameInput = document.getElementById('qrModalPlayerNameInput');
+            const nameVal = (qrNameInput ? qrNameInput.value : '').trim();
+            if (!nameVal) {
+                showMonoToast('يرجى كتابة اسمك أولاً للدخول المباشر');
+                if (qrNameInput) qrNameInput.focus();
+                return;
+            }
+
+            // مزامنة الاسم مع الحقل الرئيسي ثم محاولة الدخول المباشر للغرفة
+            const mainNameInput = document.getElementById('playerNameInput');
+            if (mainNameInput) mainNameInput.value = nameVal;
+            myProfile.name = nameVal;
+
+            if (activeRoomCode) {
+                const joinInput = document.getElementById('joinRoomCodeInput');
+                if (joinInput) joinInput.value = activeRoomCode;
+            }
+
+            const joinedSuccessfully = await joinMonopolyRoom();
+            const qrModal = document.getElementById('qrRoomDirectJoinModal');
+            if (joinedSuccessfully) {
+                isQrPendingDirectJoin = false;
+                if (qrModal) qrModal.classList.add('hidden');
+            } else {
+                // إذا رُفض الدخول بسبب تكرار الاسم داخل الغرفة تبقى النافذة مفتوحة ليختار اسماً آخر
+                if (isQrPendingDirectJoin && qrNameInput) {
+                    qrNameInput.focus();
+                    qrNameInput.select();
+                } else if (qrModal) {
+                    qrModal.classList.add('hidden');
+                }
             }
         }
 
@@ -2696,6 +2939,8 @@
                         name: myProfile.name,
                         avatar: myProfile.avatar,
                         balance: 1500,
+                        isLeft: false,
+                        activeSessionId: myDeviceSessionToken,
                         joinedAt: Date.now()
                     }
                 },
@@ -2708,13 +2953,13 @@
             showMonoToast(`تم إنشاء الغرفة بنجاح! الكود: ${code}`);
         }
 
-        // 2. الدخول إلى غرفة مونوبولي بواسطة الكود المكون من 4 أرقام (مع استعادة حساب اللاعب ومعلوماته إذا دخل بنفس اسمه السابق)
+        // 2. الدخول إلى غرفة مونوبولي بواسطة الكود المكون من 4 أرقام (مع منع الدخول مرتين بنفس الاسم من جهازين، واستعادة الحساب فقط إذا كان اللاعب قد غادر الغرفة)
         async function joinMonopolyRoom() {
-            if (!validateUserIdentity()) return;
+            if (!validateUserIdentity()) return false;
             const codeInput = document.getElementById('joinRoomCodeInput').value.trim();
             if (codeInput.length !== 4) {
                 showMonoToast('يرجى إدخال كود صحيح مكون من 4 أرقام');
-                return;
+                return false;
             }
 
             let roomData = null;
@@ -2731,8 +2976,11 @@
             }
 
             if (!roomData) {
+                isQrPendingDirectJoin = false;
+                if (!currentRoomData) switchMonopolyView('monoAuthView');
+                if (!currentRoomData) switchMonopolyView('monoAuthView');
                 showMonoToast('لم يتم العثور على غرفة بهذا الكود');
-                return;
+                return false;
             }
 
             // إذا مر يومان (48 ساعة) على الغرفة، تُحذف بياناتها القديمة وتُعاد ضبطها كغرفة جديدة تماماً بنفس الكود
@@ -2750,6 +2998,8 @@
                             name: myProfile.name,
                             avatar: myProfile.avatar,
                             balance: 1500,
+                            isLeft: false,
+                            activeSessionId: myDeviceSessionToken,
                             joinedAt: Date.now()
                         }
                     },
@@ -2761,15 +3011,32 @@
                 await saveRoomData(codeInput, resetRoom);
                 subscribeToRoom(codeInput);
                 showMonoToast(`مر يومان على الغرفة #${codeInput} — تمت إعادة ضبطها كغرفة جديدة وأنت القائد!`);
-                return;
+                return true;
             }
 
-            // البحث عما إذا كان اللاعب مسجلاً مسبقاً في هذه الغرفة بنفس الاسم لاستعادة رصيده وأراضيه ومعلوماته
+            // البحث عما إذا كان هناك لاعب مسجل بنفس الاسم في الغرفة
             const existingPlayerByName = findExistingPlayerByNameInRoom(roomData, myProfile.name);
 
+            // منع الدخول مرتين بنفس الاسم من جهازين: إذا كان الاسم موجوداً ونشطاً حالياً داخل الغرفة (لم يغادر) يُرفض الدخول فوراً
+            if (existingPlayerByName) {
+                const isAlreadyActiveInRoom = (existingPlayerByName.isLeft !== true) || existingPlayerByName.isOfflineMember;
+                const isAnotherDeviceSession = existingPlayerByName.id !== myPlayerId ||
+                    (existingPlayerByName.activeSessionId && existingPlayerByName.activeSessionId !== myDeviceSessionToken);
+
+                if (isAlreadyActiveInRoom && isAnotherDeviceSession) {
+                    showMonoToast(`عذراً، الاسم "${existingPlayerByName.name}" موجود حالياً في الغرفة! يُسمح بالدخول مرة واحدة فقط بهذا الاسم`);
+                    const mainNameInput = document.getElementById('playerNameInput');
+                    if (mainNameInput && !isQrPendingDirectJoin) mainNameInput.focus();
+                    return false;
+                }
+            }
+
             if (!roomData.isOpen && !existingPlayerByName && (!roomData.players || !roomData.players[myPlayerId])) {
+                isQrPendingDirectJoin = false;
+                if (!currentRoomData) switchMonopolyView('monoAuthView');
+                if (!currentRoomData) switchMonopolyView('monoAuthView');
                 showMonoToast('عذراً، هذه الغرفة مغلقة حالياً من قِبل القائد');
-                return;
+                return false;
             }
 
             activeRoomCode = codeInput;
@@ -2777,17 +3044,18 @@
             roomData.players = roomData.players || {};
 
             if (existingPlayerByName) {
-                // استعادة نفس معرف اللاعب السابق ومعلوماته المحفوظة (الرصيد، الأراضي، طلبات الرهن، إلخ)
+                // اللاعب كان قد خرج سابقاً (isLeft === true) ويدخل الآن مرة واحدة فقط لاستعادة رصيده وأراضيه
                 myPlayerId = existingPlayerByName.id;
                 myProfile.name = existingPlayerByName.name;
                 myProfile.avatar = existingPlayerByName.avatar || myProfile.avatar;
                 document.getElementById('selectedAvatarPreview').src = getSafeAvatarSrc(myProfile.avatar);
                 roomData.players[myPlayerId].isLeft = false;
+                roomData.players[myPlayerId].activeSessionId = myDeviceSessionToken;
 
                 await saveRoomData(codeInput, roomData);
                 subscribeToRoom(codeInput);
                 showMonoToast(`مرحباً بعودتك ${existingPlayerByName.name}! تم استرجاع رصيدك وأراضيك بنجاح`);
-                return;
+                return true;
             }
 
             if (!roomData.players[myPlayerId]) {
@@ -2796,17 +3064,21 @@
                     name: myProfile.name,
                     avatar: myProfile.avatar,
                     balance: 1500,
+                    isLeft: false,
+                    activeSessionId: myDeviceSessionToken,
                     joinedAt: Date.now()
                 };
             } else {
                 roomData.players[myPlayerId].name = myProfile.name;
                 roomData.players[myPlayerId].avatar = myProfile.avatar;
                 roomData.players[myPlayerId].isLeft = false;
+                roomData.players[myPlayerId].activeSessionId = myDeviceSessionToken;
             }
 
             await saveRoomData(codeInput, roomData);
             subscribeToRoom(codeInput);
             showMonoToast(`مرحباً بك في غرفة المونوبولي #${codeInput}`);
+            return true;
         }
 
         // الخروج من الغرفة (مع حفظ معلومات اللاعب إن بقي أحد، أو حذف الغرفة بالكامل إذا خرج الجميع والقائد)
@@ -2819,6 +3091,7 @@
             const players = { ...(currentRoomData.players || {}) };
             if (players[myPlayerId]) {
                 players[myPlayerId].isLeft = true;
+                players[myPlayerId].activeSessionId = null;
             }
 
             // التحقق من اللاعبين المتصلين المتبقين في الغرفة (غير الأعضاء المحليين وغير الخارجين)
@@ -2859,6 +3132,8 @@
             }
 
             currentRoomData = null;
+            // توليد معرف جديد بعد الخروج حتى لو دخل باسم مختلف لا يكتب فوق حسابه السابق، وإذا دخل بنفس اسمه يستعيد حسابه المحفوظ
+            myPlayerId = 'p_' + Math.random().toString(36).substring(2, 10);
             switchMonopolyView('monoAuthView');
             showMonoToast('تم الخروج مع حفظ جميع معلوماتك وأراضيك في الغرفة');
         }
@@ -2894,6 +3169,18 @@
                 impersonatedMemberId = null;
                 switchMonopolyView('monoAuthView');
                 showMonoToast('تم إخراجك من الغرفة');
+                return;
+            }
+
+            // حماية إضافية لمنع فتح نفس الاسم من جهازين في نفس الوقت
+            if (players[myPlayerId].activeSessionId && players[myPlayerId].activeSessionId !== myDeviceSessionToken) {
+                if (roomUnsubscribe) roomUnsubscribe();
+                activeRoomCode = null;
+                currentRoomData = null;
+                impersonatedMemberId = null;
+                myPlayerId = 'p_' + Math.random().toString(36).substring(2, 10);
+                switchMonopolyView('monoAuthView');
+                showMonoToast('لا يمكن الدخول بنفس الاسم من أكثر من جهاز في نفس الوقت');
                 return;
             }
 
@@ -4896,10 +5183,38 @@
             testImg.src = remoteIconUrl;
         }
 
+        // تفعيل أنميشن النقر والموجة الضوئية (Ripple + Spring) وصوت نقرة خفيف لجميع الأزرار في الموقع
+        function setupGlobalButtonAnimations() {
+            document.addEventListener('pointerdown', function (e) {
+                const btn = e.target.closest('button, [role="button"], label.cursor-pointer, #roomCodePill');
+                if (!btn) return;
+
+                // إعادة تشغيل أنميشن الارتداد المرن للزر والأيقونة بداخله
+                btn.classList.remove('btn-click-anim');
+                void btn.offsetWidth;
+                btn.classList.add('btn-click-anim');
+
+                // إنشاء موجة ضوئية (Ripple) في موضع النقر داخل الزر
+                const rect = btn.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.className = 'btn-ripple-wave';
+                const x = (e.clientX || (rect.left + rect.width / 2)) - rect.left;
+                const y = (e.clientY || (rect.top + rect.height / 2)) - rect.top;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                btn.appendChild(ripple);
+
+                setTimeout(() => {
+                    if (ripple.parentNode) ripple.remove();
+                }, 540);
+            }, { passive: true });
+        }
+
         // التهيئة عند التشغيل
         window.onload = function () {
             setupHomeScreenAppIcon();
             lockNativeAppViewport();
+            setupGlobalButtonAnimations();
             build3DCube('cube1');
             build3DCube('cube2');
             buildArcDots();
