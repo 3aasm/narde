@@ -311,6 +311,55 @@
             backdrop-filter: blur(2px);
         }
 
+        /* أحجام متدرجة لبطاقة الأرض الحقيقية حسب المساحة (xs, sm, md, lg) */
+        .deed-scale-xs {
+            width: 58px;
+            height: 78px;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 6px;
+        }
+
+        .deed-scale-xs > .deed-card {
+            width: 155px;
+            transform: scale(0.374);
+            transform-origin: top right;
+            pointer-events: none;
+        }
+
+        .deed-scale-sm {
+            width: 82px;
+            height: 112px;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 7px;
+        }
+
+        .deed-scale-sm > .deed-card {
+            width: 155px;
+            transform: scale(0.529);
+            transform-origin: top right;
+            pointer-events: none;
+        }
+
+        .deed-scale-md {
+            width: 108px;
+            height: 146px;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 8px;
+        }
+
+        .deed-scale-md > .deed-card {
+            width: 155px;
+            transform: scale(0.696);
+            transform-origin: top right;
+            pointer-events: none;
+        }
+
         /* تصميم بطاقة الفيزا الذكية القابلة للسحب */
         .visa-card-bank {
             background: linear-gradient(135deg, #1f2427 0%, #141719 55%, #24382e 100%);
@@ -1090,12 +1139,12 @@
                         </button>
                     </div>
 
-                    <div class="matte-card p-3 flex items-center justify-between border border-white/10">
+                    <div class="matte-card p-3 flex items-center justify-between gap-3 border border-white/10">
                         <div>
                             <span class="text-[10px] text-[#7c8288] block">عقارك المحدد للتبديل:</span>
-                            <span id="tradeSourcePropName" class="text-xs font-bold text-white">—</span>
+                            <span id="tradeSourcePropName" class="text-xs font-bold text-white block mt-0.5">—</span>
                         </div>
-                        <span id="tradeSourcePropColor" class="w-4 h-8 rounded-lg border border-white/20"></span>
+                        <div id="tradeSourcePropCardWrap" class="shrink-0"></div>
                     </div>
 
                     <div>
@@ -3717,7 +3766,7 @@
                 return;
             }
 
-            // عرض طلبات تبديل/نقل الأراضي بين اللاعبين
+            // عرض طلبات تبديل/نقل الأراضي بين اللاعبين (مع بطاقات الأراضي بحجم صغير يناسب القائمة)
             tradeReqs.forEach(tr => {
                 const fromPlayer = players[tr.fromPlayerId];
                 const toPlayer = players[tr.toPlayerId];
@@ -3725,42 +3774,55 @@
                 const toProp = tr.toPropId ? MONOPOLY_PROPERTIES.find(p => p.id === tr.toPropId) : null;
                 if (!fromPlayer || !toPlayer || !fromProp) return;
 
+                const propState = currentRoomData.propertyState || {};
+                const fromCardHTML = `<div class="deed-scale-xs">${createAuthenticDeedCardHTML(fromProp, propState[fromProp.id])}</div>`;
+                const toCardHTML = toProp ? `<div class="deed-scale-xs">${createAuthenticDeedCardHTML(toProp, propState[toProp.id])}</div>` : '';
+
                 const item = document.createElement('div');
-                item.className = 'matte-card p-3 flex items-center justify-between gap-2 border border-sky-500/30';
+                item.className = 'matte-card p-3 flex flex-col gap-2.5 border border-sky-500/30';
                 item.innerHTML = `
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-300 shrink-0">
-                            <i class="ph-fill ph-arrows-left-right text-base"></i>
-                        </div>
-                        <div>
-                            <div class="text-xs font-semibold text-white">طلب تبديل أراضي: ${fromPlayer.name} ⇄ ${toPlayer.name}</div>
-                            <div class="text-[10px] text-sky-300 mt-0.5">
-                                ${toProp
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-300 shrink-0">
+                                <i class="ph-fill ph-arrows-left-right text-sm"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-white">طلب تبديل أراضي: ${fromPlayer.name} ⇄ ${toPlayer.name}</div>
+                                <div class="text-[10px] text-sky-300 mt-0.5">
+                                    ${toProp
                         ? `مبادلة <strong>${fromProp.arName}</strong> مقابل <strong>${toProp.arName}</strong>`
                         : `نقل ملكية <strong>${fromProp.arName}</strong> إلى <strong>${toPlayer.name}</strong> (بدون مقابل)`}
+                                </div>
                             </div>
                         </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="resolveTradeRequest('${tr.id}', true)" class="px-3 py-1.5 rounded-xl bg-[#95e6b8] text-[#121415] text-[10px] font-bold">موافقة</button>
+                            <button onclick="resolveTradeRequest('${tr.id}', false)" class="px-2.5 py-1.5 rounded-xl bg-red-500/20 text-red-300 text-[10px]">رفض</button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <button onclick="resolveTradeRequest('${tr.id}', true)" class="px-3 py-1.5 rounded-xl bg-[#95e6b8] text-[#121415] text-[10px] font-bold">موافقة</button>
-                        <button onclick="resolveTradeRequest('${tr.id}', false)" class="px-2.5 py-1.5 rounded-xl bg-red-500/20 text-red-300 text-[10px]">رفض</button>
+                    <div class="flex items-center justify-center gap-3 bg-black/20 rounded-2xl p-2">
+                        ${fromCardHTML}
+                        <i class="ph-bold ph-arrows-left-right text-sky-300 text-base"></i>
+                        ${toCardHTML || `<span class="text-[10px] text-white/60 px-2 py-1 rounded-lg bg-white/5">بدون مقابل (إهداء)</span>`}
                     </div>
                 `;
                 list.appendChild(item);
             });
 
-            // عرض طلبات الرهن وفك الرهن
+            // عرض طلبات الرهن وفك الرهن (مع بطاقة الأرض الحقيقية بحجم صغير بجانب الطلب)
             reqs.forEach(req => {
                 const player = players[req.playerId];
                 const prop = MONOPOLY_PROPERTIES.find(p => p.id === req.propId);
                 if (!player || !prop) return;
 
+                const propState = currentRoomData.propertyState || {};
+                const miniDeedHTML = `<div class="deed-scale-xs">${createAuthenticDeedCardHTML(prop, propState[prop.id])}</div>`;
                 const isMortgage = req.type === 'mortgage';
                 const item = document.createElement('div');
                 item.className = 'matte-card p-3 flex items-center justify-between gap-2';
                 item.innerHTML = `
                     <div class="flex items-center gap-2.5">
-                        <span class="w-3 h-9 rounded-full shrink-0" style="background:${prop.isStation ? '#82b546' : prop.color}"></span>
+                        ${miniDeedHTML}
                         <div>
                             <div class="text-xs font-semibold text-white">${player.name} — ${isMortgage ? 'طلب رهن عقار' : 'طلب فك رهن'}</div>
                             <div class="text-[10px] text-[#7c8288]">${prop.arName} (${prop.name})</div>
@@ -3836,7 +3898,11 @@
             activeTradeSourceOwnerId = actingOwnerId;
 
             document.getElementById('tradeSourcePropName').textContent = `${prop.arName} (${prop.name})`;
-            document.getElementById('tradeSourcePropColor').style.background = (prop.isStation || prop.isUtility || prop.isSpecialCard) ? '#82b546' : prop.color;
+            const cardWrap = document.getElementById('tradeSourcePropCardWrap');
+            if (cardWrap) {
+                const st = (currentRoomData.propertyState || {})[propId];
+                cardWrap.innerHTML = `<div class="deed-scale-xs">${createAuthenticDeedCardHTML(prop, st)}</div>`;
+            }
 
             const playerSelect = document.getElementById('tradeTargetPlayerSelect');
             playerSelect.innerHTML = '';
@@ -3970,8 +4036,8 @@
                 const isLeader = p.id === currentRoomData.leaderId;
                 const summary = getPlayerPropertiesSummary(p.id);
                 const safeAvatar = getSafeAvatarSrc(p.avatar, idx);
-                const colorDots = summary.owned.slice(0, 6).map(pr =>
-                    `<span class="w-2.5 h-3.5 rounded-sm inline-block border border-white/20" style="background:${(pr.isStation || pr.isUtility || pr.isSpecialCard) ? '#82b546' : pr.color}" title="${pr.arName}"></span>`
+                const miniDeedsRow = summary.all.map(pr =>
+                    `<div class="deed-scale-xs" title="${pr.arName}">${createAuthenticDeedCardHTML(pr, (currentRoomData.propertyState || {})[pr.id])}</div>`
                 ).join('');
 
                 const row = document.createElement('div');
@@ -3995,7 +4061,6 @@
                                     <span class="text-[#95e6b8] font-medium">مملوكة: ${summary.owned.length}</span>
                                     <span class="text-amber-400/90">مرهونة: ${summary.mortgaged.length}</span>
                                 </div>
-                                <div class="flex items-center gap-1 mt-1">${colorDots || '<span class="text-[9px] text-[#7c8288]">لا توجد عقارات بعد</span>'}</div>
                             </div>
                         </div>
                         <div class="text-left shrink-0 flex flex-col items-end gap-1" dir="ltr">
@@ -4006,6 +4071,11 @@
                             </span>
                         </div>
                     </div>
+                    ${summary.all.length > 0 ? `
+                        <div class="flex items-center gap-1.5 overflow-x-auto custom-scroll py-1 border-t border-white/[0.06]">
+                            ${miniDeedsRow}
+                        </div>
+                    ` : `<div class="text-[9.5px] text-[#7c8288] pt-1 border-t border-white/[0.04]">لا توجد بطاقات عقارات مملوكة بعد</div>`}
                     <div class="flex items-center justify-end gap-1.5 pt-1.5 border-t border-white/[0.06]" onclick="event.stopPropagation()">
                         ${isLeader ? `<span class="text-[10px] px-2.5 py-1 rounded-full bg-[#95e6b8]/20 text-[#95e6b8] font-medium">القائد (أنت)</span>` : `
                             <button onclick="enterMemberFullPage('${p.id}')" class="px-2.5 py-1.5 rounded-xl bg-[#95e6b8] hover:bg-[#82d9a8] text-[#121415] text-[10px] font-bold transition flex items-center gap-1" title="دخول صفحته بالكامل">
@@ -4147,18 +4217,13 @@
                 const isLeader = p.id === currentRoomData.leaderId;
                 const safeAvatar = getSafeAvatarSrc(p.avatar, idx);
 
-                const ownedPills = summary.owned.map(pr =>
-                    `<span class="inline-flex items-center gap-1 text-[9.5px] px-2 py-0.5 rounded-md bg-white/[0.06] text-white/90 border border-white/10">
-                        <span class="w-2 h-2 rounded-full" style="background:${(pr.isStation || pr.isUtility || pr.isSpecialCard) ? '#82b546' : pr.color}"></span>
-                        <span>${pr.arName}</span>
-                    </span>`
+                const propState = currentRoomData.propertyState || {};
+                const ownedMiniCards = summary.owned.map(pr =>
+                    `<div class="deed-scale-xs" title="${pr.arName}">${createAuthenticDeedCardHTML(pr, propState[pr.id])}</div>`
                 ).join('');
 
-                const mortgagedPills = summary.mortgaged.map(pr =>
-                    `<span class="inline-flex items-center gap-1 text-[9.5px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                        <i class="ph-fill ph-lock-key text-[10px]"></i>
-                        <span>${pr.arName}</span>
-                    </span>`
+                const mortgagedMiniCards = summary.mortgaged.map(pr =>
+                    `<div class="deed-scale-xs" title="${pr.arName} (مرهونة)">${createAuthenticDeedCardHTML(pr, propState[pr.id])}</div>`
                 ).join('');
 
                 const card = document.createElement('div');
@@ -4195,9 +4260,9 @@
                     </div>
 
                     ${(summary.owned.length > 0 || summary.mortgaged.length > 0) ? `
-                        <div class="pt-2 border-t border-white/[0.06] flex flex-wrap gap-1">
-                            ${ownedPills}
-                            ${mortgagedPills}
+                        <div class="pt-2 border-t border-white/[0.06] flex flex-wrap gap-1.5">
+                            ${ownedMiniCards}
+                            ${mortgagedMiniCards}
                         </div>
                     ` : `
                         <div class="pt-1.5 border-t border-white/[0.04] text-[10px] text-[#7c8288]">
@@ -4227,70 +4292,23 @@
             const ownedStationsCount = getOwnedStationsCount(playerId);
             const ownedUtilitiesCount = getOwnedUtilitiesCount(playerId);
 
+            const propState = currentRoomData.propertyState || {};
             const ownedListHTML = summary.owned.length > 0
-                ? summary.owned.map(prop => {
-                    const houses = prop.houses || 0;
-                    const currentRent = prop.isStation
-                        ? prop.rent[Math.max(0, Math.min(ownedStationsCount - 1, 3))]
-                        : prop.isUtility
-                            ? prop.rent[Math.max(0, Math.min(ownedUtilitiesCount - 1, 1))]
-                            : prop.isSpecialCard
-                                ? prop.rent[0]
-                                : (prop.rent ? prop.rent[Math.min(houses, 5)] : 0);
-
-                    const buildTag = prop.isStation
-                        ? `<span class="px-2 py-0.5 rounded-md bg-lime-500/20 text-lime-300 border border-lime-500/30 text-[9.5px] font-semibold">محطة قطار 🚂 (${ownedStationsCount}/4)</span>`
-                        : prop.isUtility
-                            ? `<span class="px-2 py-0.5 rounded-md bg-lime-500/20 text-lime-300 border border-lime-500/30 text-[9.5px] font-semibold">مرفق عام ⚡ (${ownedUtilitiesCount}/2)</span>`
-                            : prop.isSpecialCard
-                                ? `<span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9.5px] font-semibold">سلع فاخرة 💍</span>`
-                                : houses === 5
-                                    ? `<span class="px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 border border-red-500/30 text-[9.5px] font-semibold">فندق 🏨</span>`
-                                    : houses > 0
-                                        ? `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9.5px] font-semibold">${houses} منازل 🏠</span>`
-                                        : `<span class="px-2 py-0.5 rounded-md bg-white/5 text-[#7c8288] text-[9.5px]">بدون مباني</span>`;
-
-                    return `
-                        <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-[#121415] border border-white/[0.06] hover:border-white/20 flex items-center justify-between gap-2 cursor-pointer transition">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3.5 h-10 rounded-lg shrink-0 shadow-sm border border-white/20" style="background:${(prop.isStation || prop.isUtility || prop.isSpecialCard) ? '#82b546' : prop.color}"></span>
-                                <div>
-                                    <div class="text-xs font-semibold text-white">${prop.arName}</div>
-                                    <div class="text-[10px] text-[#7c8288] num-font">${prop.name}</div>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        ${buildTag}
-                                        <span class="text-[10px] text-[#95e6b8] num-font">الإيجار الحالي: $${currentRent}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="text-left shrink-0" dir="ltr">
-                                <div class="num-font text-xs font-bold text-white">$${prop.price}</div>
-                                <div class="text-[9px] text-[#7c8288] mt-0.5">سعر العقار</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('')
+                ? `<div class="grid grid-cols-3 gap-2 justify-items-center">` + summary.owned.map(prop => `
+                    <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-1.5 rounded-2xl bg-[#121415] border border-white/[0.08] hover:border-[#95e6b8]/40 flex flex-col items-center gap-1 cursor-pointer transition w-full">
+                        <div class="deed-scale-sm">${createAuthenticDeedCardHTML(prop, propState[prop.id])}</div>
+                        <span class="text-[9px] font-semibold text-white truncate max-w-full">${prop.arName}</span>
+                    </div>
+                `).join('') + `</div>`
                 : `<div class="p-4 rounded-2xl bg-[#121415]/60 border border-white/5 text-center text-[11px] text-[#7c8288]">لا توجد أراضي مملوكة نشطة لدى هذا اللاعب</div>`;
 
             const mortgagedListHTML = summary.mortgaged.length > 0
-                ? summary.mortgaged.map(prop => `
-                    <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-3 rounded-2xl bg-amber-500/[0.06] border border-amber-500/25 flex items-center justify-between gap-2 cursor-pointer transition">
-                        <div class="flex items-center gap-3">
-                            <span class="w-3.5 h-10 rounded-lg shrink-0 opacity-60 border border-white/20" style="background:${(prop.isStation || prop.isUtility || prop.isSpecialCard) ? '#82b546' : prop.color}"></span>
-                            <div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="text-xs font-semibold text-amber-200">${prop.arName}</span>
-                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-medium">مرهونة ومحجوبة</span>
-                                </div>
-                                <div class="text-[10px] text-[#7c8288] num-font mt-0.5">${prop.name}</div>
-                            </div>
-                        </div>
-                        <div class="text-left shrink-0" dir="ltr">
-                            <div class="num-font text-xs font-bold text-amber-300">$${prop.mortgage}</div>
-                            <div class="text-[9px] text-amber-200/70 mt-0.5">قيمة الرهن</div>
-                        </div>
+                ? `<div class="grid grid-cols-3 gap-2 justify-items-center">` + summary.mortgaged.map(prop => `
+                    <div onclick="openPlayerDeedsModal('${player.id}', true)" class="p-1.5 rounded-2xl bg-amber-500/[0.06] border border-amber-500/25 hover:border-amber-400/50 flex flex-col items-center gap-1 cursor-pointer transition w-full">
+                        <div class="deed-scale-sm">${createAuthenticDeedCardHTML(prop, propState[prop.id])}</div>
+                        <span class="text-[9px] font-semibold text-amber-200 truncate max-w-full">${prop.arName}</span>
                     </div>
-                `).join('')
+                `).join('') + `</div>`
                 : `<div class="p-4 rounded-2xl bg-[#121415]/60 border border-white/5 text-center text-[11px] text-[#7c8288]">لا توجد أراضي مرهونة لدى هذا اللاعب</div>`;
 
             const content = document.getElementById('userReadOnlyProfileContent');
